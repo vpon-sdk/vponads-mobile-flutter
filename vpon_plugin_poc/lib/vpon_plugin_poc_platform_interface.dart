@@ -1,6 +1,8 @@
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 import 'vpon_plugin_poc_method_channel.dart';
+import 'package:vpon_plugin_poc/ad_request.dart';
+import 'package:vpon_plugin_poc/interstitial_ad.dart';
 
 abstract class VponPluginPocPlatform extends PlatformInterface {
   /// Constructs a VponPluginPocPlatform.
@@ -27,7 +29,11 @@ abstract class VponPluginPocPlatform extends PlatformInterface {
     throw UnimplementedError('platformVersion() has not been implemented.');
   }
 
-  Future<void> loadInterstitialAd() {
+  Future<void> loadInterstitialAd(String licenseKey, AdRequest request, InterstitialAdLoadCallback adLoadCallback) {
     throw UnimplementedError('loadInterstitialAd() has not been implemented.');
+  }
+
+  Future<void> loadBannerAd() {
+    throw UnimplementedError('loadBannerAd() has not been implemented.');
   }
 }
