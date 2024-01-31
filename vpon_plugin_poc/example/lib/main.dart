@@ -1,19 +1,23 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 
 import 'package:flutter/services.dart';
+import 'package:vpon_plugin_poc/ad_listeners.dart';
 import 'package:vpon_plugin_poc/ad_request.dart';
-import 'package:vpon_plugin_poc/vpon_plugin_poc.dart';
 import 'package:vpon_plugin_poc_example/banner_widget.dart';
-import 'package:vpon_plugin_poc/interstitial_ad.dart';
+import 'package:vpon_plugin_poc/ad_containers.dart';
+import 'package:vpon_plugin_poc/vpon_ad_sdk.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  VponAdSDK.instance.initialize();
   runApp(const MaterialApp(
     title: 'Vpon Plugin Demo',
     home: MyApp(),
   ));
 }
+
+const String testDevice = '00000000-0000-0000-0000-000000000000'; // iOS simulator
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
@@ -23,84 +27,87 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  static const nativeChannel = MethodChannel('vpon_plugin_poc');
-  final _vponPluginPocPlugin = VponPluginPoc();
-
-  bool _isInterstitialReady = false;
-  bool get isInterstitialReady => _isInterstitialReady;
-
-  set isInterstitialReady(bool newValue) {
-    if (_isInterstitialReady != newValue) {
-      _isInterstitialReady = newValue;
-      showInterstitial(); // Call your desired function here
-    }
-  }
-
-  void showInterstitial() {
-    nativeChannel.invokeMethod('showInterstitial');
-    debugPrint('isInterstitialReady changed to $_isInterstitialReady');
-  }
-
+  static final AdRequest request = AdRequest(
+      keywords: <String>['test1', 'test2'],
+      contentUrl: 'https://google.com',
+      contentData: {'test': '123'},
+      format: "mi"
+  );
   InterstitialAd? _interstitialAd;
-  AdRequest adRequest = AdRequest();
 
   @override
   void initState() {
     super.initState();
-    nativeChannel.setMethodCallHandler(flutterMethod);
-    initPlatformState();
-
-    adRequest.setContentUrl('https://google.com');
-    adRequest.addContentData('test', 0);
+    VponAdSDK.instance.updateRequestConfiguration(RequestConfiguration(testDeviceIds: [testDevice]));
+    _createInterstitialAd();
   }
 
-  Future<void> flutterMethod(MethodCall methodCall) async {
-    switch (methodCall.method) {
-      case 'onVpadnInterstitialLoaded':
-        isInterstitialReady = true;
+  void _createInterstitialAd() {
+    debugPrint('_createInterstitialAd');
+    InterstitialAd.load(
+        licenseKey: '8a80854b79a9f2ce0179c09793ab4b79',
+        request: request,
+        adLoadCallback: InterstitialAdLoadCallback(
+          onAdLoaded: (InterstitialAd ad) {
+            debugPrint('$ad loaded');
+            _interstitialAd = ad;
+          },
+          onAdFailedToLoad: (LoadAdError error) {
+            debugPrint('InterstitialAd failed to load: $error.');
+            _interstitialAd = null;
+          },
+        )
+    );
+  }
 
-        debugPrint('methodChannel 原生 iOS 调用了 onVpadnInterstitialLoaded 方法 参数是：' +
-            methodCall.arguments);
-
+  void showInterstitial() {
+    debugPrint('main.dart showInterstitial called');
+    if (_interstitialAd == null) {
+      debugPrint('Warning: attempt to show interstitial before loaded.');
+      return;
     }
+    debugPrint('main.dart _interstitialAd!.fullScreenContentCallback');
+    _interstitialAd!.fullScreenContentCallback = FullScreenContentCallback(
+      onAdShowedFullScreenContent: (InterstitialAd ad) =>
+          debugPrint('ad onAdShowedFullScreenContent.'),
+      onAdDismissedFullScreenContent: (InterstitialAd ad) {
+        debugPrint('$ad onAdDismissedFullScreenContent.');
+        ad.dispose();
+        _createInterstitialAd();
+      },
+      onAdFailedToShowFullScreenContent: (InterstitialAd ad, AdError error) {
+        debugPrint('$ad onAdFailedToShowFullScreenContent: $error');
+        ad.dispose();
+        _createInterstitialAd();
+      },
+    );
+    debugPrint('main.dart call _interstitialAd!.show()');
+    _interstitialAd!.show();
+    _interstitialAd = null;
   }
 
-  // Platform messages are asynchronous, so we initialize in an async method.
-  Future<void> initPlatformState() async {
-    String platformVersion;
-    // Platform messages may fail, so we use a try/catch PlatformException.
-    // We also handle the message potentially returning null.
-    try {
-      platformVersion = await _vponPluginPocPlugin.getPlatformVersion() ??
-          'Unknown platform version';
-    } on PlatformException {
-      platformVersion = 'Failed to get platform version.';
-    }
-
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
-    if (!mounted) return;
-
-    setState(() {});
+  @override
+  void dispose() {
+    super.dispose();
+    _interstitialAd?.dispose();
   }
 
-  Future<void> tryLoadVponIS() async {
-    try {
-      await InterstitialAd.load(
-          licenseKey: '8a80854b79a9f2ce0179c09793ab4b79',
-          request: adRequest,
-          adLoadCallback:
-              InterstitialAdLoadCallback(onAdLoaded: (InterstitialAd ad) {
-            // Keep a reference to the ad so you can show it later.
-            // _interstitialAd = ad;
-          }, onAdFailedToLoad: (LoadAdError error) {
-            debugPrint('InterstitialAd failed to load: $error');
-          }));
-      // await _vponPluginPocPlugin.loadInterstitialAd(
-      //     '8a80854b79a9f2ce0179c09793ab4b79');
-    } on Exception {}
-  }
+  // Future<void> tryLoadVponIS() async {
+  //   try {
+  //     await InterstitialAd.load(
+  //         licenseKey: '8a80854b79a9f2ce0179c09793ab4b79',
+  //         request: request,
+  //         adLoadCallback:
+  //             InterstitialAdLoadCallback(onAdLoaded: (InterstitialAd ad) {
+  //           // Keep a reference to the ad so you can show it later.
+  //           // _interstitialAd = ad;
+  //         }, onAdFailedToLoad: (LoadAdError error) {
+  //           debugPrint('InterstitialAd failed to load: $error');
+  //         }));
+  //     // await _vponPluginPocPlugin.loadInterstitialAd(
+  //     //     '8a80854b79a9f2ce0179c09793ab4b79');
+  //   } on Exception {}
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -124,13 +131,13 @@ class _MyAppState extends State<MyApp> {
             mainAxisSize: MainAxisSize.min,
             children: [
               ElevatedButton(
-                onPressed: () => tryLoadVponIS(),
+                onPressed: () => showInterstitial(),
                 style: const ButtonStyle(
                     foregroundColor: MaterialStatePropertyAll(Colors.black),
                     textStyle: MaterialStatePropertyAll(
                       TextStyle(fontSize: 20),
                     )),
-                child: const Text('Load Interstitial'),
+                child: const Text('Show Interstitial'),
               ),
               const SizedBox(
                 height: 20,

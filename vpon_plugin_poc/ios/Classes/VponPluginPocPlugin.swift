@@ -3,136 +3,128 @@ import UIKit
 import VpadnSDKAdKit
 import AdSupport
 
-enum MappedBannerSize: String {
-    case banner = "banner"
-    
-    var size: CGSize {
-        switch self {
-        case .banner:
-            return .init(width: 320, height: 50)
-        }
-    }
-}
-
 public class VponPluginPocPlugin: NSObject, FlutterPlugin {
     
-    static var channel: FlutterMethodChannel?
-    
-    var interstitial: VpadnInterstitial?
-    var banner: VpadnBanner?
-    var mappedSize: MappedBannerSize?
+    var channel: FlutterMethodChannel?
+    var manager: AdInstanceManager?
+    var readerWriter: FlutterVponAdReaderWriter?
     
     public static func register(with registrar: FlutterPluginRegistrar) {
-        channel = FlutterMethodChannel(name: "vpon_plugin_poc", binaryMessenger: registrar.messenger())
-        let instance = VponPluginPocPlugin()
-        registrar.addMethodCallDelegate(instance, channel: channel!)
+        let instance = VponPluginPocPlugin(binaryMessenger: registrar.messenger())
+        registrar.publish(instance)
+        
+        let readerWriter = FlutterVponAdReaderWriter()
+        instance.readerWriter = readerWriter
+        
+        let codec = FlutterStandardMethodCodec(readerWriter: readerWriter)
+        
+        instance.channel = FlutterMethodChannel(name: Constant.channelName,
+                                                binaryMessenger: registrar.messenger(),
+                                                codec: codec)
+        registrar.addMethodCallDelegate(instance, channel: instance.channel!)
         
         // Register native view
-        let factory = PlatformAdViewFactory(messenger: registrar.messenger())
-        registrar.register(factory, withId: "plugins.flutter.io/custom_platform_view")
-        
-        // Init Vpon SDK
-        VpadnAdConfiguration.shared.initializeSdk()
-        VpadnAdConfiguration.shared.logLevel = .defaultLevel
+        let factory = VponAdsViewFactory(messenger: registrar.messenger())
+        registrar.register(factory, withId: "plugins.flutter.io/vpon/ad_widget")
+        registrar.addApplicationDelegate(instance)
+    }
+    
+    init(binaryMessenger: FlutterBinaryMessenger) {
+        manager = AdInstanceManager(binaryMessenger: binaryMessenger)
     }
     
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+        let rootController = self.rootController()
         switch call.method {
-        case "getPlatformVersion":
-            result("iOS " + UIDevice.current.systemVersion)
+     
+        case "VponAdSDK#initialize":
+            // Init Vpon SDK
+            VponAdConfiguration.shared.initializeSdk()
+            VponAdConfiguration.shared.logLevel = .default
+            
+        case "_init":
+            // TODO: implement manager.disposeAllAds
+            break
+            
+        case "VponAdSDK#updateRequestConfiguration":
+            if let arg = call.arguments as? [String: Any] {
+                let config = VponAdRequestConfiguration.shared
+                if let testDeviceIds = arg["testDeviceIds"] as? [String] {
+                    config.testDeviceIdentifiers = testDeviceIds
+                }
+                if let maxAdContentRating = arg["maxAdContentRating"] as? String {
+                    switch maxAdContentRating {
+                    case "general":
+                        config.maxAdContentRating = .general
+                    case "parentalGuidance":
+                        config.maxAdContentRating = .parentalGuidance
+                    case "teen":
+                        config.maxAdContentRating = .teen
+                    case "matureAudience":
+                        config.maxAdContentRating = .matureAudience
+                    default:
+                        config.maxAdContentRating = .unspecified
+                    }
+                }
+                if let tagForChildDirectedTreatment = arg["tagForChildDirectedTreatment"] as? Int {
+                    switch tagForChildDirectedTreatment {
+                    case 0:
+                        config.tagForChildDirectedTreatment = .notForChildDirectedTreatment
+                    case 1:
+                        config.tagForChildDirectedTreatment = .forChildDirectedTreatment
+                    default:
+                        config.tagForChildDirectedTreatment = .unspecified
+                    }
+                }
+                if let tagForUnderAgeOfConsent = arg["tagForUnderAgeOfConsent"] as? Int {
+                    switch tagForUnderAgeOfConsent {
+                    case 0:
+                        config.tagForUnderAgeOfConsent = .notForUnderAgeOfConsent
+                    case 1:
+                        config.tagForUnderAgeOfConsent = .forUnderAgeOfConsent
+                    default:
+                        config.tagForUnderAgeOfConsent = .unspecified
+                    }
+                }
+            }
+            
         case "loadInterstitialAd":
             // Deal with arguments from Dart
             if let arg = call.arguments as? [String: Any],
                let key = arg["licenseKey"] as? String,
-               let request = arg["adRequest"] as? [String: Any],
-               let autoRefresh = request["autoRefresh"] as? Bool,
-               let contentURL = request["contentUrl"] as? String,
-               let contentData = request["contentData"] as? [String: Any] {
+               let adId = arg["adId"] as? Int,
+               let request = arg["request"] as? FlutterAdRequest {
                 
-                let request = VpadnAdRequest()
-                request.autoRefresh = autoRefresh
-                request.setContentUrl(contentURL)
-                request.setContentData(contentData)
-                
-                request.setTestDevices([ASIdentifierManager.shared().advertisingIdentifier.uuidString])
-                interstitial = VpadnInterstitial(licenseKey: key)
-           
-                interstitial?.delegate = self
-                interstitial?.loadRequest(request)
-                result(nil)
-                
-            } else {
-                result(FlutterError(code: "errorSetLicenseKey", message: "data or format error", details: nil))
+                let ad = FlutterInterstitialAd(licenseKey: key, request: request, rootViewController: rootController, adId: adId)
+                manager?.loadAd(ad)
             }
-        case "showInterstitial":
-            if let vc = UIApplication.shared.keyWindow?.rootViewController {
-                DispatchQueue.main.async {
-                    self.interstitial?.showFromRootViewController(vc)
-                }
+            result(nil)
+            
+        case "showAdWithoutView":
+            if let arg = call.arguments as? [String: Any],
+               let adId = arg["adId"] as? Int {
+                manager?.showAd(adId: adId)
             }
+            result(nil)
             
         case "loadBannerAd":
-            let request = VpadnAdRequest()
-            request.setTestDevices([ASIdentifierManager.shared().advertisingIdentifier.uuidString])
-            
-            // Deal with arguments from Dart
-            if let arg = call.arguments as? [String: Any],
-               let key = arg["licenseKey"] as? String,
-               let size = arg["adSize"] as? String {
-               
-                mappedSize = MappedBannerSize(rawValue: size)
-                var adSize: VpadnAdSize
-                switch mappedSize {
-                case .banner:
-                    adSize = .banner()
-                default:
-                    adSize = .banner()
-                }
-                banner = VpadnBanner(licenseKey: key, adSize: adSize)
-                banner?.delegate = self
-                banner?.loadRequest(request)
-                result(nil)
-                
-            } else {
-                result(FlutterError(code: "errorSetLicenseKey", message: "data or format error", details: nil))
-            }
+            result(nil)
             
         default:
             result(FlutterMethodNotImplemented)
         }
     }
     
-    private func convertBannerSize(from size: VpadnAdSize) {
-       
-    }
-}
-
-extension VponPluginPocPlugin: VpadnInterstitialDelegate {
-    public func onVpadnInterstitialLoaded(_ interstitial: VpadnInterstitial) {
-        VponPluginPocPlugin.channel?.invokeMethod("onVpadnInterstitialLoaded", arguments: "", result: { result in
-            if let error = result as? FlutterError {
-                
-                print("error = \(error.message), \(error.code)")
-            }
-        })
-    }
+    // MARK: - Helper
     
-    public func onVpadnInterstitial(_ interstitial: VpadnInterstitial, failedToLoad error: Error) {
-        print("[VponPluginPocPlugin] onVpadnInterstitial failedToLoad with error: \(error.localizedDescription)")
-    }
-}
-
-extension VponPluginPocPlugin: VpadnBannerDelegate {
-    public func onVpadnAdLoaded(_ banner: VpadnBanner) {
-        print("[VponPluginPocPlugin] onVpadnAdLoaded")
-        guard let adView = banner.getVpadnAdView(),
-              let mappedSize else { return }
-        // how to present banner?
-        // 1. prepare banner here in platformView, but need adContainer size & position
-        // 2. invoke dart method to show banner
-    }
-    
-    public func onVpadnAd(_ banner: VpadnBanner, failedToLoad error: Error) {
-        print("[VponPluginPocPlugin] onVpadnBanner failedToLoad with error: \(error.localizedDescription)")
+    private func rootController() -> UIViewController {
+        var root = UIApplication.shared.delegate?.window??.rootViewController ?? UIApplication.shared.keyWindow?.rootViewController
+        
+        var presentedViewController = root
+        while let presented = presentedViewController?.presentedViewController {
+            presentedViewController = presented
+        }
+        
+        return presentedViewController ?? UIViewController()
     }
 }

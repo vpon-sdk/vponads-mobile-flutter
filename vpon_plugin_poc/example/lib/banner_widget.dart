@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 
 import 'package:flutter/services.dart';
-import 'package:vpon_plugin_poc/vpon_plugin_poc.dart';
 
 class BannerWidget extends StatefulWidget {
   const BannerWidget({super.key});
@@ -15,14 +14,10 @@ class BannerWidget extends StatefulWidget {
 }
 
 class _BannerWidgetState extends State<BannerWidget> {
-  final _vponPluginPocPlugin = VponPluginPoc();
+
 
   Future<void> loadBannerAd() async {
-    try {
-      await _vponPluginPocPlugin.loadBannerAd();
-    } on Exception {
 
-    }
   }
 
   @override
@@ -63,7 +58,7 @@ class _BannerWidgetState extends State<BannerWidget> {
   Widget iosView() {
     if (defaultTargetPlatform == TargetPlatform.iOS) {
       return const UiKitView(
-        viewType: 'plugins.flutter.io/custom_platform_view',
+        viewType: 'plugins.flutter.io/vpon/ad_widget',
         creationParams: {'text': 'Flutter传给IOSTextView的参数'},
         creationParamsCodec: StandardMessageCodec(),
       );

@@ -9,7 +9,7 @@ import UIKit
 import VpadnSDKAdKit
 import Flutter
 
-class PlatformAdViewFactory:NSObject, FlutterPlatformViewFactory {
+class VponAdsViewFactory:NSObject, FlutterPlatformViewFactory {
 
     var messenger: FlutterBinaryMessenger
 
@@ -53,7 +53,7 @@ class PlatformAdView:NSObject, FlutterPlatformView {
         super.init()
         channel = FlutterMethodChannel(name: "vpon_plugin_poc", binaryMessenger: messenger)
         channel?.invokeMethod("showBanner", arguments: nil, result: { result in
-            print("showBanner with result: \(result)")
+            Console.log("showBanner with result: \(String(describing: result))")
         })
 //        nameLabel.text = "我是 iOS Test View"
 //        webview.load(URLRequest(url: URL(string: "https://google.com")!))

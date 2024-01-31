@@ -2,15 +2,15 @@ PODS:
   - Flutter (1.0.0)
   - integration_test (0.0.1):
     - Flutter
-  - VpadnSDK (5.5.0)
+  - VpadnSDK (5.6.0)
   - vpon_plugin_poc (0.0.1):
     - Flutter
-    - VpadnSDK (>= 5.5.0)
+    - VpadnSDK (>= 5.6.0)
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
   - integration_test (from `.symlinks/plugins/integration_test/ios`)
-  - VpadnSDK (= 5.5.0)
+  - VpadnSDK (= 5.6.0)
   - vpon_plugin_poc (from `.symlinks/plugins/vpon_plugin_poc/ios`)
 
 SPEC REPOS:
@@ -28,9 +28,9 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
   integration_test: 13825b8a9334a850581300559b8839134b124670
-  VpadnSDK: bdbbbae7d2fdd273986ae3fb90088dee23ab3d41
-  vpon_plugin_poc: cdd743c9a2727e55cc7c6526089015a12f19fc7f
+  VpadnSDK: c2c44db035e93b5c0ee02503c7205db221942bac
+  vpon_plugin_poc: e266a4d491cc64d670fa76b26149ba0a2d62da40
 
-PODFILE CHECKSUM: b21fa381947d0bce20a1a75c23137eaaf46eda67
+PODFILE CHECKSUM: 983957b9cf8cb73db91a8ebc02c626f76cd8e9ee
 
-COCOAPODS: 1.12.1
+COCOAPODS: 1.15.0
