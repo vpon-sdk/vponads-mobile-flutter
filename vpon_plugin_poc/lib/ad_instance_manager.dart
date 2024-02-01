@@ -27,7 +27,6 @@ class AdInstanceManager {
       final String eventName = call.arguments['eventName'];
 
       final Ad? ad = adFor(adId);
-
       if (ad != null) {
         _onAdEvent(ad, eventName, call.arguments);
       } else {
@@ -49,7 +48,6 @@ class AdInstanceManager {
   }
 
   void _onAdEvent(Ad ad, String eventName, Map<dynamic, dynamic> arguments) {
-    debugPrint('AdInstanceManager _onAdEvent called with $eventName and arg $arguments');
     if (defaultTargetPlatform == TargetPlatform.android) {
       _onAdEventAndroid(ad, eventName, arguments);
     } else {
@@ -58,7 +56,7 @@ class AdInstanceManager {
   }
 
   void _onAdEventIOS(Ad ad, String eventName, Map<dynamic, dynamic> arguments) {
-    debugPrint('_onAdEventIOS');
+    debugPrint('AdInstanceManager _onAdEventIOS called with $eventName and arg $arguments');
     switch (eventName) {
       case 'onAdLoaded':
         _invokeOnAdLoaded(ad, eventName, arguments);
@@ -70,6 +68,7 @@ class AdInstanceManager {
         _invokeOnAdClicked(ad, eventName);
         break;
       case 'adDidRecordImpression': // Fall through
+        debugPrint('adDidRecordImpression, fall through');
       case 'adWillPresentFullScreenContent':
         _invokeOnAdShowedFullScreenContent(ad, eventName);
         break;
@@ -142,6 +141,7 @@ class AdInstanceManager {
 
   void _invokeOnAdLoaded(
       Ad ad, String eventName, Map<dynamic, dynamic> arguments) {
+    debugPrint('instanceManager _invokeOnAdLoaded');
     if (ad is InterstitialAd) {
       ad.adLoadCallback.onAdLoaded.call(ad);
     } else {
@@ -151,6 +151,7 @@ class AdInstanceManager {
 
   void _invokeOnAdFailedToLoad(
       Ad ad, String eventName, Map<dynamic, dynamic> arguments) {
+    debugPrint('instanceManager _invokeOnAdFailedToLoad');
     if (ad is InterstitialAd) {
       ad.dispose();
       ad.adLoadCallback.onAdFailedToLoad.call(arguments['loadAdError']);
@@ -160,6 +161,7 @@ class AdInstanceManager {
   }
 
   void _invokeOnAdShowedFullScreenContent(Ad ad, String eventName) {
+    debugPrint('instanceManager _invokeOnAdShowedFullScreenContent');
     if (ad is InterstitialAd) {
       ad.fullScreenContentCallback?.onAdShowedFullScreenContent?.call(ad);
     } else {
@@ -168,6 +170,7 @@ class AdInstanceManager {
   }
 
   void _invokeOnAdDismissedFullScreenContent(Ad ad, String eventName) {
+    debugPrint('instanceManager _invokeOnAdDismissedFullScreenContent');
     if (ad is InterstitialAd) {
       ad.fullScreenContentCallback?.onAdDismissedFullScreenContent?.call(ad);
     } else {
@@ -177,6 +180,7 @@ class AdInstanceManager {
 
   void _invokeOnAdFailedToShowFullScreenContent(
       Ad ad, String eventName, Map<dynamic, dynamic> arguments) {
+    debugPrint('instanceManager _invokeOnAdFailedToShowFullScreenContent');
     if (ad is InterstitialAd) {
       ad.fullScreenContentCallback?.onAdFailedToShowFullScreenContent
           ?.call(ad, arguments['error']);
@@ -194,6 +198,7 @@ class AdInstanceManager {
   }
 
   void _invokeOnAdClicked(Ad ad, String eventName) {
+    debugPrint('instanceManager _invokeOnAdClicked');
     if (ad is InterstitialAd) {
       ad.fullScreenContentCallback?.onAdClicked?.call(ad);
     } else {

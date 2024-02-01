@@ -4,16 +4,16 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 
-class BannerWidget extends StatefulWidget {
-  const BannerWidget({super.key});
+class BannerExample extends StatefulWidget {
+  const BannerExample({super.key});
 
   @override
-  State<BannerWidget> createState() {
-    return _BannerWidgetState();
+  State<BannerExample> createState() {
+    return _BannerExampleState();
   }
 }
 
-class _BannerWidgetState extends State<BannerWidget> {
+class _BannerExampleState extends State<BannerExample> {
 
 
   Future<void> loadBannerAd() async {

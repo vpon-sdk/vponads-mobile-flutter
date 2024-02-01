@@ -36,62 +36,67 @@ public class VponPluginPocPlugin: NSObject, FlutterPlugin {
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         let rootController = self.rootController()
         switch call.method {
-     
+            
         case "VponAdSDK#initialize":
             // Init Vpon SDK
             VponAdConfiguration.shared.initializeSdk()
             VponAdConfiguration.shared.logLevel = .default
             
         case "_init":
-            // TODO: implement manager.disposeAllAds
-            break
+            manager?.disposeAllAds()
+            result(nil)
             
         case "VponAdSDK#updateRequestConfiguration":
-            if let arg = call.arguments as? [String: Any] {
-                let config = VponAdRequestConfiguration.shared
-                if let testDeviceIds = arg["testDeviceIds"] as? [String] {
-                    config.testDeviceIdentifiers = testDeviceIds
-                }
-                if let maxAdContentRating = arg["maxAdContentRating"] as? String {
-                    switch maxAdContentRating {
-                    case "general":
-                        config.maxAdContentRating = .general
-                    case "parentalGuidance":
-                        config.maxAdContentRating = .parentalGuidance
-                    case "teen":
-                        config.maxAdContentRating = .teen
-                    case "matureAudience":
-                        config.maxAdContentRating = .matureAudience
-                    default:
-                        config.maxAdContentRating = .unspecified
-                    }
-                }
-                if let tagForChildDirectedTreatment = arg["tagForChildDirectedTreatment"] as? Int {
-                    switch tagForChildDirectedTreatment {
-                    case 0:
-                        config.tagForChildDirectedTreatment = .notForChildDirectedTreatment
-                    case 1:
-                        config.tagForChildDirectedTreatment = .forChildDirectedTreatment
-                    default:
-                        config.tagForChildDirectedTreatment = .unspecified
-                    }
-                }
-                if let tagForUnderAgeOfConsent = arg["tagForUnderAgeOfConsent"] as? Int {
-                    switch tagForUnderAgeOfConsent {
-                    case 0:
-                        config.tagForUnderAgeOfConsent = .notForUnderAgeOfConsent
-                    case 1:
-                        config.tagForUnderAgeOfConsent = .forUnderAgeOfConsent
-                    default:
-                        config.tagForUnderAgeOfConsent = .unspecified
-                    }
+            guard let arg = call.arguments as? [String: Any] else {
+                result(nil)
+                return
+            }
+            let config = VponAdRequestConfiguration.shared
+            if let testDeviceIds = arg["testDeviceIds"] as? [String] {
+                config.testDeviceIdentifiers = testDeviceIds
+            }
+            if let maxAdContentRating = arg["maxAdContentRating"] as? String {
+                switch maxAdContentRating {
+                case "general":
+                    config.maxAdContentRating = .general
+                case "parentalGuidance":
+                    config.maxAdContentRating = .parentalGuidance
+                case "teen":
+                    config.maxAdContentRating = .teen
+                case "matureAudience":
+                    config.maxAdContentRating = .matureAudience
+                default:
+                    config.maxAdContentRating = .unspecified
                 }
             }
+            if let tagForChildDirectedTreatment = arg["tagForChildDirectedTreatment"] as? Int {
+                switch tagForChildDirectedTreatment {
+                case 0:
+                    config.tagForChildDirectedTreatment = .notForChildDirectedTreatment
+                case 1:
+                    config.tagForChildDirectedTreatment = .forChildDirectedTreatment
+                default:
+                    config.tagForChildDirectedTreatment = .unspecified
+                }
+            }
+            if let tagForUnderAgeOfConsent = arg["tagForUnderAgeOfConsent"] as? Int {
+                switch tagForUnderAgeOfConsent {
+                case 0:
+                    config.tagForUnderAgeOfConsent = .notForUnderAgeOfConsent
+                case 1:
+                    config.tagForUnderAgeOfConsent = .forUnderAgeOfConsent
+                default:
+                    config.tagForUnderAgeOfConsent = .unspecified
+                }
+            }
+            result(nil)
             
         case "loadInterstitialAd":
-            // Deal with arguments from Dart
-            if let arg = call.arguments as? [String: Any],
-               let key = arg["licenseKey"] as? String,
+            guard let arg = call.arguments as? [String: Any] else {
+                result(nil)
+                return
+            }
+            if let key = arg["licenseKey"] as? String,
                let adId = arg["adId"] as? Int,
                let request = arg["request"] as? FlutterAdRequest {
                 
@@ -100,9 +105,22 @@ public class VponPluginPocPlugin: NSObject, FlutterPlugin {
             }
             result(nil)
             
+        case "disposeAd":
+            guard let arg = call.arguments as? [String: Any] else {
+                result(nil)
+                return
+            }
+            if let adId = arg["adId"] as? Int {
+                manager?.dispose(adId: adId)
+            }
+            result(nil)
+            
         case "showAdWithoutView":
-            if let arg = call.arguments as? [String: Any],
-               let adId = arg["adId"] as? Int {
+            guard let arg = call.arguments as? [String: Any] else {
+                result(nil)
+                return
+            }
+            if let adId = arg["adId"] as? Int {
                 manager?.showAd(adId: adId)
             }
             result(nil)

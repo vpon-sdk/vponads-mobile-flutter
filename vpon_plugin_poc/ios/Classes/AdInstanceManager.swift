@@ -45,6 +45,14 @@ class AdInstanceManager {
         ad.show()
     }
     
+    func dispose(adId: Int) {
+        ads.removeValue(forKey: adId)
+    }
+    
+    func disposeAllAds() {
+        ads.removeAll()
+    }
+    
     func onAdLoaded(_ ad: FlutterAd) {
         Console.log("AdInstanceManager invoke onAdEvent onAdLoaded")
         channel.invokeMethod(Constant.onAdEvent, arguments: [
@@ -53,9 +61,12 @@ class AdInstanceManager {
         ])
     }
     
-    func onAdFailed(toLoad: FlutterAd, error: Error) {
+    func onAdFailed(toLoad ad: FlutterAd, error: Error) {
         Console.log("AdInstanceManager invoke onAdEvent onAdFailedToLoad")
-        channel.invokeMethod(Constant.onAdEvent, arguments: [Constant.eventName: "onAdFailedToLoad"])
+        channel.invokeMethod(Constant.onAdEvent, arguments: [
+            Constant.adId: ad.adId,
+            Constant.eventName: "onAdFailedToLoad"
+        ])
     }
     
     // MARK: - Dart notification - VponFullScreenContentDelegate
@@ -63,13 +74,30 @@ class AdInstanceManager {
     func didFailToPresentFullScreenContent(_ ad: FlutterAd, with error: Error) {
         channel.invokeMethod(Constant.onAdEvent, 
                              arguments: [
-                                Constant.eventName: "didFailToPresentFullScreenContent",
+                                Constant.adId: ad.adId,
+                                Constant.eventName: "didFailToPresentFullScreenContentWithError",
                                 "error": error
                              ])
     }
     
-    func adWillPresentScreen(_ ad: FlutterAd) {
-        sendAdEvent("adWillPresentScreen", ad: ad)
+    func adWillPresentFullScreenContent(_ ad: FlutterAd) {
+        sendAdEvent("adWillPresentFullScreenContent", ad: ad)
+    }
+    
+    func adWillDismissFullScreenContent(_ ad: FlutterAd) {
+        sendAdEvent("adWillDismissFullScreenContent", ad: ad)
+    }
+    
+    func adDidDismissFullScreenContent(_ ad: FlutterAd) {
+        sendAdEvent("adDidDismissFullScreenContent", ad: ad)
+    }
+    
+    func adDidRecordImpression(_ ad: FlutterAd) {
+        sendAdEvent("adDidRecordImpression", ad: ad)
+    }
+    
+    func adDidRecordClick(_ ad: FlutterAd) {
+        sendAdEvent("adDidRecordClick", ad: ad)
     }
     
     // MARK: - Helper
@@ -78,6 +106,7 @@ class AdInstanceManager {
         Console.log("AdInstanceManager sendAdEvent: onAdEvent \(eventName)")
         channel.invokeMethod(Constant.onAdEvent,
                              arguments: [
+                                Constant.adId: ad.adId,
                                 Constant.eventName: eventName
                              ])
     }
