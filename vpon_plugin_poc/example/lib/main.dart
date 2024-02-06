@@ -26,6 +26,8 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  late BuildContext scaffoldContext;
+
   static final AdRequest request = AdRequest(
       keywords: <String>['test1', 'test2'],
       contentUrl: 'https://google.com',
@@ -51,45 +53,59 @@ class _MyAppState extends State<MyApp> {
         adLoadCallback: InterstitialAdLoadCallback(
           onAdLoaded: (InterstitialAd ad) {
             debugPrint('$ad loaded');
+            _showToast(scaffoldContext,
+                'InterstitialAd onAdLoaded');
             _interstitialAd = ad;
           },
           onAdFailedToLoad: (LoadAdError error) {
             debugPrint('InterstitialAd failed to load: $error.');
+            _showToast(scaffoldContext,
+                'InterstitialAd failed to load: $error.');
             _interstitialAd = null;
           },
         ));
   }
 
+  void _showToast(BuildContext context, String message) {
+    final scaffold = ScaffoldMessenger.of(context);
+    scaffold.showSnackBar(
+      SnackBar(
+        content: Text(message),
+      ),
+    );
+  }
+
   void _showInterstitial() {
-    debugPrint('main.dart showInterstitial called');
     if (_interstitialAd == null) {
-      debugPrint('Warning: attempt to show interstitial before loaded.');
+      _showToast(scaffoldContext,
+          'Warning: attempt to show interstitial before loaded.');
       return;
     }
     debugPrint('main.dart _interstitialAd!.fullScreenContentCallback');
     _interstitialAd!.fullScreenContentCallback = FullScreenContentCallback(
-        onAdShowedFullScreenContent: (InterstitialAd ad) =>
-            debugPrint('ad onAdShowedFullScreenContent.'),
-        onAdDismissedFullScreenContent: (InterstitialAd ad) {
-          debugPrint('$ad onAdDismissedFullScreenContent.');
-          ad.dispose();
-          _createInterstitialAd();
-        },
-        onAdFailedToShowFullScreenContent: (InterstitialAd ad, AdError error) {
-          debugPrint('$ad onAdFailedToShowFullScreenContent: $error');
-          ad.dispose();
-          _createInterstitialAd();
-        },
-        onAdWillDismissFullScreenContent: (InterstitialAd ad) {
-          debugPrint('$ad onAdWillDismissFullScreenContent');
-        },
-        onAdImpression: (InterstitialAd ad) {
-          debugPrint('$ad onAdImpression');
-        },
-        onAdClicked: (InterstitialAd ad) {
-          debugPrint('$ad onAdClicked');
-        });
-    debugPrint('main.dart call _interstitialAd!.show()');
+        onAdShowedFullScreenContent: (InterstitialAd ad) {
+      debugPrint('main.dart onAdShowedFullScreenContent.');
+      _showToast(scaffoldContext, 'onAdShowedFullScreenContent');
+    }, onAdDismissedFullScreenContent: (InterstitialAd ad) {
+      debugPrint('main.dart onAdDismissedFullScreenContent.');
+      _showToast(scaffoldContext, 'onAdDismissedFullScreenContent');
+      ad.dispose();
+      _createInterstitialAd();
+    }, onAdFailedToShowFullScreenContent: (InterstitialAd ad, AdError error) {
+      debugPrint('main.dart onAdFailedToShowFullScreenContent: $error');
+      _showToast(scaffoldContext, 'onAdFailedToShowFullScreenContent: $error');
+      ad.dispose();
+      _createInterstitialAd();
+    }, onAdWillDismissFullScreenContent: (InterstitialAd ad) {
+      debugPrint('main.dart onAdWillDismissFullScreenContent');
+      _showToast(scaffoldContext, 'onAdWillDismissFullScreenContent');
+    }, onAdImpression: (InterstitialAd ad) {
+      debugPrint('main.dart onAdImpression');
+      _showToast(scaffoldContext, 'onAdImpression');
+    }, onAdClicked: (InterstitialAd ad) {
+      debugPrint('main.dart onAdClicked');
+      _showToast(scaffoldContext, 'onAdClicked');
+    });
     _interstitialAd!.show();
     _interstitialAd = null;
   }
@@ -108,6 +124,7 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Builder(builder: (BuildContext context) {
+        scaffoldContext = context;
         return Scaffold(
           appBar: AppBar(
             title: const Text('Vpon Plugin example app'),

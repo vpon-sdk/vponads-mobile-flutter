@@ -63,9 +63,12 @@ class AdInstanceManager {
     
     func onAdFailed(toLoad ad: FlutterAd, error: Error) {
         Console.log("AdInstanceManager invoke onAdEvent onAdFailedToLoad")
+        
         channel.invokeMethod(Constant.onAdEvent, arguments: [
             Constant.adId: ad.adId,
-            Constant.eventName: "onAdFailedToLoad"
+            Constant.eventName: "onAdFailedToLoad",
+            Constant.loadAdError: "testLoadAdError"
+//            Constant.loadAdError: FlutterLoadAdError(error: error as NSError)
         ])
     }
     

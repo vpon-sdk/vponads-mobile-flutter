@@ -13,6 +13,7 @@ struct Constant {
     static let adId = "adId"
     static let onAdEvent = "onAdEvent"
     static let eventName = "eventName"
+    static let loadAdError = "loadAdError"
 }
 
 struct Console {

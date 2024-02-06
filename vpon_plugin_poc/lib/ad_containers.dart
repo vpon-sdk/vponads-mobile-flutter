@@ -190,6 +190,7 @@ class LoadAdError extends AdError {
 
   @override
   String toString() {
-    return '$runtimeType(code: $code, domain: $domain, message: $message)';
+    return '$runtimeType(code: $code, domain: $domain, message: $message'
+        ')';
   }
 }

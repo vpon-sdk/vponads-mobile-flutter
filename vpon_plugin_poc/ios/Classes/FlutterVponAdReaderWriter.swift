@@ -10,15 +10,29 @@ import VpadnSDKAdKit
 
 enum FlutterVponField: UInt8 {
     case adRequest = 129
+    case loadAdError = 133
+    case adError = 139
 }
 
 class FlutterAdSizeFactory {
     
 }
 
+class FlutterLoadAdError: NSObject {
+    var code: NSNumber
+    var domain: String?
+    var message: String?
+    
+    init(error: NSError? = nil) {
+        code = (error?.code ?? 999) as NSNumber
+        domain = error?.domain
+        message = error?.localizedDescription
+        super.init()
+    }
+}
+
 /// Bridge between Dart and VponAdRequest
 class FlutterAdRequest {
-    
     var keywords: [String]?
     var contentURL: String?
     
@@ -81,6 +95,22 @@ class FlutterVponAdReader: FlutterStandardReader {
             request.keywords = self.readValue(ofType: self.readByte()) as? [String]
             request.contentURL = self.readValue(ofType: self.readByte()) as? String
             return request
+            
+        case .loadAdError:
+            let code = self.readValue(ofType: readByte()) as? NSNumber
+            let domain = self.readValue(ofType: readByte()) as? String
+            let message = self.readValue(ofType: readByte()) as? String
+            let loadAdError = FlutterLoadAdError()
+            loadAdError.code = code ?? 999
+            loadAdError.domain = domain
+            loadAdError.message = message
+            return loadAdError
+            
+        case .adError:
+            let code = self.readValue(ofType: readByte()) as? Int ?? 999
+            let domain = self.readValue(ofType: readByte()) as? String ?? "N/A"
+            let message = self.readValue(ofType: readByte()) as? String ?? "N/A"
+            return NSError(domain: domain, code: code, userInfo: [NSLocalizedDescriptionKey: message])
         }
     }
 }
@@ -88,12 +118,21 @@ class FlutterVponAdReader: FlutterStandardReader {
 class FlutterVponAdWriter: FlutterStandardWriter {
     
     override func writeValue(_ value: Any) {
+        Console.log("writeValue \(value)")
         switch value {
         case is FlutterAdRequest:
-            self.writeByte(FlutterVponField.adRequest.rawValue)
+            writeByte(FlutterVponField.adRequest.rawValue)
             let request = value as! FlutterAdRequest
             self.writeValue(request.keywords ?? [])
             self.writeValue(request.contentURL ?? "")
+            
+        case is FlutterLoadAdError:
+            writeByte(FlutterVponField.loadAdError.rawValue)
+            let error = value as! FlutterLoadAdError
+            self.writeValue(error.code)
+            self.writeValue(error.domain ?? "")
+            self.writeValue(error.message ?? "")
+            
         default:
             super.writeValue(value)
         }

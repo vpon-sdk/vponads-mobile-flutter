@@ -136,7 +136,7 @@ public class VponPluginPocPlugin: NSObject, FlutterPlugin {
     // MARK: - Helper
     
     private func rootController() -> UIViewController {
-        var root = UIApplication.shared.delegate?.window??.rootViewController ?? UIApplication.shared.keyWindow?.rootViewController
+        let root = UIApplication.shared.delegate?.window??.rootViewController ?? UIApplication.shared.keyWindow?.rootViewController
         
         var presentedViewController = root
         while let presented = presentedViewController?.presentedViewController {

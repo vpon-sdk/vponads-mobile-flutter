@@ -42,7 +42,7 @@ class AdInstanceManager {
   final MethodChannel channel;
 
   Future initialize() async {
-    return (await instanceManager.channel.invokeMethod (
+    return (await instanceManager.channel.invokeMethod(
       'VponAdSDK#initialize',
     ))!;
   }
@@ -56,12 +56,14 @@ class AdInstanceManager {
   }
 
   void _onAdEventIOS(Ad ad, String eventName, Map<dynamic, dynamic> arguments) {
-    debugPrint('AdInstanceManager _onAdEventIOS called with $eventName and arg $arguments');
+    debugPrint(
+        'AdInstanceManager _onAdEventIOS called with $eventName and arg $arguments');
     switch (eventName) {
       case 'onAdLoaded':
         _invokeOnAdLoaded(ad, eventName, arguments);
         break;
       case 'onAdFailedToLoad':
+        debugPrint('onAdFailedToLoad triggered');
         _invokeOnAdFailedToLoad(ad, eventName, arguments);
         break;
       case 'adDidRecordClick':
@@ -230,6 +232,7 @@ class AdInstanceManager {
 
     final int adId = _nextAdId++;
     _loadedAds[adId] = ad;
+    debugPrint('channel.invokeMethod loadInterstitialAd, request: $ad');
     return channel.invokeMethod<void>(
       'loadInterstitialAd',
       <dynamic, dynamic>{
@@ -355,6 +358,7 @@ class AdMessageCodec extends StandardMessageCodec {
 
   @override
   void writeValue(WriteBuffer buffer, dynamic value) {
+    debugPrint('writeValue $value');
     if (value is AdRequest) {
       buffer.putUint8(_valueAdRequest);
       writeValue(buffer, value.keywords);
@@ -365,6 +369,16 @@ class AdMessageCodec extends StandardMessageCodec {
       writeValue(buffer, value.tagForChildDirectedTreatment);
       writeValue(buffer, value.tagForUnderAgeOfConsent);
       writeValue(buffer, value.testDeviceIds);
+    } else if (value is LoadAdError) {
+      buffer.putUint8(_valueLoadAdError);
+      writeValue(buffer, value.code);
+      writeValue(buffer, value.domain);
+      writeValue(buffer, value.message);
+    } else if (value is AdError) {
+      buffer.putUint8(_valueAdError);
+      writeValue(buffer, value.code);
+      writeValue(buffer, value.domain);
+      writeValue(buffer, value.message);
     } else {
       super.writeValue(buffer, value);
     }
@@ -372,23 +386,23 @@ class AdMessageCodec extends StandardMessageCodec {
 
   @override
   dynamic readValueOfType(dynamic type, ReadBuffer buffer) {
+    debugPrint('readValueOfType $type');
     switch (type) {
-      case _valueAdRequest:
-        return AdRequest(
-            keywords:
-                readValueOfType(buffer.getUint8(), buffer)?.cast<String>(),
-            contentUrl: readValueOfType(buffer.getUint8(), buffer));
-
-      case _valueRequestConfigurationParams:
-        return RequestConfiguration(
-          maxAdContentRating: readValueOfType(buffer.getUint8(), buffer),
-          tagForChildDirectedTreatment:
-              readValueOfType(buffer.getUint8(), buffer),
-          tagForUnderAgeOfConsent: readValueOfType(buffer.getUint8(), buffer),
-          testDeviceIds:
-              readValueOfType(buffer.getUint8(), buffer).cast<String>(),
+      case _valueLoadAdError:
+        return LoadAdError(
+            readValueOfType(buffer.getUint8(), buffer),
+            readValueOfType(buffer.getUint8(), buffer),
+            readValueOfType(buffer.getUint8(), buffer)
         );
+
+      case _valueAdError:
+        return AdError(
+            readValueOfType(buffer.getUint8(), buffer),
+            readValueOfType(buffer.getUint8(), buffer),
+            readValueOfType(buffer.getUint8(), buffer));
+
       default:
+        debugPrint('super.readValueOfType $type');
         return super.readValueOfType(type, buffer);
     }
   }
@@ -396,7 +410,7 @@ class AdMessageCodec extends StandardMessageCodec {
   Map<String, List<T>>? _tryDeepMapCast<T>(Map<dynamic, dynamic>? map) {
     if (map == null) return null;
     return map.map<String, List<T>>(
-      (dynamic key, dynamic value) => MapEntry<String, List<T>>(
+          (dynamic key, dynamic value) => MapEntry<String, List<T>>(
         key,
         value?.cast<T>(),
       ),
@@ -406,7 +420,7 @@ class AdMessageCodec extends StandardMessageCodec {
   Map<String, String> _deepCastStringMap(Map<dynamic, dynamic>? map) {
     if (map == null) return {};
     return map.map<String, String>(
-      (dynamic key, dynamic value) => MapEntry<String, String>(
+          (dynamic key, dynamic value) => MapEntry<String, String>(
         key,
         value,
       ),
@@ -417,7 +431,7 @@ class AdMessageCodec extends StandardMessageCodec {
       Map<dynamic, dynamic>? map) {
     if (map == null) return {};
     return map.map<String, dynamic>(
-      (dynamic key, dynamic value) => MapEntry<String, dynamic>(
+          (dynamic key, dynamic value) => MapEntry<String, dynamic>(
         key,
         value,
       ),
@@ -430,107 +444,7 @@ class AdMessageCodec extends StandardMessageCodec {
   String _safeReadString(ReadBuffer buffer) {
     return readValueOfType(buffer.getUint8(), buffer) ?? '';
   }
-
-/*void writeAdSize(WriteBuffer buffer, AdSize value) {
-    if (value is InlineAdaptiveSize) {
-      buffer.putUint8(_valueInlineAdaptiveBannerAdSize);
-      writeValue(buffer, value.width);
-      writeValue(buffer, value.maxHeight);
-      writeValue(buffer, value.orientationValue);
-    } else if (value is AnchoredAdaptiveBannerAdSize) {
-      buffer.putUint8(_valueAnchoredAdaptiveBannerAdSize);
-      var orientationValue;
-      if (value.orientation != null) {
-        orientationValue = (value.orientation as Orientation).name;
-      }
-      writeValue(buffer, orientationValue);
-      writeValue(buffer, value.width);
-    } else if (value is SmartBannerAdSize) {
-      buffer.putUint8(_valueSmartBannerAdSize);
-      if (defaultTargetPlatform == TargetPlatform.iOS) {
-        writeValue(buffer, value.orientation.name);
-      }
-    } else {
-      buffer.putUint8(_valueAdSize);
-      writeValue(buffer, value.width);
-      writeValue(buffer, value.height);
-    }
-  }*/
 }
-
-/*/// An extension that maps each [MediaAspectRatio] to an int.
-extension MediaAspectRatioExtension on MediaAspectRatio {
-  /// Gets the int mapping to pass to platform channel.
-  int get intValue {
-    switch (this) {
-      case MediaAspectRatio.unknown:
-        return 0;
-      case MediaAspectRatio.any:
-        return 1;
-      case MediaAspectRatio.landscape:
-        return 2;
-      case MediaAspectRatio.portrait:
-        return 3;
-      case MediaAspectRatio.square:
-        return 4;
-    }
-  }
-
-  /// Maps an int back to [MediaAspectRatio].
-  static MediaAspectRatio? fromInt(int? intValue) {
-    switch (intValue) {
-      case 0:
-        return MediaAspectRatio.unknown;
-      case 1:
-        return MediaAspectRatio.any;
-      case 2:
-        return MediaAspectRatio.landscape;
-      case 3:
-        return MediaAspectRatio.portrait;
-      case 4:
-        return MediaAspectRatio.square;
-      default:
-        return null;
-    }
-  }
-}*/
-
-/*/// An extension that maps each [AdChoicesPlacement] to an int.
-extension AdChoicesPlacementExtension on AdChoicesPlacement {
-  /// Gets the int mapping to pass to platform channel.
-  int get intValue {
-    switch (this) {
-      case AdChoicesPlacement.topRightCorner:
-        return Platform.isAndroid ? 1 : 0;
-      case AdChoicesPlacement.topLeftCorner:
-        return Platform.isAndroid ? 0 : 1;
-      case AdChoicesPlacement.bottomRightCorner:
-        return 2;
-      case AdChoicesPlacement.bottomLeftCorner:
-        return 3;
-    }
-  }
-
-  /// Maps an int back to [AdChoicesPlacement].
-  static AdChoicesPlacement? fromInt(int? intValue) {
-    switch (intValue) {
-      case 0:
-        return Platform.isAndroid
-            ? AdChoicesPlacement.topLeftCorner
-            : AdChoicesPlacement.topRightCorner;
-      case 1:
-        return Platform.isAndroid
-            ? AdChoicesPlacement.topRightCorner
-            : AdChoicesPlacement.topLeftCorner;
-      case 2:
-        return AdChoicesPlacement.bottomRightCorner;
-      case 3:
-        return AdChoicesPlacement.bottomLeftCorner;
-      default:
-        return null;
-    }
-  }
-}*/
 
 class _BiMap<K extends Object, V extends Object> extends MapBase<K, V> {
   _BiMap() {
