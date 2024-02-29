@@ -8,7 +8,7 @@ import 'ad_request.dart';
 
 /// Loads and disposes [BannerAds] and [InterstitialAds].
 AdInstanceManager instanceManager = AdInstanceManager(
-  'plugins.flutter.io/vpon_plugin_poc',
+  'plugins.flutter.io/vpon',
 );
 
 /// Maintains access to loaded [Ad] instances and handles sending/receiving
@@ -47,6 +47,14 @@ class AdInstanceManager {
     ))!;
   }
 
+  Future<BannerAdSize?> getAdSize(Ad ad) =>
+      instanceManager.channel.invokeMethod<BannerAdSize>(
+        'getAdSize',
+        <dynamic, dynamic>{
+          'adId': adIdFor(ad),
+        },
+      );
+
   void _onAdEvent(Ad ad, String eventName, Map<dynamic, dynamic> arguments) {
     if (defaultTargetPlatform == TargetPlatform.android) {
       _onAdEventAndroid(ad, eventName, arguments);
@@ -82,7 +90,7 @@ class AdInstanceManager {
           ad.fullScreenContentCallback?.onAdWillDismissFullScreenContent
               ?.call(ad);
         } else {
-          debugPrint('invalid ad: $ad, for event name: $eventName');
+          debugPrint('invalid ad : $ad, for event name: $eventName');
         }
         break;
       case 'didFailToPresentFullScreenContentWithError':
@@ -144,7 +152,9 @@ class AdInstanceManager {
   void _invokeOnAdLoaded(
       Ad ad, String eventName, Map<dynamic, dynamic> arguments) {
     debugPrint('instanceManager _invokeOnAdLoaded');
-    if (ad is InterstitialAd) {
+    if (ad is AdWithView) {
+      ad.listener.onAdLoaded?.call(ad);
+    } else if (ad is InterstitialAd) {
       ad.adLoadCallback.onAdLoaded.call(ad);
     } else {
       debugPrint('invalid ad: $ad, for event name: $eventName');
@@ -154,7 +164,9 @@ class AdInstanceManager {
   void _invokeOnAdFailedToLoad(
       Ad ad, String eventName, Map<dynamic, dynamic> arguments) {
     debugPrint('instanceManager _invokeOnAdFailedToLoad');
-    if (ad is InterstitialAd) {
+    if (ad is AdWithView) {
+      ad.listener.onAdFailedToLoad?.call(ad, arguments['loadAdError']);
+    } else if (ad is InterstitialAd) {
       ad.dispose();
       ad.adLoadCallback.onAdFailedToLoad.call(arguments['loadAdError']);
     } else {
@@ -192,7 +204,9 @@ class AdInstanceManager {
   }
 
   void _invokeOnAdImpression(Ad ad, String eventName) {
-    if (ad is InterstitialAd) {
+    if (ad is AdWithView) {
+      ad.listener.onAdImpression?.call(ad);
+    } else if (ad is InterstitialAd) {
       ad.fullScreenContentCallback?.onAdImpression?.call(ad);
     } else {
       debugPrint('invalid ad: $ad, for event name: $eventName');
@@ -201,7 +215,9 @@ class AdInstanceManager {
 
   void _invokeOnAdClicked(Ad ad, String eventName) {
     debugPrint('instanceManager _invokeOnAdClicked');
-    if (ad is InterstitialAd) {
+    if (ad is AdWithView) {
+      ad.listener.onAdClicked?.call(ad);
+    } else if (ad is InterstitialAd) {
       ad.fullScreenContentCallback?.onAdClicked?.call(ad);
     } else {
       debugPrint('invalid ad: $ad, for event name: $eventName');
@@ -224,6 +240,27 @@ class AdInstanceManager {
 
   /// Indicates that [adId] is unmounted from the widget tree.
   void unmountWidgetAdId(int adId) => _mountedWidgetAdIds.remove(adId);
+
+  /// Starts loading the ad if not previously loaded.
+  ///
+  /// Does nothing if we have already tried to load the ad.
+  Future<void> loadBannerAd(BannerAd ad) {
+    if (adIdFor(ad) != null) {
+      return Future<void>.value();
+    }
+
+    final int adId = _nextAdId++;
+    _loadedAds[adId] = ad;
+    return channel.invokeMethod<void>(
+      'loadBannerAd',
+      <dynamic, dynamic>{
+        'adId': adId,
+        'licenseKey': ad.licenseKey,
+        'request': ad.request,
+        'size': ad.size,
+      },
+    );
+  }
 
   Future<void> loadInterstitialAd(InterstitialAd ad) {
     if (adIdFor(ad) != null) {
@@ -302,12 +339,6 @@ class AdInstanceManager {
     );
   }
 
-  /// Gets the global [RequestConfiguration].
-  Future<RequestConfiguration> getRequestConfiguration() async {
-    return (await instanceManager.channel.invokeMethod<RequestConfiguration>(
-        'MobileAds#getRequestConfiguration'))!;
-  }
-
   /// Set the [RequestConfiguration] to apply for future ad requests.
   Future<void> updateRequestConfiguration(
       RequestConfiguration requestConfiguration) {
@@ -344,11 +375,10 @@ class AdMessageCodec extends StandardMessageCodec {
   static const int _valueAdError = 139;
   static const int _valueResponseInfo = 140;
   static const int _valueAdapterResponseInfo = 141;
-  static const int _valueAnchoredAdaptiveBannerAdSize = 142;
-  static const int _valueSmartBannerAdSize = 143;
+
   static const int _valueNativeAdOptions = 144;
   static const int _valueVideoOptions = 145;
-  static const int _valueInlineAdaptiveBannerAdSize = 146;
+
   static const int _valueRequestConfigurationParams = 148;
   static const int _valueNativeTemplateStyle = 149;
   static const int _valueNativeTemplateTextStyle = 150;
@@ -358,8 +388,10 @@ class AdMessageCodec extends StandardMessageCodec {
 
   @override
   void writeValue(WriteBuffer buffer, dynamic value) {
-    debugPrint('writeValue $value');
-    if (value is AdRequest) {
+    // debugPrint('writeValue $value');
+    if (value is BannerAdSize) {
+      writeAdSize(buffer, value);
+    } else if (value is AdRequest) {
       buffer.putUint8(_valueAdRequest);
       writeValue(buffer, value.keywords);
       writeValue(buffer, value.contentUrl);
@@ -384,16 +416,22 @@ class AdMessageCodec extends StandardMessageCodec {
     }
   }
 
+  void writeAdSize(WriteBuffer buffer, BannerAdSize value) {
+    // debugPrint('writeAdSize, value = $value');
+    buffer.putUint8(_valueAdSize);
+    writeValue(buffer, value.width);
+    writeValue(buffer, value.height);
+  }
+
   @override
   dynamic readValueOfType(dynamic type, ReadBuffer buffer) {
-    debugPrint('readValueOfType $type');
+    // debugPrint('readValueOfType $type');
     switch (type) {
       case _valueLoadAdError:
         return LoadAdError(
             readValueOfType(buffer.getUint8(), buffer),
             readValueOfType(buffer.getUint8(), buffer),
-            readValueOfType(buffer.getUint8(), buffer)
-        );
+            readValueOfType(buffer.getUint8(), buffer));
 
       case _valueAdError:
         return AdError(
@@ -402,7 +440,7 @@ class AdMessageCodec extends StandardMessageCodec {
             readValueOfType(buffer.getUint8(), buffer));
 
       default:
-        debugPrint('super.readValueOfType $type');
+        // debugPrint('super.readValueOfType $type');
         return super.readValueOfType(type, buffer);
     }
   }
@@ -410,7 +448,7 @@ class AdMessageCodec extends StandardMessageCodec {
   Map<String, List<T>>? _tryDeepMapCast<T>(Map<dynamic, dynamic>? map) {
     if (map == null) return null;
     return map.map<String, List<T>>(
-          (dynamic key, dynamic value) => MapEntry<String, List<T>>(
+      (dynamic key, dynamic value) => MapEntry<String, List<T>>(
         key,
         value?.cast<T>(),
       ),
@@ -420,7 +458,7 @@ class AdMessageCodec extends StandardMessageCodec {
   Map<String, String> _deepCastStringMap(Map<dynamic, dynamic>? map) {
     if (map == null) return {};
     return map.map<String, String>(
-          (dynamic key, dynamic value) => MapEntry<String, String>(
+      (dynamic key, dynamic value) => MapEntry<String, String>(
         key,
         value,
       ),
@@ -431,7 +469,7 @@ class AdMessageCodec extends StandardMessageCodec {
       Map<dynamic, dynamic>? map) {
     if (map == null) return {};
     return map.map<String, dynamic>(
-          (dynamic key, dynamic value) => MapEntry<String, dynamic>(
+      (dynamic key, dynamic value) => MapEntry<String, dynamic>(
         key,
         value,
       ),

@@ -1,8 +1,10 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'dart:async';
 
-import 'package:flutter/services.dart';
+import 'package:vpon_plugin_poc/ad_containers.dart';
+import 'package:vpon_plugin_poc/ad_listeners.dart';
+import 'package:vpon_plugin_poc/ad_request.dart';
+
+import 'Constants.dart';
 
 class BannerExample extends StatefulWidget {
   const BannerExample({super.key});
@@ -14,56 +16,105 @@ class BannerExample extends StatefulWidget {
 }
 
 class _BannerExampleState extends State<BannerExample> {
+  BannerAd? _bannerAd;
+  bool _isLoaded = false;
+  BannerAdSize? _adSize;
 
+  final double _adWidth = 320;
 
-  Future<void> loadBannerAd() async {
+  void _loadBannerAd() async {
+    if (_bannerAd == null) {
+      await _bannerAd?.dispose();
+      setState(() {
+        _bannerAd = null;
+        _isLoaded = false;
+      });
 
+      BannerAdSize size = BannerAdSize.banner;
+
+      _bannerAd = BannerAd(
+        licenseKey: '8a80854b79a9f2ce0179c095a3394b75',
+        size: size,
+        request: const AdRequest(),
+        listener: BannerAdListener(
+          onAdLoaded: (Ad ad) async {
+            // if (_bannerAd != null) {
+            //   debugPrint('_bannerAd != null, return');
+            //   return;
+            // }
+            BannerAd bannerAd = (ad as BannerAd);
+
+// setState() after onAdLoaded
+            setState(() {
+              _bannerAd = bannerAd;
+              _isLoaded = true;
+              _adSize = size;
+            });
+          },
+          onAdFailedToLoad: (Ad ad, LoadAdError error) {
+            debugPrint('banner_example onAdFailedToLoad');
+            ad.dispose();
+          },
+        ),
+      );
+
+      debugPrint('await _bannerAd?.load()');
+      await _bannerAd?.load();
+    }
   }
 
-  @override
-  Widget build(context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Banner demo'),
-      ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: Container(
-              width: 300,
-              height: 250,
-              color: Colors.blue,
-              child: iosView(),
+  Widget _getAdWidget() {
+    return OrientationBuilder(
+      builder: (context, orientation) {
+        if (_bannerAd != null && _isLoaded && _adSize != null) {
+          return Align(
+              child: SizedBox(
+            width: _adWidth,
+            height: _adSize!.height.toDouble(),
+            child: AdWidget(
+              ad: _bannerAd!,
             ),
-          ),
-          const SizedBox(
-            height: 100,
-          ),
-          ElevatedButton(
-            onPressed: () => loadBannerAd(),
-            style: const ButtonStyle(
-                foregroundColor: MaterialStatePropertyAll(Colors.black),
-                textStyle: MaterialStatePropertyAll(
-                  TextStyle(fontSize: 20),
-                )),
-            child: const Text('Request'),
-          ),
-        ],
-      ),
+          ));
+        } else {
+          _loadBannerAd();
+          return Container();
+        }
+      },
     );
   }
 
-  Widget iosView() {
-    if (defaultTargetPlatform == TargetPlatform.iOS) {
-      return const UiKitView(
-        viewType: 'plugins.flutter.io/vpon/ad_widget',
-        creationParams: {'text': 'Flutter传给IOSTextView的参数'},
-        creationParamsCodec: StandardMessageCodec(),
-      );
-    } else {
-      return Container();
-    }
+  @override
+  Widget build(BuildContext context) => Scaffold(
+      appBar: AppBar(
+        title: const Text('Banner demo'),
+      ),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: ListView.separated(
+            itemCount: 3,
+            separatorBuilder: (BuildContext context, int index) {
+              return Container(
+                height: 40,
+              );
+            },
+            itemBuilder: (BuildContext context, int index) {
+              if (index == 1) {
+                return _getAdWidget();
+              }
+              return const Text(
+                Constants.placeholderText,
+                style: TextStyle(fontSize: 14),
+              );
+            },
+          ),
+        ),
+      ));
+
+  @override
+  void dispose() {
+    super.dispose();
+    debugPrint('bannerAd?.dispose() called');
+    _bannerAd?.dispose();
   }
 }

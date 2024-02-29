@@ -9,7 +9,8 @@ import Foundation
 import OSLog
 
 struct Constant {
-    static let channelName = "plugins.flutter.io/vpon_plugin_poc"
+    /// "plugins.flutter.io/vpon"
+    static let channelName = "plugins.flutter.io/vpon"
     static let adId = "adId"
     static let onAdEvent = "onAdEvent"
     static let eventName = "eventName"

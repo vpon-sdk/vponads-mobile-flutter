@@ -6,27 +6,27 @@ import AdSupport
 public class VponPluginPocPlugin: NSObject, FlutterPlugin {
     
     var channel: FlutterMethodChannel?
-    var manager: AdInstanceManager?
+    var manager: AdInstanceManager
     var readerWriter: FlutterVponAdReaderWriter?
     
     public static func register(with registrar: FlutterPluginRegistrar) {
-        let instance = VponPluginPocPlugin(binaryMessenger: registrar.messenger())
-        registrar.publish(instance)
+        let plugin = VponPluginPocPlugin(binaryMessenger: registrar.messenger())
+        registrar.publish(plugin)
         
         let readerWriter = FlutterVponAdReaderWriter()
-        instance.readerWriter = readerWriter
+        plugin.readerWriter = readerWriter
         
         let codec = FlutterStandardMethodCodec(readerWriter: readerWriter)
         
-        instance.channel = FlutterMethodChannel(name: Constant.channelName,
+        plugin.channel = FlutterMethodChannel(name: Constant.channelName,
                                                 binaryMessenger: registrar.messenger(),
                                                 codec: codec)
-        registrar.addMethodCallDelegate(instance, channel: instance.channel!)
+        registrar.addMethodCallDelegate(plugin, channel: plugin.channel!)
         
         // Register native view
-        let factory = VponAdsViewFactory(messenger: registrar.messenger())
-        registrar.register(factory, withId: "plugins.flutter.io/vpon/ad_widget")
-        registrar.addApplicationDelegate(instance)
+        let factory = VponAdsViewFactory(manager: plugin.manager)
+        registrar.register(factory, withId: "\(Constant.channelName)/ad_widget")
+        registrar.addApplicationDelegate(plugin)
     }
     
     init(binaryMessenger: FlutterBinaryMessenger) {
@@ -40,10 +40,10 @@ public class VponPluginPocPlugin: NSObject, FlutterPlugin {
         case "VponAdSDK#initialize":
             // Init Vpon SDK
             VponAdConfiguration.shared.initializeSdk()
-            VponAdConfiguration.shared.logLevel = .default
+            VponAdConfiguration.shared.logLevel = .debug
             
         case "_init":
-            manager?.disposeAllAds()
+            manager.disposeAllAds()
             result(nil)
             
         case "VponAdSDK#updateRequestConfiguration":
@@ -100,10 +100,33 @@ public class VponPluginPocPlugin: NSObject, FlutterPlugin {
                let adId = arg["adId"] as? Int,
                let request = arg["request"] as? FlutterAdRequest {
                 
-                let ad = FlutterInterstitialAd(licenseKey: key, request: request, rootViewController: rootController, adId: adId)
-                manager?.loadAd(ad)
+                let ad = FlutterInterstitialAd(licenseKey: key, 
+                                               request: request,
+                                               rootViewController: rootController,
+                                               adId: adId)
+                manager.loadAd(ad)
             }
             result(nil)
+            
+        case "loadBannerAd":
+            guard let arg = call.arguments as? [String: Any] else {
+                result(nil)
+                return
+            }
+            if let key = arg["licenseKey"] as? String,
+               let size = arg["size"] as? FlutterBannerAdSize,
+               let adId = arg["adId"] as? Int,
+               let request = arg["request"] as? FlutterAdRequest {
+                
+                let ad = FlutterBannerAd(licenseKey: key,
+                                         size: size,
+                                         request: request,
+                                         rootViewController: rootController,
+                                         adId: adId)
+                manager.loadAd(ad)
+            }
+            result(nil)
+            
             
         case "disposeAd":
             guard let arg = call.arguments as? [String: Any] else {
@@ -111,7 +134,7 @@ public class VponPluginPocPlugin: NSObject, FlutterPlugin {
                 return
             }
             if let adId = arg["adId"] as? Int {
-                manager?.dispose(adId: adId)
+                manager.dispose(adId: adId)
             }
             result(nil)
             
@@ -121,11 +144,8 @@ public class VponPluginPocPlugin: NSObject, FlutterPlugin {
                 return
             }
             if let adId = arg["adId"] as? Int {
-                manager?.showAd(adId: adId)
+                manager.showAd(adId: adId)
             }
-            result(nil)
-            
-        case "loadBannerAd":
             result(nil)
             
         default:

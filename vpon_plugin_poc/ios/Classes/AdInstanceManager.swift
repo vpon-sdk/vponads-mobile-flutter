@@ -18,11 +18,11 @@ class AdInstanceManager {
         channel = FlutterMethodChannel(name: Constant.channelName, binaryMessenger: binaryMessenger)
     }
     
-    private func ad(for adId: Int) -> FlutterAd? {
+    func ad(for adId: Int) -> FlutterAd? {
         return ads[adId]
     }
     
-    private func adId(for ad: FlutterAd) -> Int? {
+    func adId(for ad: FlutterAd) -> Int? {
         let matchingKeys = ads.filter { $0.value === ad }.keys
         if matchingKeys.count > 1 {
             Console.log("\(type(of: self)) Error: Multiple keys for a single ad.")
@@ -95,6 +95,8 @@ class AdInstanceManager {
         sendAdEvent("adDidDismissFullScreenContent", ad: ad)
     }
     
+    // MARK: - General
+    
     func adDidRecordImpression(_ ad: FlutterAd) {
         sendAdEvent("adDidRecordImpression", ad: ad)
     }
@@ -102,6 +104,8 @@ class AdInstanceManager {
     func adDidRecordClick(_ ad: FlutterAd) {
         sendAdEvent("adDidRecordClick", ad: ad)
     }
+    
+   
     
     // MARK: - Helper
     

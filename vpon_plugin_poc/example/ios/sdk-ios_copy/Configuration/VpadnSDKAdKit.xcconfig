@@ -1,0 +1,30 @@
+//
+//  VpadnSDKAdKit.xcconfig
+//  vpon-sdk
+//
+//  Created by Vpon on 9/23/16.
+//  Copyright © 2016 com.vpon. All rights reserved.
+//
+
+#include "Common.xcconfig"
+
+// Architectures configuration
+SDKROOT = iphoneos
+ONLY_ACTIVE_ARCH = NO
+SUPPORTED_PLATFORMS = iphonesimulator iphoneos
+
+// Build Setting
+IPHONEOS_DEPLOYMENT_TARGET = 7.1
+
+// Cocoa Touch Framework
+MACH_O_TYPE = staticlib
+SKIP_INSTALL = YES
+CODE_SIGNING_REQUIRED = NO
+BUILD_DIR = $(SRCROOT)/build
+
+// Language
+CLANG_WARN_DOCUMENTATION_COMMENTS = YES
+
+// Packaging
+DEFINES_MODULE = YES
+CLANG_ENABLE_MODULE_DEBUGGING = NO

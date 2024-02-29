@@ -9,13 +9,10 @@ import Flutter
 import VpadnSDKAdKit
 
 enum FlutterVponField: UInt8 {
+    case bannerAdSize = 128
     case adRequest = 129
     case loadAdError = 133
     case adError = 139
-}
-
-class FlutterAdSizeFactory {
-    
 }
 
 class FlutterLoadAdError: NSObject {
@@ -36,7 +33,7 @@ class FlutterAdRequest {
     var keywords: [String]?
     var contentURL: String?
     
-    func asVponAdRequest(licenseKey: String) -> VponAdRequest {
+    func asVponAdRequest() -> VponAdRequest {
         let request = VponAdRequest()
         if let contentURL {
             request.setContentUrl(contentURL)
@@ -50,18 +47,22 @@ class FlutterAdRequest {
     }
 }
 
+class FlutterBannerAdSizeFactory: NSObject {
+    
+}
+
 /// Translator for converting Dart objects to Vpon Ad SDK objects and vice versa.
 class FlutterVponAdReaderWriter: FlutterStandardReaderWriter {
     
-    let adSizeFactory: FlutterAdSizeFactory
+    let adSizeFactory: FlutterBannerAdSizeFactory
     
-    init(factory: FlutterAdSizeFactory) {
+    init(factory: FlutterBannerAdSizeFactory) {
         adSizeFactory = factory
         super.init()
     }
     
     convenience override init() {
-        self.init(factory: FlutterAdSizeFactory())
+        self.init(factory: FlutterBannerAdSizeFactory())
     }
     
     override func reader(with data: Data) -> FlutterStandardReader {
@@ -76,9 +77,9 @@ class FlutterVponAdReaderWriter: FlutterStandardReaderWriter {
 
 class FlutterVponAdReader: FlutterStandardReader {
     
-    let adSizeFactory: FlutterAdSizeFactory
+    let adSizeFactory: FlutterBannerAdSizeFactory
     
-    init(factory: FlutterAdSizeFactory, data: Data) {
+    init(factory: FlutterBannerAdSizeFactory, data: Data) {
         adSizeFactory = factory
         super.init(data: data)
     }
@@ -95,6 +96,10 @@ class FlutterVponAdReader: FlutterStandardReader {
             request.keywords = self.readValue(ofType: self.readByte()) as? [String]
             request.contentURL = self.readValue(ofType: self.readByte()) as? String
             return request
+            
+        case .bannerAdSize:
+            return FlutterBannerAdSize(width: readValue(ofType: readByte()) as? Int,
+                                       height: readValue(ofType: readByte()) as? Int)
             
         case .loadAdError:
             let code = self.readValue(ofType: readByte()) as? NSNumber
@@ -118,23 +123,33 @@ class FlutterVponAdReader: FlutterStandardReader {
 class FlutterVponAdWriter: FlutterStandardWriter {
     
     override func writeValue(_ value: Any) {
-        Console.log("writeValue \(value)")
         switch value {
         case is FlutterAdRequest:
+            Console.log("writeValue FlutterAdRequest")
             writeByte(FlutterVponField.adRequest.rawValue)
             let request = value as! FlutterAdRequest
             self.writeValue(request.keywords ?? [])
             self.writeValue(request.contentURL ?? "")
             
         case is FlutterLoadAdError:
+            Console.log("writeValue FlutterLoadAdError")
             writeByte(FlutterVponField.loadAdError.rawValue)
             let error = value as! FlutterLoadAdError
             self.writeValue(error.code)
             self.writeValue(error.domain ?? "")
             self.writeValue(error.message ?? "")
             
+        case is FlutterBannerAdSize:
+          
+            writeAdSize(value: value as! FlutterBannerAdSize)
         default:
+            Console.log("writeValue default \(value)")
             super.writeValue(value)
         }
+    }
+    
+    /// Helper method especially for banner size
+    private func writeAdSize(value: FlutterBannerAdSize) {
+        Console.log("writeAdSize trigger: \(value)")
     }
 }
