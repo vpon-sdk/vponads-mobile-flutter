@@ -18,37 +18,46 @@ class BannerExample extends StatefulWidget {
 class _BannerExampleState extends State<BannerExample> {
   BannerAd? _bannerAd;
   bool _isLoaded = false;
-  BannerAdSize? _adSize;
+  BannerAdSize? _adSize; // default size
+  BannerAdSize? previousAdSize;
 
-  final double _adWidth = 320;
+  set adSize(BannerAdSize newSize) {
+    _adSize = newSize;
+    _loadBannerAd();
+  }
 
   void _loadBannerAd() async {
-    if (_bannerAd == null) {
-      await _bannerAd?.dispose();
-      setState(() {
-        _bannerAd = null;
-        _isLoaded = false;
-      });
+    await _bannerAd?.dispose();
+    setState(() {
+      _bannerAd = null;
+      _isLoaded = false;
+    });
 
-      BannerAdSize size = BannerAdSize.banner;
+    String key = '';
+    switch (_adSize) {
+      case BannerAdSize.banner:
+        key = '8a80854b79a9f2ce0179c095a3394b75';
+      case BannerAdSize.largeBanner:
+        key = '8a80854b79a9f2ce0179c09661714b77';
+      case BannerAdSize.mediumRectangle:
+        key = '8a80854b79a9f2ce0179c09619fe4b76';
+      case BannerAdSize.largeRectangle:
+        key = '8a80854b79a9f2ce0179c096a4f94b78';
+    }
 
+    if (_adSize != null) {
       _bannerAd = BannerAd(
-        licenseKey: '8a80854b79a9f2ce0179c095a3394b75',
-        size: size,
+        licenseKey: key,
+        size: _adSize!,
         request: const AdRequest(),
         listener: BannerAdListener(
           onAdLoaded: (Ad ad) async {
-            // if (_bannerAd != null) {
-            //   debugPrint('_bannerAd != null, return');
-            //   return;
-            // }
             BannerAd bannerAd = (ad as BannerAd);
 
-// setState() after onAdLoaded
+            // setState() after onAdLoaded
             setState(() {
               _bannerAd = bannerAd;
               _isLoaded = true;
-              _adSize = size;
             });
           },
           onAdFailedToLoad: (Ad ad, LoadAdError error) {
@@ -63,23 +72,60 @@ class _BannerExampleState extends State<BannerExample> {
     }
   }
 
-  Widget _getAdWidget() {
+  Widget _getBannerAdWidget() {
     return OrientationBuilder(
       builder: (context, orientation) {
-        if (_bannerAd != null && _isLoaded && _adSize != null) {
+        if (_bannerAd != null && _isLoaded) {
           return Align(
               child: SizedBox(
-            width: _adWidth,
-            height: _adSize!.height.toDouble(),
+            width: _adSize?.width.toDouble(),
+            height: _adSize?.height.toDouble(),
             child: AdWidget(
               ad: _bannerAd!,
             ),
           ));
-        } else {
-          _loadBannerAd();
-          return Container();
+        }
+        return Container();
+      },
+    );
+  }
+
+  Widget _getAdSizeSegmentedButtonWidget() {
+    return SegmentedButton<BannerAdSize?>(
+      style: SegmentedButton.styleFrom(
+        backgroundColor: Colors.black12,
+        foregroundColor: Colors.black,
+        selectedBackgroundColor: Colors.orange,
+        selectedForegroundColor: Colors.white,
+      ),
+      segments: const <ButtonSegment<BannerAdSize>>[
+        ButtonSegment<BannerAdSize>(
+            value: BannerAdSize.banner,
+            label: Text('320x50'),
+            icon: Icon(Icons.ad_units)),
+        ButtonSegment<BannerAdSize>(
+            value: BannerAdSize.largeBanner,
+            label: Text('320x100'),
+            icon: Icon(Icons.ad_units)),
+        ButtonSegment<BannerAdSize>(
+            value: BannerAdSize.mediumRectangle,
+            label: Text('300x250'),
+            icon: Icon(Icons.ad_units)),
+        ButtonSegment<BannerAdSize>(
+            value: BannerAdSize.largeRectangle,
+            label: Text('320x480'),
+            icon: Icon(Icons.ad_units)),
+      ],
+      selected: <BannerAdSize?>{_adSize},
+      onSelectionChanged: (Set<BannerAdSize?> newSize) {
+        if (newSize.isNotEmpty) {
+          setState(() {
+            adSize = newSize.first!;
+          });
         }
       },
+      multiSelectionEnabled: false,
+      emptySelectionAllowed: true,
     );
   }
 
@@ -99,8 +145,10 @@ class _BannerExampleState extends State<BannerExample> {
               );
             },
             itemBuilder: (BuildContext context, int index) {
-              if (index == 1) {
-                return _getAdWidget();
+              if (index == 0) {
+                return _getAdSizeSegmentedButtonWidget();
+              } else if (index == 1) {
+                return _getBannerAdWidget();
               }
               return const Text(
                 Constants.placeholderText,
