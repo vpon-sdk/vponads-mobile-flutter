@@ -20,9 +20,6 @@ class VponAdsViewFactory: NSObject, FlutterPlatformViewFactory {
     func create(withFrame frame: CGRect, 
                 viewIdentifier viewId: Int64,
                 arguments args: Any?) -> FlutterPlatformView {
-       
-      
-        
         guard let adId = args as? Int,
               let view = manager.ad(for: adId) as? FlutterPlatformView else {
             fatalError("Could not find an ad with id: \(String(describing: args as? Int)). Was this ad already disposed?")

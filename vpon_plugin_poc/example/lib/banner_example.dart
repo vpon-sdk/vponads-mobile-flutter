@@ -18,8 +18,7 @@ class BannerExample extends StatefulWidget {
 class _BannerExampleState extends State<BannerExample> {
   BannerAd? _bannerAd;
   bool _isLoaded = false;
-  BannerAdSize? _adSize; // default size
-  BannerAdSize? previousAdSize;
+  BannerAdSize? _adSize;
 
   set adSize(BannerAdSize newSize) {
     _adSize = newSize;
@@ -71,6 +70,15 @@ class _BannerExampleState extends State<BannerExample> {
       await _bannerAd?.load();
     }
   }
+
+  @override
+  void dispose() {
+    super.dispose();
+    debugPrint('bannerAd?.dispose() called');
+    _bannerAd?.dispose();
+  }
+
+  /* --------------------------------- Widget --------------------------------- */
 
   Widget _getBannerAdWidget() {
     return OrientationBuilder(
@@ -158,11 +166,4 @@ class _BannerExampleState extends State<BannerExample> {
           ),
         ),
       ));
-
-  @override
-  void dispose() {
-    super.dispose();
-    debugPrint('bannerAd?.dispose() called');
-    _bannerAd?.dispose();
-  }
 }
