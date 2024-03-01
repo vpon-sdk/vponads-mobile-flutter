@@ -4,7 +4,7 @@ import 'package:vpon_plugin_poc/ad_containers.dart';
 import 'package:vpon_plugin_poc/ad_listeners.dart';
 import 'package:vpon_plugin_poc/ad_request.dart';
 
-import 'Constants.dart';
+import 'constants.dart';
 
 class BannerExample extends StatefulWidget {
   const BannerExample({super.key});
@@ -140,7 +140,7 @@ class _BannerExampleState extends State<BannerExample> {
   @override
   Widget build(BuildContext context) => Scaffold(
       appBar: AppBar(
-        title: const Text('Banner demo'),
+        title: const Text('Banner Demo'),
       ),
       body: Center(
         child: Padding(
