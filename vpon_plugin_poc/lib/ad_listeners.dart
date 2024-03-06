@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 
 import 'ad_containers.dart';
+import 'insterstitial_ad.dart';
 
 /// The callback type to handle an event occurring for an [Ad].
 typedef AdEventCallback = void Function(Ad ad);
@@ -9,10 +10,10 @@ typedef AdEventCallback = void Function(Ad ad);
 typedef GenericAdEventCallback<Ad> = void Function(Ad ad);
 
 /// A callback type for when an error occurs loading a full screen ad.
-typedef FullScreenAdLoadErrorCallback = void Function(LoadAdError error);
+typedef FullScreenAdLoadErrorCallback = void Function(Map error);
 
 /// The callback type to handle an error loading an [Ad].
-typedef AdLoadErrorCallback = void Function(Ad ad, LoadAdError error);
+typedef AdLoadErrorCallback = void Function(Ad ad, Map error);
 
 /// Callback events for for full screen ads, such as Interstitial.
 class FullScreenContentCallback<Ad> {
@@ -45,7 +46,7 @@ class FullScreenContentCallback<Ad> {
   final GenericAdEventCallback<Ad>? onAdClicked;
 
   /// Called when ad fails to show full screen content.
-  final void Function(Ad ad, AdError error)? onAdFailedToShowFullScreenContent;
+  final void Function(Ad ad, Map error)? onAdFailedToShowFullScreenContent;
 }
 
 /// Generic parent class for ad load callbacks.
@@ -111,22 +112,8 @@ abstract class AdWithViewListener {
   final AdEventCallback? onAdClicked;
 }
 
-/// A listener for receiving notifications for the lifecycle of a [BannerAd].
 class BannerAdListener extends AdWithViewListener {
-  /// Constructs a [BannerAdListener] that notifies for the provided event callbacks.
-  ///
-  /// Typically you will override [onAdLoaded] and [onAdFailedToLoad]:
-  /// ```dart
-  /// BannerAdListener(
-  ///   onAdLoaded: (ad) {
-  ///     // Ad successfully loaded - display an AdWidget with the banner ad.
-  ///   },
-  ///   onAdFailedToLoad: (ad, error) {
-  ///     // Ad failed to load - log the error and dispose the ad.
-  ///   },
-  ///   ...
-  /// )
-  /// ```
+
   const BannerAdListener({
     AdEventCallback? onAdLoaded,
     AdLoadErrorCallback? onAdFailedToLoad,
@@ -144,4 +131,18 @@ class BannerAdListener extends AdWithViewListener {
     onAdImpression: onAdImpression,
     onAdClicked: onAdClicked,
   );
+}
+
+class NativeAdListener extends AdWithViewListener {
+ 
+  NativeAdListener({
+    AdEventCallback? onAdLoaded,
+    Function(Ad ad, Map error)? onAdFailedToLoad,
+    AdEventCallback? onAdImpression,
+    AdEventCallback? onAdClicked,
+  }) : super(
+            onAdLoaded: onAdLoaded,
+            onAdFailedToLoad: onAdFailedToLoad,
+            onAdImpression: onAdImpression,
+            onAdClicked: onAdClicked);
 }

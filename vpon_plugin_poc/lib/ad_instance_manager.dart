@@ -5,6 +5,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'ad_containers.dart';
 import 'ad_request.dart';
+import 'insterstitial_ad.dart';
+import 'banner_ad.dart';
 
 /// Loads and disposes [BannerAds] and [InterstitialAds].
 AdInstanceManager instanceManager = AdInstanceManager(
@@ -77,8 +79,9 @@ class AdInstanceManager {
       case 'adDidRecordClick':
         _invokeOnAdClicked(ad, eventName);
         break;
-      case 'adDidRecordImpression': // Fall through
-        debugPrint('adDidRecordImpression, fall through');
+      case 'adDidRecordImpression':
+        _invokeOnAdImpression(ad, eventName);
+        break;
       case 'adWillPresentFullScreenContent':
         _invokeOnAdShowedFullScreenContent(ad, eventName);
         break;
@@ -89,11 +92,13 @@ class AdInstanceManager {
         if (ad is InterstitialAd) {
           ad.fullScreenContentCallback?.onAdWillDismissFullScreenContent
               ?.call(ad);
+          debugPrint('adWillDismissFullScreenContent');
         } else {
           debugPrint('invalid ad : $ad, for event name: $eventName');
         }
         break;
       case 'didFailToPresentFullScreenContentWithError':
+        debugPrint('ad didFailToPresentFullScreenContentWithError');
         _invokeOnAdFailedToShowFullScreenContent(ad, eventName, arguments);
         break;
       default:
@@ -366,18 +371,9 @@ class AdMessageCodec extends StandardMessageCodec {
   static const int _valueAdSize = 128;
   static const int _valueAdRequest = 129;
 
-  static const int _valueLoadAdError = 133;
-  static const int _valueAdManagerAdRequest = 134;
-  static const int _valueInitializationState = 135;
-  static const int _valueAdapterStatus = 136;
-  static const int _valueInitializationStatus = 137;
-
-  static const int _valueAdError = 139;
   static const int _valueResponseInfo = 140;
-  static const int _valueAdapterResponseInfo = 141;
 
   static const int _valueNativeAdOptions = 144;
-  static const int _valueVideoOptions = 145;
 
   static const int _valueRequestConfigurationParams = 148;
   static const int _valueNativeTemplateStyle = 149;
@@ -401,16 +397,6 @@ class AdMessageCodec extends StandardMessageCodec {
       writeValue(buffer, value.tagForChildDirectedTreatment);
       writeValue(buffer, value.tagForUnderAgeOfConsent);
       writeValue(buffer, value.testDeviceIds);
-    } else if (value is LoadAdError) {
-      buffer.putUint8(_valueLoadAdError);
-      writeValue(buffer, value.code);
-      writeValue(buffer, value.domain);
-      writeValue(buffer, value.message);
-    } else if (value is AdError) {
-      buffer.putUint8(_valueAdError);
-      writeValue(buffer, value.code);
-      writeValue(buffer, value.domain);
-      writeValue(buffer, value.message);
     } else {
       super.writeValue(buffer, value);
     }
@@ -427,53 +413,12 @@ class AdMessageCodec extends StandardMessageCodec {
   dynamic readValueOfType(dynamic type, ReadBuffer buffer) {
     // debugPrint('readValueOfType $type');
     switch (type) {
-      case _valueLoadAdError:
-        return LoadAdError(
-            readValueOfType(buffer.getUint8(), buffer),
-            readValueOfType(buffer.getUint8(), buffer),
-            readValueOfType(buffer.getUint8(), buffer));
-
-      case _valueAdError:
-        return AdError(
-            readValueOfType(buffer.getUint8(), buffer),
-            readValueOfType(buffer.getUint8(), buffer),
-            readValueOfType(buffer.getUint8(), buffer));
+     
 
       default:
         // debugPrint('super.readValueOfType $type');
         return super.readValueOfType(type, buffer);
     }
-  }
-
-  Map<String, List<T>>? _tryDeepMapCast<T>(Map<dynamic, dynamic>? map) {
-    if (map == null) return null;
-    return map.map<String, List<T>>(
-      (dynamic key, dynamic value) => MapEntry<String, List<T>>(
-        key,
-        value?.cast<T>(),
-      ),
-    );
-  }
-
-  Map<String, String> _deepCastStringMap(Map<dynamic, dynamic>? map) {
-    if (map == null) return {};
-    return map.map<String, String>(
-      (dynamic key, dynamic value) => MapEntry<String, String>(
-        key,
-        value,
-      ),
-    );
-  }
-
-  Map<String, dynamic> _deepCastStringKeyDynamicValueMap(
-      Map<dynamic, dynamic>? map) {
-    if (map == null) return {};
-    return map.map<String, dynamic>(
-      (dynamic key, dynamic value) => MapEntry<String, dynamic>(
-        key,
-        value,
-      ),
-    );
   }
 
   /// Reads the next value as a non-nullable string.

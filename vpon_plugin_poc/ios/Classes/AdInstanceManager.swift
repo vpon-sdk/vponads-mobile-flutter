@@ -67,8 +67,8 @@ class AdInstanceManager {
         channel.invokeMethod(Constant.onAdEvent, arguments: [
             Constant.adId: ad.adId,
             Constant.eventName: "onAdFailedToLoad",
-            Constant.loadAdError: "testLoadAdError"
-//            Constant.loadAdError: FlutterLoadAdError(error: error as NSError)
+            Constant.loadAdError: [Constant.errorDescription: error.localizedDescription,
+                                        Constant.errorCode:  (error as NSError).code]
         ])
     }
     
@@ -79,7 +79,8 @@ class AdInstanceManager {
                              arguments: [
                                 Constant.adId: ad.adId,
                                 Constant.eventName: "didFailToPresentFullScreenContentWithError",
-                                "error": error
+                                Constant.loadAdError: [Constant.errorDescription: error.localizedDescription,
+                                                       Constant.errorCode:  (error as NSError).code]
                              ])
     }
     

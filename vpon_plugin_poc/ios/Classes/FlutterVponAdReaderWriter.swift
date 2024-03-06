@@ -11,21 +11,6 @@ import VpadnSDKAdKit
 enum FlutterVponField: UInt8 {
     case bannerAdSize = 128
     case adRequest = 129
-    case loadAdError = 133
-    case adError = 139
-}
-
-class FlutterLoadAdError: NSObject {
-    var code: NSNumber
-    var domain: String?
-    var message: String?
-    
-    init(error: NSError? = nil) {
-        code = (error?.code ?? 999) as NSNumber
-        domain = error?.domain
-        message = error?.localizedDescription
-        super.init()
-    }
 }
 
 /// Bridge between Dart and VponAdRequest
@@ -101,21 +86,6 @@ class FlutterVponAdReader: FlutterStandardReader {
             return FlutterBannerAdSize(width: readValue(ofType: readByte()) as? Int,
                                        height: readValue(ofType: readByte()) as? Int)
             
-        case .loadAdError:
-            let code = self.readValue(ofType: readByte()) as? NSNumber
-            let domain = self.readValue(ofType: readByte()) as? String
-            let message = self.readValue(ofType: readByte()) as? String
-            let loadAdError = FlutterLoadAdError()
-            loadAdError.code = code ?? 999
-            loadAdError.domain = domain
-            loadAdError.message = message
-            return loadAdError
-            
-        case .adError:
-            let code = self.readValue(ofType: readByte()) as? Int ?? 999
-            let domain = self.readValue(ofType: readByte()) as? String ?? "N/A"
-            let message = self.readValue(ofType: readByte()) as? String ?? "N/A"
-            return NSError(domain: domain, code: code, userInfo: [NSLocalizedDescriptionKey: message])
         }
     }
 }
@@ -131,17 +101,9 @@ class FlutterVponAdWriter: FlutterStandardWriter {
             self.writeValue(request.keywords ?? [])
             self.writeValue(request.contentURL ?? "")
             
-        case is FlutterLoadAdError:
-            Console.log("writeValue FlutterLoadAdError")
-            writeByte(FlutterVponField.loadAdError.rawValue)
-            let error = value as! FlutterLoadAdError
-            self.writeValue(error.code)
-            self.writeValue(error.domain ?? "")
-            self.writeValue(error.message ?? "")
-            
         case is FlutterBannerAdSize:
-          
             writeAdSize(value: value as! FlutterBannerAdSize)
+            
         default:
             Console.log("writeValue default \(value)")
             super.writeValue(value)

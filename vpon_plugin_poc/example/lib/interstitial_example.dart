@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:vpon_plugin_poc/ad_containers.dart';
 import 'package:vpon_plugin_poc/ad_listeners.dart';
 import 'package:vpon_plugin_poc/ad_request.dart';
+import 'package:vpon_plugin_poc/insterstitial_ad.dart';
 import 'package:vpon_plugin_poc_example/constants.dart';
+import 'context_extensions.dart';
 
 class InterstitialExample extends StatefulWidget {
   const InterstitialExample({super.key});
@@ -45,62 +46,51 @@ class _InterstitialExampleState extends State<InterstitialExample> {
           adLoadCallback: InterstitialAdLoadCallback(
             onAdLoaded: (InterstitialAd ad) {
               debugPrint('$ad loaded');
-              _showToast(scaffoldContext, 'InterstitialAd onAdLoaded');
+              context.showToast(scaffoldContext, 'InterstitialAd onAdLoaded');
               _interstitialAd = ad;
               _showInterstitial();
             },
-            onAdFailedToLoad: (LoadAdError error) {
-              debugPrint('InterstitialAd failed to load: $error.');
-              _showToast(
-                  scaffoldContext, 'InterstitialAd failed to load: $error.');
+            onAdFailedToLoad: (Map error) {
+              String description = error['errorDescription'];
+              int code = error['errorCode'];
+
+              context.showToast(context, 'Error code: $code | $description');
               _interstitialAd = null;
             },
           ));
     } else {
-      _showToast(scaffoldContext, 'Format is null!');
+      context.showToast(scaffoldContext, 'Format is null!');
     }
   }
 
   void _showInterstitial() {
     if (_interstitialAd == null) {
-      _showToast(scaffoldContext,
+      context.showToast(scaffoldContext,
           'Warning: attempt to show interstitial before loaded.');
       return;
     }
     _interstitialAd!.fullScreenContentCallback = FullScreenContentCallback(
         onAdShowedFullScreenContent: (InterstitialAd ad) {
       debugPrint('onAdShowedFullScreenContent.');
-      _showToast(scaffoldContext, 'onAdShowedFullScreenContent');
+      context.showToast(scaffoldContext, 'onAdShowedFullScreenContent');
     }, onAdDismissedFullScreenContent: (InterstitialAd ad) {
       debugPrint('onAdDismissedFullScreenContent.');
-      _showToast(scaffoldContext, 'onAdDismissedFullScreenContent');
+      context.showToast(scaffoldContext, 'onAdDismissedFullScreenContent');
       ad.dispose();
-    }, onAdFailedToShowFullScreenContent: (InterstitialAd ad, AdError error) {
+    }, onAdFailedToShowFullScreenContent: (InterstitialAd ad, Map error) {
       debugPrint('onAdFailedToShowFullScreenContent: $error');
-      _showToast(scaffoldContext, 'onAdFailedToShowFullScreenContent: $error');
+      context.showToast(
+          scaffoldContext, 'onAdFailedToShowFullScreenContent: $error');
       ad.dispose();
     }, onAdWillDismissFullScreenContent: (InterstitialAd ad) {
       debugPrint('onAdWillDismissFullScreenContent');
-      _showToast(scaffoldContext, 'onAdWillDismissFullScreenContent');
     }, onAdImpression: (InterstitialAd ad) {
       debugPrint('onAdImpression');
-      _showToast(scaffoldContext, 'onAdImpression');
     }, onAdClicked: (InterstitialAd ad) {
       debugPrint('onAdClicked');
-      _showToast(scaffoldContext, 'onAdClicked');
     });
     _interstitialAd!.show();
     _interstitialAd = null;
-  }
-
-  void _showToast(BuildContext context, String message) {
-    final scaffold = ScaffoldMessenger.of(context);
-    scaffold.showSnackBar(
-      SnackBar(
-        duration: const Duration(seconds: 2),
-        content: Text(message),
-      ),
-    );
   }
 
   @override

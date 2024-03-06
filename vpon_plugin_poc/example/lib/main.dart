@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-import 'package:vpon_plugin_poc/ad_request.dart';
 import 'package:vpon_plugin_poc_example/banner_example.dart';
 import 'package:vpon_plugin_poc/vpon_ad_sdk.dart';
 import 'package:vpon_plugin_poc_example/interstitial_example.dart';
+import 'package:vpon_plugin_poc_example/native_example.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,16 +25,17 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  static const interstitialButtonText = 'Interstitial';
-  static const bannerButtonText = 'Banner';
+  static const interstitial = 'Interstitial';
+  static const banner = 'Banner';
+  static const native = 'Native';
 
-  final List<String> menuItems = [interstitialButtonText, bannerButtonText];
+  final List<String> menuItems = [interstitial, banner, native];
 
   @override
   void initState() {
     super.initState();
-    VponAdSDK.instance.updateRequestConfiguration(
-        RequestConfiguration(testDeviceIds: [testDeviceiOS]));
+    // VponAdSDK.instance.updateRequestConfiguration(
+    //     RequestConfiguration(testDeviceIds: [testDeviceiOS]));
   }
 
   @override
@@ -82,17 +83,24 @@ class _MyAppState extends State<MyApp> {
 
   void _handleMenuItemSelected(String selectedItem) {
     switch (selectedItem) {
-      case interstitialButtonText:
+      case interstitial:
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const InterstitialExample()),
         );
         break;
 
-      case bannerButtonText:
+      case banner:
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const BannerExample()),
+        );
+        break;
+
+      case native:
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const NativeExample()),
         );
         break;
 

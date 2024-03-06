@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:vpon_plugin_poc/ad_containers.dart';
 import 'package:vpon_plugin_poc/ad_listeners.dart';
 import 'package:vpon_plugin_poc/ad_request.dart';
+import 'package:vpon_plugin_poc/banner_ad.dart';
+import 'context_extensions.dart';
 
 import 'constants.dart';
 
@@ -16,6 +18,7 @@ class BannerExample extends StatefulWidget {
 }
 
 class _BannerExampleState extends State<BannerExample> {
+  late BuildContext scaffoldContext;
   BannerAd? _bannerAd;
   bool _isLoaded = false;
   BannerAdSize? _adSize;
@@ -59,8 +62,11 @@ class _BannerExampleState extends State<BannerExample> {
               _isLoaded = true;
             });
           },
-          onAdFailedToLoad: (Ad ad, LoadAdError error) {
-            debugPrint('banner_example onAdFailedToLoad');
+          onAdFailedToLoad: (Ad ad, Map error) {
+            String description = error['errorDescription'];
+            int code = error['errorCode'];
+
+            context.showToast(context, 'Error code: $code | $description');
             ad.dispose();
           },
         ),
@@ -138,32 +144,35 @@ class _BannerExampleState extends State<BannerExample> {
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-      appBar: AppBar(
-        title: const Text('Banner Demo'),
-      ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          child: ListView.separated(
-            itemCount: 3,
-            separatorBuilder: (BuildContext context, int index) {
-              return Container(
-                height: 40,
-              );
-            },
-            itemBuilder: (BuildContext context, int index) {
-              if (index == 0) {
-                return _getAdSizeSegmentedButtonWidget();
-              } else if (index == 1) {
-                return _getBannerAdWidget();
-              }
-              return const Text(
-                Constants.placeholderText,
-                style: TextStyle(fontSize: 14),
-              );
-            },
-          ),
+  Widget build(BuildContext context) {
+    scaffoldContext = context;
+    return Scaffold(
+        appBar: AppBar(
+          title: const Text('Banner Demo'),
         ),
-      ));
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: ListView.separated(
+              itemCount: 3,
+              separatorBuilder: (BuildContext context, int index) {
+                return Container(
+                  height: 40,
+                );
+              },
+              itemBuilder: (BuildContext context, int index) {
+                if (index == 0) {
+                  return _getAdSizeSegmentedButtonWidget();
+                } else if (index == 1) {
+                  return _getBannerAdWidget();
+                }
+                return const Text(
+                  Constants.placeholderText,
+                  style: TextStyle(fontSize: 14),
+                );
+              },
+            ),
+          ),
+        ));
+  }
 }

@@ -64,23 +64,23 @@ class RequestConfiguration {
 
 /// Values for [RequestConfiguration.maxAdContentRating].
 class MaxAdContentRating {
-  static final String unspecified = '';
-  static final String general = 'G';
-  static final String parentalGuidance = 'PG';
-  static final String teen = 'T';
-  static final String matureAudience = 'MA';
+  static const String unspecified = '';
+  static const String general = 'G';
+  static const String parentalGuidance = 'PG';
+  static const String teen = 'T';
+  static const String matureAudience = 'MA';
 }
 
 /// Values for [RequestConfiguration.tagForUnderAgeOfConsent].
 class TagForUnderAgeOfConsent {
-  static final int yes = 1;
-  static final int no = 0;
-  static final int unspecified = -1;
+  static const int yes = 1;
+  static const int no = 0;
+  static const int unspecified = -1;
 }
 
 /// Values for [RequestConfiguration.tagForChildDirectedTreatment].
 class TagForChildDirectedTreatment {
-  static final int yes = 1;
-  static final int no = 0;
-  static final int unspecified = -1;
+  static const int yes = 1;
+  static const int no = 0;
+  static const int unspecified = -1;
 }
