@@ -8,6 +8,7 @@ public class VponPluginPocPlugin: NSObject, FlutterPlugin {
     var channel: FlutterMethodChannel?
     var manager: AdInstanceManager
     var readerWriter: FlutterVponAdReaderWriter?
+    private var nativeAdFactories: [String: FlutterNativeAdFactory] = [:]
     
     public static func register(with registrar: FlutterPluginRegistrar) {
         let plugin = VponPluginPocPlugin(binaryMessenger: registrar.messenger())
@@ -31,6 +32,23 @@ public class VponPluginPocPlugin: NSObject, FlutterPlugin {
     
     init(binaryMessenger: FlutterBinaryMessenger) {
         manager = AdInstanceManager(binaryMessenger: binaryMessenger)
+    }
+    
+    public static func registerNativeAdFactory(registry: FlutterPluginRegistry, factoryId: String, nativeAdFactory: FlutterNativeAdFactory) -> Bool {
+        let pluginClassName = String(describing: VponPluginPocPlugin.self)
+        guard let vponPlugin = registry.valuePublished(byPlugin: pluginClassName) as? VponPluginPocPlugin else {
+            let reason = String(format: "Could not find a \(pluginClassName) instance. The plugin may have not been registered.")
+            NSException(name: .invalidArgumentException, reason: reason).raise()
+            return false
+        }
+        
+        if vponPlugin.nativeAdFactories[factoryId] != nil {
+            Console.log("A NativeAdFactory with factoryId: \(factoryId) already exists", type: .error)
+            return false
+        }
+        
+        vponPlugin.nativeAdFactories[factoryId] = nativeAdFactory
+        return true
     }
     
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
@@ -127,6 +145,30 @@ public class VponPluginPocPlugin: NSObject, FlutterPlugin {
             }
             result(nil)
             
+        case "loadNativeAd":
+            guard let arg = call.arguments as? [String: Any],
+                  let factoryId = arg["factoryId"] as? String else {
+                result(nil)
+                return
+            }
+            
+            guard let factory = nativeAdFactories[factoryId] else {
+                let message = "Can't find NativeAdFactory with id: \(factoryId)"
+                result(FlutterError(code: "NativeAdError", message: message, details: nil))
+                return
+            }
+            
+            if let key = arg["licenseKey"] as? String,
+               let adId = arg["adId"] as? Int,
+                let request = arg["request"] as? FlutterAdRequest {
+                let nativeAd = FlutterNativeAd(licenseKey: key,
+                                               adRequest: request,
+                                               nativeAdFactory: factory,
+                                               rootViewController: rootController,
+                                               adId: adId)
+                manager.loadAd(nativeAd)
+                result(nil)
+            }
             
         case "disposeAd":
             guard let arg = call.arguments as? [String: Any] else {

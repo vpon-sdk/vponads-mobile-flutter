@@ -72,7 +72,7 @@ class AdInstanceManager {
         ])
     }
     
-    // MARK: - Dart notification - VponFullScreenContentDelegate
+    // MARK: - Send event to Dart - FullScreen content ad callback
     
     func didFailToPresentFullScreenContent(_ ad: FlutterAd, with error: Error) {
         channel.invokeMethod(Constant.onAdEvent, 
@@ -82,6 +82,10 @@ class AdInstanceManager {
                                 Constant.loadAdError: [Constant.errorDescription: error.localizedDescription,
                                                        Constant.errorCode:  (error as NSError).code]
                              ])
+    }
+    
+    func adDidRecordImpression(_ ad: FlutterAd) {
+        sendAdEvent("adDidRecordImpression", ad: ad)
     }
     
     func adWillPresentFullScreenContent(_ ad: FlutterAd) {
@@ -96,17 +100,23 @@ class AdInstanceManager {
         sendAdEvent("adDidDismissFullScreenContent", ad: ad)
     }
     
-    // MARK: - General
+    // MARK: - Send event to Dart - Banner ad callback
     
-    func adDidRecordImpression(_ ad: FlutterAd) {
-        sendAdEvent("adDidRecordImpression", ad: ad)
+    func onBannerImpression(_ ad: FlutterBannerAd) {
+        sendAdEvent("onBannerImpression", ad: ad)
     }
+    
+    // MARK: - Send event to Dart -  Native ad callback
+    
+    func onNativeAdImpression(_ ad: FlutterNativeAd) {
+        sendAdEvent("onNativeAdImpression", ad: ad)
+    }
+    
+    // MARK: - Send event to Dart - callback
     
     func adDidRecordClick(_ ad: FlutterAd) {
         sendAdEvent("adDidRecordClick", ad: ad)
     }
-    
-   
     
     // MARK: - Helper
     

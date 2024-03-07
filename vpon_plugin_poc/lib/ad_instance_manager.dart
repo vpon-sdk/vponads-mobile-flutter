@@ -7,6 +7,7 @@ import 'ad_containers.dart';
 import 'ad_request.dart';
 import 'insterstitial_ad.dart';
 import 'banner_ad.dart';
+import 'native_ad.dart';
 
 /// Loads and disposes [BannerAds] and [InterstitialAds].
 AdInstanceManager instanceManager = AdInstanceManager(
@@ -79,7 +80,9 @@ class AdInstanceManager {
       case 'adDidRecordClick':
         _invokeOnAdClicked(ad, eventName);
         break;
-      case 'adDidRecordImpression':
+      case 'adDidRecordImpression' ||
+            'onBannerImpression' ||
+            'onNativeAdImpression':
         _invokeOnAdImpression(ad, eventName);
         break;
       case 'adWillPresentFullScreenContent':
@@ -288,7 +291,7 @@ class AdInstanceManager {
   /// Starts loading the ad if not previously loaded.
   ///
   /// Loading also terminates if ad is already in the process of loading.
-  /*Future<void> loadNativeAd(NativeAd ad) {
+  Future<void> loadNativeAd(NativeAd ad) {
     if (adIdFor(ad) != null) {
       return Future<void>.value();
     }
@@ -299,16 +302,12 @@ class AdInstanceManager {
       'loadNativeAd',
       <dynamic, dynamic>{
         'adId': adId,
-        'adUnitId': ad.adUnitId,
+        'licenseKey': ad.licenseKey,
         'request': ad.request,
-        'adManagerRequest': ad.adManagerRequest,
         'factoryId': ad.factoryId,
-        'nativeAdOptions': ad.nativeAdOptions,
-        'customOptions': ad.customOptions,
-        'nativeTemplateStyle': ad.nativeTemplateStyle,
       },
     );
-  }*/
+  }
 
   /// Free the plugin resources associated with this ad.
   ///
@@ -373,14 +372,14 @@ class AdMessageCodec extends StandardMessageCodec {
 
   static const int _valueResponseInfo = 140;
 
-  static const int _valueNativeAdOptions = 144;
+  // static const int _valueNativeAdOptions = 144;
 
   static const int _valueRequestConfigurationParams = 148;
-  static const int _valueNativeTemplateStyle = 149;
-  static const int _valueNativeTemplateTextStyle = 150;
-  static const int _valueNativeTemplateFontStyle = 151;
-  static const int _valueNativeTemplateType = 152;
-  static const int _valueColor = 153;
+  // static const int _valueNativeTemplateStyle = 149;
+  // static const int _valueNativeTemplateTextStyle = 150;
+  // static const int _valueNativeTemplateFontStyle = 151;
+  // static const int _valueNativeTemplateType = 152;
+  // static const int _valueColor = 153;
 
   @override
   void writeValue(WriteBuffer buffer, dynamic value) {
@@ -413,8 +412,6 @@ class AdMessageCodec extends StandardMessageCodec {
   dynamic readValueOfType(dynamic type, ReadBuffer buffer) {
     // debugPrint('readValueOfType $type');
     switch (type) {
-     
-
       default:
         // debugPrint('super.readValueOfType $type');
         return super.readValueOfType(type, buffer);
