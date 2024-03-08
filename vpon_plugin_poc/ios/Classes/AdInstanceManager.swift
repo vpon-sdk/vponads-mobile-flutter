@@ -68,19 +68,19 @@ class AdInstanceManager {
             Constant.adId: ad.adId,
             Constant.eventName: "onAdFailedToLoad",
             Constant.loadAdError: [Constant.errorDescription: error.localizedDescription,
-                                        Constant.errorCode:  (error as NSError).code]
+                                   Constant.errorCode: (error as NSError).code]
         ])
     }
     
     // MARK: - Send event to Dart - FullScreen content ad callback
     
     func didFailToPresentFullScreenContent(_ ad: FlutterAd, with error: Error) {
-        channel.invokeMethod(Constant.onAdEvent, 
+        channel.invokeMethod(Constant.onAdEvent,
                              arguments: [
                                 Constant.adId: ad.adId,
                                 Constant.eventName: "didFailToPresentFullScreenContentWithError",
                                 Constant.loadAdError: [Constant.errorDescription: error.localizedDescription,
-                                                       Constant.errorCode:  (error as NSError).code]
+                                                       Constant.errorCode: (error as NSError).code]
                              ])
     }
     

@@ -51,7 +51,7 @@ class _BannerExampleState extends State<BannerExample> {
       _bannerAd = BannerAd(
         licenseKey: key,
         size: _adSize!,
-        request: const AdRequest(),
+        request: AdRequest(),
         listener: BannerAdListener(
           onAdLoaded: (Ad ad) async {
             BannerAd bannerAd = (ad as BannerAd);

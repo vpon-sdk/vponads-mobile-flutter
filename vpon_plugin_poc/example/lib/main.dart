@@ -35,8 +35,15 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    // VponAdSDK.instance.updateRequestConfiguration(
-    //     RequestConfiguration(testDeviceIds: [testDeviceiOS]));
+
+    VponAdSDK.instance.getVponID().then((id) {
+      debugPrint('id = $id');
+    });
+
+    VponAdLocationManager.instance.isEnable = false;
+
+    VponAdSDK.instance.updateRequestConfiguration(
+        RequestConfiguration(testDeviceIds: [testDeviceiOS]));
   }
 
   @override

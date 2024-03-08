@@ -31,11 +31,14 @@ class _InterstitialExampleState extends State<InterstitialExample> {
   }
 
   void _loadInterstitialAd() {
-    AdRequest request = const AdRequest(
-        keywords: <String>['test1', 'test2'],
-        contentUrl: 'https://google.com',
-        contentData: {'test': '123'},
-        format: "mi");
+    AdRequest request = AdRequest();
+    request.userInfoAge = 30;
+    request.setUserInfoBirthday(year: 2000, month: 6, day: 20);
+    request.userInfoGender = UserInfoGender.male.value;
+    request.contentUrl = 'https://google.com';
+    request.contentData = {"testKey": "testValue"};
+    request.addContentData(key: "testKey2", value: "testValue2");
+    request.addKeyword('testKeyword');
 
     if (_format != null) {
       InterstitialAd.load(
@@ -72,10 +75,9 @@ class _InterstitialExampleState extends State<InterstitialExample> {
     _interstitialAd!.fullScreenContentCallback = FullScreenContentCallback(
         onAdShowedFullScreenContent: (InterstitialAd ad) {
       debugPrint('onAdShowedFullScreenContent.');
-      context.showToast(scaffoldContext, 'onAdShowedFullScreenContent');
     }, onAdDismissedFullScreenContent: (InterstitialAd ad) {
       debugPrint('onAdDismissedFullScreenContent.');
-      context.showToast(scaffoldContext, 'onAdDismissedFullScreenContent');
+
       ad.dispose();
     }, onAdFailedToShowFullScreenContent: (InterstitialAd ad, Map error) {
       debugPrint('onAdFailedToShowFullScreenContent: $error');

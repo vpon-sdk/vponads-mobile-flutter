@@ -60,6 +60,18 @@ public class VponPluginPocPlugin: NSObject, FlutterPlugin {
             VponAdConfiguration.shared.initializeSdk()
             VponAdConfiguration.shared.logLevel = .debug
             
+        case "getVponID":
+            let id = VponAdConfiguration.shared.getVponID()
+            result(id)
+            
+        case "setLocationManagerEnable":
+            guard let arg = call.arguments as? [String: Bool],
+            let isEnable = arg["isEnable"] else {
+                result(nil)
+                return
+            }
+            VponAdLocationManager.shared.isEnable = isEnable
+            
         case "_init":
             manager.disposeAllAds()
             result(nil)

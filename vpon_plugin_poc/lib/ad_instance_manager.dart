@@ -9,7 +9,6 @@ import 'insterstitial_ad.dart';
 import 'banner_ad.dart';
 import 'native_ad.dart';
 
-/// Loads and disposes [BannerAds] and [InterstitialAds].
 AdInstanceManager instanceManager = AdInstanceManager(
   'plugins.flutter.io/vpon',
 );
@@ -50,10 +49,28 @@ class AdInstanceManager {
     ))!;
   }
 
+  Future<String?> getVponID() async {
+    String? id;
+    try {
+      final String result =
+          await instanceManager.channel.invokeMethod('getVponID');
+      id = result;
+    } on PlatformException catch (e) {
+      debugPrint("Failed to get id: '${e.message}'.");
+    }
+    return id;
+  }
+
+  void setLocationManagerEnable(bool isEnable) async {
+    debugPrint('setLocationManagerEnable $isEnable');
+    await instanceManager.channel.invokeMethod(
+        'setLocationManagerEnable', <String, bool>{'isEnable': isEnable});
+  }
+
   Future<BannerAdSize?> getAdSize(Ad ad) =>
       instanceManager.channel.invokeMethod<BannerAdSize>(
         'getAdSize',
-        <dynamic, dynamic>{
+        <String, dynamic>{
           'adId': adIdFor(ad),
         },
       );
@@ -261,7 +278,7 @@ class AdInstanceManager {
     _loadedAds[adId] = ad;
     return channel.invokeMethod<void>(
       'loadBannerAd',
-      <dynamic, dynamic>{
+      <String, dynamic>{
         'adId': adId,
         'licenseKey': ad.licenseKey,
         'request': ad.request,
@@ -280,7 +297,7 @@ class AdInstanceManager {
     debugPrint('channel.invokeMethod loadInterstitialAd, request: $ad');
     return channel.invokeMethod<void>(
       'loadInterstitialAd',
-      <dynamic, dynamic>{
+      <String, dynamic>{
         'adId': adId,
         'licenseKey': ad.licenseKey,
         'request': ad.request,
@@ -300,7 +317,7 @@ class AdInstanceManager {
     _loadedAds[adId] = ad;
     return channel.invokeMethod<void>(
       'loadNativeAd',
-      <dynamic, dynamic>{
+      <String, dynamic>{
         'adId': adId,
         'licenseKey': ad.licenseKey,
         'request': ad.request,
@@ -387,9 +404,14 @@ class AdMessageCodec extends StandardMessageCodec {
     if (value is BannerAdSize) {
       writeAdSize(buffer, value);
     } else if (value is AdRequest) {
+      debugPrint('writeValue AdRequest $value');
       buffer.putUint8(_valueAdRequest);
-      writeValue(buffer, value.keywords);
       writeValue(buffer, value.contentUrl);
+      writeValue(buffer, value.contentData);
+      writeValue(buffer, value.keywords);
+      writeValue(buffer, value.userInfoAge);
+      writeValue(buffer, value.userInfoGender);
+      writeValue(buffer, value.userInfoBirthday);
     } else if (value is RequestConfiguration) {
       buffer.putUint8(_valueRequestConfigurationParams);
       writeValue(buffer, value.maxAdContentRating);
