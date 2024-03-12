@@ -43,10 +43,15 @@ class AdInstanceManager {
   /// Invokes load and dispose calls.
   final MethodChannel channel;
 
-  Future initialize() async {
+  Future<void> initialize() async {
     return (await instanceManager.channel.invokeMethod(
       'initializeSDK',
-    ))!;
+    ));
+  }
+
+  Future<void> setLogLevel(int level) async {
+    return await instanceManager.channel
+        .invokeMethod('setLogLevel', <String, int>{'level': level});
   }
 
   /// Set the [VponRequestConfiguration] to apply for future ad requests.

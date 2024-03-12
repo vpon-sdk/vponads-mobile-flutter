@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:vpon_plugin_poc/ad_request.dart';
-
-import 'package:vpon_plugin_poc_example/banner_example.dart';
 import 'package:vpon_plugin_poc/vpon_ad_sdk.dart';
+import 'package:vpon_plugin_poc_example/banner_example.dart';
 import 'package:vpon_plugin_poc_example/interstitial_example.dart';
 import 'package:vpon_plugin_poc_example/native_example.dart';
 
@@ -36,6 +34,7 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
 
+    VponAdSDK.instance.setLogLevel(VponLogLevel.debug);
     VponAdSDK.instance.getVponID().then((id) {
       debugPrint('id = $id');
     });
