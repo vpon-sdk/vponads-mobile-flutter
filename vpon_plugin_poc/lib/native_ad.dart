@@ -21,7 +21,7 @@ class NativeAd extends AdWithView {
   final NativeAdListener listener;
 
   /// Targeting information used to fetch an [Ad].
-  final AdRequest? request;
+  final VponAdRequest? request;
 
   @override
   Future<void> load() async {

@@ -72,7 +72,7 @@ class NativeExampleState extends State<NativeExample> {
           onAdClicked: (ad) {},
           onAdImpression: (ad) {},
         ),
-        request: AdRequest(),
+        request: VponAdRequest(),
       )..load();
     } else {
       debugPrint('Format is null!');

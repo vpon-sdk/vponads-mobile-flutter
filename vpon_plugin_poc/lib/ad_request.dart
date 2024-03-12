@@ -1,4 +1,4 @@
-class AdRequest {
+class VponAdRequest {
   String? contentUrl;
   List<String> keywords = [];
   Map<String, dynamic> extraData = {};
@@ -6,7 +6,7 @@ class AdRequest {
 
   int? userInfoAge;
   Map<String, int> userInfoBirthday = {};
-  int userInfoGender = UserInfoGender.unspecified.value;
+  int userInfoGender = VponUserInfoGender.unspecified.value;
 
   /// Set user birthday
   void setUserInfoBirthday(
@@ -56,65 +56,65 @@ class AdRequest {
   // }
 }
 
-enum UserInfoGender {
+enum VponUserInfoGender {
   unspecified(-1),
   male(0),
   female(1),
   unknown(2);
 
-  const UserInfoGender(this.value);
+  const VponUserInfoGender(this.value);
   final int value;
 }
 
-class RequestConfiguration {
+class VponRequestConfiguration {
   /// Maximum content rating that will be shown.
-  final MaxAdContentRating? maxAdContentRating;
+  final VponMaxAdContentRating? maxAdContentRating;
 
   /// Whether to tag as child directed.
-  final TagForChildDirectedTreatment? tagForChildDirectedTreatment;
+  final VponTagForChildDirectedTreatment? tagForChildDirectedTreatment;
 
   /// Whether to tag as under age of consent.
-  final TagForUnderAgeOfConsent? tagForUnderAgeOfConsent;
+  final VponTagForUnderAgeOfConsent? tagForUnderAgeOfConsent;
 
   /// List of test device ids to set.
   final List<String>? testDeviceIds;
 
-  /// Creates a [RequestConfiguration].
-  RequestConfiguration(
+  /// Creates a [VponRequestConfiguration].
+  VponRequestConfiguration(
       {this.maxAdContentRating,
       this.tagForChildDirectedTreatment,
       this.tagForUnderAgeOfConsent,
       this.testDeviceIds});
 }
 
-/// Values for [RequestConfiguration.maxAdContentRating].
-enum MaxAdContentRating {
+/// Values for [VponRequestConfiguration.maxAdContentRating].
+enum VponMaxAdContentRating {
   unspecified(-1),
   general(0),
   parentalGuidance(1),
   teen(2),
   matureAudience(3);
 
-  const MaxAdContentRating(this.value);
+  const VponMaxAdContentRating(this.value);
   final int value;
 }
 
-/// Values for [RequestConfiguration.tagForUnderAgeOfConsent].
-enum TagForUnderAgeOfConsent {
+/// Values for [VponRequestConfiguration.tagForUnderAgeOfConsent].
+enum VponTagForUnderAgeOfConsent {
   unspecified(-1),
   no(0),
   yes(1);
 
-  const TagForUnderAgeOfConsent(this.value);
+  const VponTagForUnderAgeOfConsent(this.value);
   final int value;
 }
 
-/// Values for [RequestConfiguration.tagForChildDirectedTreatment].
-enum TagForChildDirectedTreatment {
+/// Values for [VponRequestConfiguration.tagForChildDirectedTreatment].
+enum VponTagForChildDirectedTreatment {
   unspecified(-1),
   no(0),
   yes(1);
 
-  const TagForChildDirectedTreatment(this.value);
+  const VponTagForChildDirectedTreatment(this.value);
   final int value;
 }

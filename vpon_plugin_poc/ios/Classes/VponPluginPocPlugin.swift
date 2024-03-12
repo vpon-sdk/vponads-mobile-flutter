@@ -20,8 +20,8 @@ public class VponPluginPocPlugin: NSObject, FlutterPlugin {
         let codec = FlutterStandardMethodCodec(readerWriter: readerWriter)
         
         plugin.channel = FlutterMethodChannel(name: Constant.channelName,
-                                                binaryMessenger: registrar.messenger(),
-                                                codec: codec)
+                                              binaryMessenger: registrar.messenger(),
+                                              codec: codec)
         registrar.addMethodCallDelegate(plugin, channel: plugin.channel!)
         
         // Register native view
@@ -55,30 +55,68 @@ public class VponPluginPocPlugin: NSObject, FlutterPlugin {
         let rootController = self.rootController()
         switch call.method {
             
-        case "VponAdSDK#initialize":
-            // Init Vpon SDK
+        case .initializeSDK:
             VponAdConfiguration.shared.initializeSdk()
-            VponAdConfiguration.shared.logLevel = .debug
+            result(nil)
             
-        case "getVponID":
-            let id = VponAdConfiguration.shared.getVponID()
-            result(id)
-            
-        case "setLocationManagerEnable":
-            guard let arg = call.arguments as? [String: Bool],
-            let isEnable = arg["isEnable"] else {
-                result(nil)
+        case .setLogLevel:
+            guard let arg = call.arguments as? [String: Int],
+                  let status = arg["level"],
+                  let validLevel = VponLogLevel(rawValue: status) else {
+                result(FlutterError.invalidArgument)
                 return
             }
-            VponAdLocationManager.shared.isEnable = isEnable
+            VponAdConfiguration.shared.logLevel = validLevel
+            result(nil)
             
-        case "_init":
+            
+        case ._init:
             manager.disposeAllAds()
             result(nil)
             
-        case "VponAdSDK#updateRequestConfiguration":
+        case .getVponID:
+            let id = VponAdConfiguration.shared.getVponID()
+            result(id)
+            
+        case .setLocationManagerEnable:
+            guard let arg = call.arguments as? [String: Bool],
+                  let isEnable = arg["isEnable"] else {
+                result(FlutterError.invalidArgument)
+                return
+            }
+            VponAdLocationManager.shared.isEnable = isEnable
+            result(nil)
+            
+        case .setAudioApplicationManaged:
+            guard let arg = call.arguments as? [String: Bool],
+                  let isManaged = arg["isManaged"] else {
+                result(FlutterError.invalidArgument)
+                return
+            }
+            VponAdAudioManager.shared.isAudioApplicationManaged = isManaged
+            result(nil)
+            
+        case .noticeApplicationAudioWillStart:
+            VponAdAudioManager.shared.noticeApplicationAudioWillStart()
+            result(nil)
+            
+        case .noticeApplicationAudioDidEnd:
+            VponAdAudioManager.shared.noticeApplicationAudioDidEnded()
+            result(nil)
+            
+        case .setConsentStatus:
+            guard let arg = call.arguments as? [String: Int],
+                  let status = arg["status"],
+                  let validStatus = VponConsentStatus(rawValue: status) else {
+                result(FlutterError.invalidArgument)
+                return
+            }
+            VponUCB.shared.setConsentStatus(validStatus)
+            result(nil)
+            
+        case .updateRequestConfiguration:
             guard let arg = call.arguments as? [String: Any] else {
-                result(nil)
+                result(FlutterError.invalidArgument)
                 return
             }
             let config = VponAdRequestConfiguration.shared
@@ -121,26 +159,32 @@ public class VponPluginPocPlugin: NSObject, FlutterPlugin {
             }
             result(nil)
             
-        case "loadInterstitialAd":
+        case .getVersionString:
+            let version = VponAdConfiguration.sdkVersion()
+            result(version)
+            
+        case .loadInterstitialAd:
             guard let arg = call.arguments as? [String: Any] else {
-                result(nil)
+                result(FlutterError.invalidArgument)
                 return
             }
             if let key = arg["licenseKey"] as? String,
                let adId = arg["adId"] as? Int,
                let request = arg["request"] as? FlutterAdRequest {
                 
-                let ad = FlutterInterstitialAd(licenseKey: key, 
+                let ad = FlutterInterstitialAd(licenseKey: key,
                                                request: request,
                                                rootViewController: rootController,
                                                adId: adId)
                 manager.loadAd(ad)
-            }
-            result(nil)
-            
-        case "loadBannerAd":
-            guard let arg = call.arguments as? [String: Any] else {
                 result(nil)
+            } else {
+                result(FlutterError.invalidArgument)
+            }
+            
+        case .loadBannerAd:
+            guard let arg = call.arguments as? [String: Any] else {
+                result(FlutterError.invalidArgument)
                 return
             }
             if let key = arg["licenseKey"] as? String,
@@ -154,13 +198,15 @@ public class VponPluginPocPlugin: NSObject, FlutterPlugin {
                                          rootViewController: rootController,
                                          adId: adId)
                 manager.loadAd(ad)
+                result(nil)
+            } else {
+                result(FlutterError.invalidArgument)
             }
-            result(nil)
             
-        case "loadNativeAd":
+        case .loadNativeAd:
             guard let arg = call.arguments as? [String: Any],
                   let factoryId = arg["factoryId"] as? String else {
-                result(nil)
+                result(FlutterError.invalidArgument)
                 return
             }
             
@@ -172,7 +218,7 @@ public class VponPluginPocPlugin: NSObject, FlutterPlugin {
             
             if let key = arg["licenseKey"] as? String,
                let adId = arg["adId"] as? Int,
-                let request = arg["request"] as? FlutterAdRequest {
+               let request = arg["request"] as? FlutterAdRequest {
                 let nativeAd = FlutterNativeAd(licenseKey: key,
                                                adRequest: request,
                                                nativeAdFactory: factory,
@@ -180,26 +226,26 @@ public class VponPluginPocPlugin: NSObject, FlutterPlugin {
                                                adId: adId)
                 manager.loadAd(nativeAd)
                 result(nil)
+            } else {
+                result(FlutterError.invalidArgument)
             }
             
-        case "disposeAd":
-            guard let arg = call.arguments as? [String: Any] else {
-                result(nil)
+        case .disposeAd:
+            guard let arg = call.arguments as? [String: Any],
+                  let adId = arg["adId"] as? Int else {
+                result(FlutterError.invalidArgument)
                 return
             }
-            if let adId = arg["adId"] as? Int {
-                manager.dispose(adId: adId)
-            }
+            manager.dispose(adId: adId)
             result(nil)
             
-        case "showAdWithoutView":
-            guard let arg = call.arguments as? [String: Any] else {
-                result(nil)
+        case .showAdWithoutView:
+            guard let arg = call.arguments as? [String: Any],
+                  let adId = arg["adId"] as? Int else {
+                result(FlutterError.invalidArgument)
                 return
             }
-            if let adId = arg["adId"] as? Int {
-                manager.showAd(adId: adId)
-            }
+            manager.showAd(adId: adId)
             result(nil)
             
         default:

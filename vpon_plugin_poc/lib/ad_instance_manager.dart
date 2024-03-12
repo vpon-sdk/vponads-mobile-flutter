@@ -45,8 +45,28 @@ class AdInstanceManager {
 
   Future initialize() async {
     return (await instanceManager.channel.invokeMethod(
-      'VponAdSDK#initialize',
+      'initializeSDK',
     ))!;
+  }
+
+  /// Set the [VponRequestConfiguration] to apply for future ad requests.
+  Future<void> updateRequestConfiguration(
+      VponRequestConfiguration requestConfiguration) {
+    return channel.invokeMethod<void>(
+      'updateRequestConfiguration',
+      <dynamic, dynamic>{
+        'maxAdContentRating': requestConfiguration.maxAdContentRating,
+        'tagForChildDirectedTreatment':
+            requestConfiguration.tagForChildDirectedTreatment,
+        'testDeviceIds': requestConfiguration.testDeviceIds,
+        'tagForUnderAgeOfConsent': requestConfiguration.tagForUnderAgeOfConsent,
+      },
+    );
+  }
+
+  Future<String> getVersionString() async {
+    return (await instanceManager.channel
+        .invokeMethod<String>('getVersionString'))!;
   }
 
   Future<String?> getVponID() async {
@@ -61,10 +81,53 @@ class AdInstanceManager {
     return id;
   }
 
-  void setLocationManagerEnable(bool isEnable) async {
+  Future<void> setConsentStatus(int value) async {
+    try {
+      await instanceManager.channel
+          .invokeMethod('setConsentStatus', <String, int>{'status': value});
+    } on PlatformException catch (e) {
+      debugPrint("invokeMethod('setConsentStatus') failed: '${e.message}'.");
+    }
+  }
+
+  /* ------------------------ Location Manager Service ------------------------ */
+
+  Future<void> setLocationManagerEnable(bool isEnable) async {
     debugPrint('setLocationManagerEnable $isEnable');
     await instanceManager.channel.invokeMethod(
         'setLocationManagerEnable', <String, bool>{'isEnable': isEnable});
+  }
+
+  /* -------------------------- Audio Manager Service ------------------------- */
+
+  Future<void> setAudioApplicationManaged(bool isManaged) async {
+    try {
+      await instanceManager.channel.invokeMethod(
+          'setAudioApplicationManaged', <String, bool>{'isManaged': isManaged});
+    } on PlatformException catch (e) {
+      debugPrint(
+          "invokeMethod('setAudioApplicationManaged') failed: '${e.message}'.");
+    }
+  }
+
+  Future<void> noticeApplicationAudioWillStart() async {
+    try {
+      await instanceManager.channel
+          .invokeMethod('noticeApplicationAudioWillStart');
+    } on PlatformException catch (e) {
+      debugPrint(
+          "invokeMethod('noticeApplicationAudioWillStart') failed: '${e.message}'.");
+    }
+  }
+
+  Future<void> noticeApplicationAudioDidEnd() async {
+    try {
+      await instanceManager.channel
+          .invokeMethod('noticeApplicationAudioDidEnd');
+    } on PlatformException catch (e) {
+      debugPrint(
+          "invokeMethod('noticeApplicationAudioDidEnd') failed: '${e.message}'.");
+    }
   }
 
   Future<BannerAdSize?> getAdSize(Ad ad) =>
@@ -74,6 +137,8 @@ class AdInstanceManager {
           'adId': adIdFor(ad),
         },
       );
+
+  /* ------------------------------- Ad Callback ------------------------------ */
 
   void _onAdEvent(Ad ad, String eventName, Map<dynamic, dynamic> arguments) {
     if (defaultTargetPlatform == TargetPlatform.android) {
@@ -249,6 +314,8 @@ class AdInstanceManager {
     }
   }
 
+  /* ----------------------------- Load & Show Ad ----------------------------- */
+
   /// Returns null if an invalid [adId] was passed in.
   Ad? adFor(int adId) => _loadedAds[adId];
 
@@ -359,26 +426,6 @@ class AdInstanceManager {
       },
     );
   }
-
-  /// Set the [RequestConfiguration] to apply for future ad requests.
-  Future<void> updateRequestConfiguration(
-      RequestConfiguration requestConfiguration) {
-    return channel.invokeMethod<void>(
-      'VponAdSDK#updateRequestConfiguration',
-      <dynamic, dynamic>{
-        'maxAdContentRating': requestConfiguration.maxAdContentRating,
-        'tagForChildDirectedTreatment':
-            requestConfiguration.tagForChildDirectedTreatment,
-        'testDeviceIds': requestConfiguration.testDeviceIds,
-        'tagForUnderAgeOfConsent': requestConfiguration.tagForUnderAgeOfConsent,
-      },
-    );
-  }
-
-  Future<String> getVersionString() async {
-    return (await instanceManager.channel
-        .invokeMethod<String>('VponAdSDK#getVersionString'))!;
-  }
 }
 
 @visibleForTesting
@@ -386,24 +433,14 @@ class AdMessageCodec extends StandardMessageCodec {
   // The type values below must be consistent for each platform.
   static const int _valueAdSize = 128;
   static const int _valueAdRequest = 129;
-
-  static const int _valueResponseInfo = 140;
-
-  // static const int _valueNativeAdOptions = 144;
-
   static const int _valueRequestConfigurationParams = 148;
-  // static const int _valueNativeTemplateStyle = 149;
-  // static const int _valueNativeTemplateTextStyle = 150;
-  // static const int _valueNativeTemplateFontStyle = 151;
-  // static const int _valueNativeTemplateType = 152;
-  // static const int _valueColor = 153;
 
   @override
   void writeValue(WriteBuffer buffer, dynamic value) {
     // debugPrint('writeValue $value');
     if (value is BannerAdSize) {
       writeAdSize(buffer, value);
-    } else if (value is AdRequest) {
+    } else if (value is VponAdRequest) {
       debugPrint('writeValue AdRequest $value');
       buffer.putUint8(_valueAdRequest);
       writeValue(buffer, value.contentUrl);
@@ -412,7 +449,7 @@ class AdMessageCodec extends StandardMessageCodec {
       writeValue(buffer, value.userInfoAge);
       writeValue(buffer, value.userInfoGender);
       writeValue(buffer, value.userInfoBirthday);
-    } else if (value is RequestConfiguration) {
+    } else if (value is VponRequestConfiguration) {
       buffer.putUint8(_valueRequestConfigurationParams);
       writeValue(buffer, value.maxAdContentRating);
       writeValue(buffer, value.tagForChildDirectedTreatment);

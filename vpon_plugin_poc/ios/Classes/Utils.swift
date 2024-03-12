@@ -7,6 +7,7 @@
 
 import Foundation
 import OSLog
+import Flutter
 
 struct Constant {
     /// "plugins.flutter.io/vpon"
@@ -19,10 +20,35 @@ struct Constant {
     static let errorCode = "errorCode"
 }
 
+/// For handle FlutterMethodCall
+extension String {
+    static let initializeSDK = "initializeSDK"
+    static let _init = "_init"
+    static let setLogLevel = "setLogLevel"
+    static let getVponID = "getVponID"
+    static let setLocationManagerEnable = "setLocationManagerEnable"
+    static let setAudioApplicationManaged = "setAudioApplicationManaged"
+    static let noticeApplicationAudioWillStart = "noticeApplicationAudioWillStart"
+    static let noticeApplicationAudioDidEnd = "noticeApplicationAudioDidEnd"
+    static let setConsentStatus = "setConsentStatus"
+    static let updateRequestConfiguration = "updateRequestConfiguration"
+    static let getVersionString = "getVersionString"
+    
+    static let loadInterstitialAd = "loadInterstitialAd"
+    static let loadBannerAd = "loadBannerAd"
+    static let loadNativeAd = "loadNativeAd"
+    static let disposeAd = "disposeAd"
+    static let showAdWithoutView = "showAdWithoutView"
+}
+
 struct Console {
     
     static func log(_ message: String, type: OSLogType = .debug) {
         print("<Plugin> [iOS Native] \(message)")
 //        os_log("<Plugin> [iOS Native] %@", log: .default, type: type , message)
     }
+}
+
+extension FlutterError {
+    static var invalidArgument: FlutterError { return FlutterError(code: "InvalidArgument", message: "The argument passed by Dart is null. Please check the spelling and type of the argument.", details: nil)}
 }

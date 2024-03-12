@@ -14,7 +14,7 @@ class BannerAd extends AdWithView {
   }) : super(licenseKey: licenseKey, listener: listener);
 
   /// Targeting information used to fetch an [Ad].
-  final AdRequest request;
+  final VponAdRequest request;
 
   /// A listener for receiving events in the ad lifecycle.
   @override

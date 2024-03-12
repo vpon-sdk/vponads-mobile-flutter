@@ -39,11 +39,17 @@ class _MyAppState extends State<MyApp> {
     VponAdSDK.instance.getVponID().then((id) {
       debugPrint('id = $id');
     });
+    VponAdSDK.instance.getVersionString().then((version) {
+      debugPrint('version = $version');
+    });
 
-    VponAdLocationManager.instance.isEnable = false;
+    VponAdLocationManager.instance.setIsEnable(false);
+    VponAdAudioManager.instance.setIsAudioApplicationManaged(true);
+    VponAdAudioManager.instance.noticeApplicationAudioDidEnd();
+    VponUCB.instance.setConsentStatus(VponConsentStatus.personalized);
 
     VponAdSDK.instance.updateRequestConfiguration(
-        RequestConfiguration(testDeviceIds: [testDeviceiOS]));
+        VponRequestConfiguration(testDeviceIds: [testDeviceiOS]));
   }
 
   @override

@@ -15,7 +15,7 @@ class InterstitialAd extends AdWithoutView {
   }) : super(licenseKey: licenseKey);
 
   /// Targeting information used to fetch an [Ad].
-  final AdRequest request;
+  final VponAdRequest request;
 
   /// Callback to be invoked when the ad finishes loading.
   final InterstitialAdLoadCallback adLoadCallback;
@@ -26,7 +26,7 @@ class InterstitialAd extends AdWithoutView {
   /// Loads an [InterstitialAd] with the given [licenseKey] and [request].
   static Future<void> load({
     required String licenseKey,
-    required AdRequest request,
+    required VponAdRequest request,
     required InterstitialAdLoadCallback adLoadCallback,
   }) async {
     InterstitialAd ad = InterstitialAd._(
