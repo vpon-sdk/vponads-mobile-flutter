@@ -22,7 +22,7 @@ class FullScreenContentCallback<Ad> {
   /// [Ad.dispose] should be called from [onAdFailedToShowFullScreenContent]
   /// and [onAdDismissedFullScreenContent], in order to free up resources.
   const FullScreenContentCallback({
-    this.onAdShowedFullScreenContent,
+    this.onAdWillShowFullScreenContent,
     this.onAdImpression,
     this.onAdFailedToShowFullScreenContent,
     this.onAdWillDismissFullScreenContent,
@@ -30,8 +30,8 @@ class FullScreenContentCallback<Ad> {
     this.onAdClicked,
   });
 
-  /// Called when an ad shows full screen content.
-  final GenericAdEventCallback<Ad>? onAdShowedFullScreenContent;
+  /// Called when an ad is going to show full screen content.
+  final GenericAdEventCallback<Ad>? onAdWillShowFullScreenContent;
 
   /// Called when an ad dismisses full screen content.
   final GenericAdEventCallback<Ad>? onAdDismissedFullScreenContent;
@@ -66,11 +66,46 @@ abstract class FullScreenAdLoadCallback<T> {
 
 class InterstitialAdLoadCallback
     extends FullScreenAdLoadCallback<InterstitialAd> {
-  /// Construct a [InterstitialAdLoadCallback].
-  const InterstitialAdLoadCallback({
+   const InterstitialAdLoadCallback({
     required GenericAdEventCallback<InterstitialAd> onAdLoaded,
     required FullScreenAdLoadErrorCallback onAdFailedToLoad,
-  }) : super(onAdLoaded: onAdLoaded, onAdFailedToLoad: onAdFailedToLoad);
+    GenericAdEventCallback<InterstitialAd>? onAdWillShowFullScreenContent,
+    GenericAdEventCallback<InterstitialAd>? onAdImpression,
+    GenericAdEventCallback<InterstitialAd>? onAdClicked,
+    GenericAdEventCallback<InterstitialAd>? onAdWillDismissFullScreenContent,
+    GenericAdEventCallback<InterstitialAd>? onAdDismissedFullScreenContent,
+  }) : _onAdWillShowFullScreenContent = onAdWillShowFullScreenContent,
+       _onAdImpression = onAdImpression,
+       _onAdClicked = onAdClicked,
+       _onAdWillDismissFullScreenContent = onAdWillDismissFullScreenContent,
+       _onAdDismissedFullScreenContent = onAdDismissedFullScreenContent, super(onAdLoaded: onAdLoaded, onAdFailedToLoad: onAdFailedToLoad);
+
+  final GenericAdEventCallback<InterstitialAd>? _onAdWillShowFullScreenContent;
+  final GenericAdEventCallback<InterstitialAd>? _onAdImpression;
+  final GenericAdEventCallback<InterstitialAd>? _onAdClicked;
+  final GenericAdEventCallback<InterstitialAd>? _onAdWillDismissFullScreenContent;
+  final GenericAdEventCallback<InterstitialAd>? _onAdDismissedFullScreenContent;
+
+  
+  void onAdWillShowFullScreenContent(InterstitialAd ad) {
+    _onAdWillShowFullScreenContent?.call(ad);
+  }
+
+  void onAdImpression(InterstitialAd ad) {
+    _onAdImpression?.call(ad);
+  }
+
+  void onAdClicked(InterstitialAd ad) {
+    _onAdClicked?.call(ad);
+  }
+
+  void onAdWillDismissFullScreenContent(InterstitialAd ad) {
+    _onAdWillDismissFullScreenContent?.call(ad);
+  }
+
+  void onAdDismissedFullScreenContent(InterstitialAd ad) {
+    _onAdDismissedFullScreenContent?.call(ad);
+  }
 }
 
 /// Shared event callbacks used in Native and Banner ads.
@@ -113,7 +148,6 @@ abstract class AdWithViewListener {
 }
 
 class BannerAdListener extends AdWithViewListener {
-
   const BannerAdListener({
     AdEventCallback? onAdLoaded,
     AdLoadErrorCallback? onAdFailedToLoad,
@@ -123,18 +157,17 @@ class BannerAdListener extends AdWithViewListener {
     AdEventCallback? onAdImpression,
     AdEventCallback? onAdClicked,
   }) : super(
-    onAdLoaded: onAdLoaded,
-    onAdFailedToLoad: onAdFailedToLoad,
-    onAdOpened: onAdOpened,
-    onAdClosed: onAdClosed,
-    onAdWillDismissScreen: onAdWillDismissScreen,
-    onAdImpression: onAdImpression,
-    onAdClicked: onAdClicked,
-  );
+          onAdLoaded: onAdLoaded,
+          onAdFailedToLoad: onAdFailedToLoad,
+          onAdOpened: onAdOpened,
+          onAdClosed: onAdClosed,
+          onAdWillDismissScreen: onAdWillDismissScreen,
+          onAdImpression: onAdImpression,
+          onAdClicked: onAdClicked,
+        );
 }
 
 class NativeAdListener extends AdWithViewListener {
- 
   NativeAdListener({
     AdEventCallback? onAdLoaded,
     Function(Ad ad, Map error)? onAdFailedToLoad,

@@ -16,7 +16,7 @@ class _InterstitialExampleState extends State<InterstitialExample> {
   late BuildContext scaffoldContext;
 
   InterstitialAd? _interstitialAd;
-  int? _format;
+  int? _format = null;
 
   set format(int newFormat) {
     _format = newFormat;
@@ -40,25 +40,42 @@ class _InterstitialExampleState extends State<InterstitialExample> {
 
     if (_format != null) {
       InterstitialAd.load(
-          licenseKey: _format == 0
-              ? '8a80854b79a9f2ce0179c09793ab4b79'
-              : '8a80854b79a9f2ce0179c097d26e4b7a',
-          request: request,
-          adLoadCallback: InterstitialAdLoadCallback(
-            onAdLoaded: (InterstitialAd ad) {
-              debugPrint('$ad loaded');
-              context.showToast(scaffoldContext, 'InterstitialAd onAdLoaded');
-              _interstitialAd = ad;
-              _showInterstitial();
-            },
-            onAdFailedToLoad: (Map error) {
-              String description = error['errorDescription'];
-              int code = error['errorCode'];
+        licenseKey: _format == 0
+            ? '8a80854b79a9f2ce0179c09793ab4b79'
+            : '8a80854b79a9f2ce0179c097d26e4b7a',
+        request: request,
+        adLoadCallback: InterstitialAdLoadCallback(
+          onAdLoaded: (InterstitialAd ad) {
+            debugPrint('$ad loaded');
+            context.showToast(scaffoldContext, 'InterstitialAd onAdLoaded');
+            _interstitialAd = ad;
+            _showInterstitial();
+          },
+          onAdFailedToLoad: (Map error) {
+            String description = error['errorDescription'];
+            int code = error['errorCode'];
 
-              context.showToast(context, 'Error code: $code | $description');
-              _interstitialAd = null;
-            },
-          ));
+            context.showToast(context, 'Error code: $code | $description');
+            _interstitialAd = null;
+          },
+          onAdImpression: (InterstitialAd ad) {
+            debugPrint('onAdImpression');
+          },
+          onAdClicked: (InterstitialAd ad) {
+            debugPrint('onAdClicked');
+          },
+          onAdWillDismissFullScreenContent: (InterstitialAd ad) {
+            debugPrint('onAdWillDismissFullScreenContent');
+          },
+          onAdDismissedFullScreenContent: (InterstitialAd ad) {
+            debugPrint('onAdDismissedFullScreenContent');
+          },
+          onAdWillShowFullScreenContent: (InterstitialAd ad) {
+            debugPrint('onAdWillShowFullScreenContent');
+          },
+
+        ),
+      );
     } else {
       context.showToast(scaffoldContext, 'Format is null!');
     }
@@ -71,8 +88,8 @@ class _InterstitialExampleState extends State<InterstitialExample> {
       return;
     }
     _interstitialAd!.fullScreenContentCallback = FullScreenContentCallback(
-        onAdShowedFullScreenContent: (InterstitialAd ad) {
-      debugPrint('onAdShowedFullScreenContent.');
+        onAdWillShowFullScreenContent: (InterstitialAd ad) {
+      debugPrint('onAdWillShowFullScreenContent.');
     }, onAdDismissedFullScreenContent: (InterstitialAd ad) {
       debugPrint('onAdDismissedFullScreenContent.');
 
@@ -120,6 +137,7 @@ class _InterstitialExampleState extends State<InterstitialExample> {
         if (newFormat.isNotEmpty) {
           setState(() {
             format = newFormat.first!;
+            _format = null;
           });
         }
       },

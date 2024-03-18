@@ -144,34 +144,3 @@ class _AdWidgetState extends State<AdWidget> {
     );
   }
 }
-
-/// Error information about why an ad operation failed.
-// class AdError {
-//   /// Creates an [AdError] with the given [code], [domain] and [message].
-//   @protected
-//   AdError(this.code, this.domain, this.message);
-
-//   final int code;
-
-//   /// The domain from which the error came.
-//   final String domain;
-//   final String message;
-
-//   @override
-//   String toString() {
-//     return '$runtimeType(code: $code, domain: $domain, message: $message)';
-//   }
-// }
-
-// class LoadAdError extends AdError {
-//   /// Default constructor for [LoadAdError].
-//   @protected
-//   LoadAdError(int code, String domain, String message)
-//       : super(code, domain, message);
-
-//   @override
-//   String toString() {
-//     return '$runtimeType(code: $code, domain: $domain, message: $message'
-//         ')';
-//   }
-// }

@@ -173,7 +173,7 @@ class AdInstanceManager {
         _invokeOnAdImpression(ad, eventName);
         break;
       case 'adWillPresentFullScreenContent':
-        _invokeOnAdShowedFullScreenContent(ad, eventName);
+        _invokeOnAdWillShowFullScreenContent(ad, eventName);
         break;
       case 'adDidDismissFullScreenContent':
         _invokeOnAdDismissedFullScreenContent(ad, eventName);
@@ -269,10 +269,10 @@ class AdInstanceManager {
     }
   }
 
-  void _invokeOnAdShowedFullScreenContent(Ad ad, String eventName) {
-    debugPrint('instanceManager _invokeOnAdShowedFullScreenContent');
+  void _invokeOnAdWillShowFullScreenContent(Ad ad, String eventName) {
+    debugPrint('instanceManager _invokeOnAdWillShowFullScreenContent');
     if (ad is InterstitialAd) {
-      ad.fullScreenContentCallback?.onAdShowedFullScreenContent?.call(ad);
+      ad.fullScreenContentCallback?.onAdWillShowFullScreenContent?.call(ad);
     } else {
       debugPrint('invalid ad: $ad, for event name: $eventName');
     }

@@ -206,6 +206,7 @@ class FlutterNativeAd: FlutterAd, FlutterPlatformView, VponNativeAdLoaderDelegat
     func view() -> UIView {
         let test = UIView()
         test.backgroundColor = .red
+        #warning("What to do if adView is nil?")
         return adView ?? test
     }
     
