@@ -151,17 +151,11 @@ class BannerAdListener extends AdWithViewListener {
   const BannerAdListener({
     AdEventCallback? onAdLoaded,
     AdLoadErrorCallback? onAdFailedToLoad,
-    AdEventCallback? onAdOpened,
-    AdEventCallback? onAdClosed,
-    AdEventCallback? onAdWillDismissScreen,
     AdEventCallback? onAdImpression,
     AdEventCallback? onAdClicked,
   }) : super(
           onAdLoaded: onAdLoaded,
           onAdFailedToLoad: onAdFailedToLoad,
-          onAdOpened: onAdOpened,
-          onAdClosed: onAdClosed,
-          onAdWillDismissScreen: onAdWillDismissScreen,
           onAdImpression: onAdImpression,
           onAdClicked: onAdClicked,
         );

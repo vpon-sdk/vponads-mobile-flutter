@@ -66,6 +66,12 @@ class _BannerExampleState extends State<BannerExample> {
             context.showToast(context, 'Error code: $code | $description');
             ad.dispose();
           },
+          onAdImpression: (Ad ad) {
+            debugPrint('onAdImpression');
+          },
+          onAdClicked: (Ad ad) {
+            debugPrint('onAdClicked');
+          },
         ),
       );
 

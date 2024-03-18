@@ -16,7 +16,7 @@ class _InterstitialExampleState extends State<InterstitialExample> {
   late BuildContext scaffoldContext;
 
   InterstitialAd? _interstitialAd;
-  int? _format = null;
+  int? _format;
 
   set format(int newFormat) {
     _format = newFormat;
@@ -73,7 +73,6 @@ class _InterstitialExampleState extends State<InterstitialExample> {
           onAdWillShowFullScreenContent: (InterstitialAd ad) {
             debugPrint('onAdWillShowFullScreenContent');
           },
-
         ),
       );
     } else {

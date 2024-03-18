@@ -442,7 +442,6 @@ class AdMessageCodec extends StandardMessageCodec {
 
   @override
   void writeValue(WriteBuffer buffer, dynamic value) {
-    // debugPrint('writeValue $value');
     if (value is BannerAdSize) {
       writeAdSize(buffer, value);
     } else if (value is VponAdRequest) {
@@ -474,19 +473,10 @@ class AdMessageCodec extends StandardMessageCodec {
 
   @override
   dynamic readValueOfType(dynamic type, ReadBuffer buffer) {
-    // debugPrint('readValueOfType $type');
     switch (type) {
       default:
-        // debugPrint('super.readValueOfType $type');
         return super.readValueOfType(type, buffer);
     }
-  }
-
-  /// Reads the next value as a non-nullable string.
-  ///
-  /// Returns '' if the next value is null.
-  String _safeReadString(ReadBuffer buffer) {
-    return readValueOfType(buffer.getUint8(), buffer) ?? '';
   }
 }
 
