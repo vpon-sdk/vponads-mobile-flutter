@@ -125,12 +125,14 @@ class FlutterBannerAd: FlutterAd, FlutterPlatformView, VponBannerViewDelegate {
     private let bannerView: VponBannerView
     private let adRequest: FlutterAdRequest
     private let licenseKey: String
+    private let autoRefresh: Bool
    
     
-    init(licenseKey: String, size: FlutterBannerAdSize, request: FlutterAdRequest, rootViewController: UIViewController, adId: Int) {
+    init(licenseKey: String, size: FlutterBannerAdSize, request: FlutterAdRequest, rootViewController: UIViewController, adId: Int, autoRefresh: Bool) {
         self.bannerView = VponBannerView(adSize: size.size ?? .banner())
         self.adRequest = request
         self.licenseKey = licenseKey
+        self.autoRefresh = autoRefresh
         super.init(adId: adId)
         self.adId = adId
         self.bannerView.rootViewController = rootViewController
@@ -139,6 +141,7 @@ class FlutterBannerAd: FlutterAd, FlutterPlatformView, VponBannerViewDelegate {
     override func load() {
         self.bannerView.delegate = self
         self.bannerView.licenseKey = licenseKey
+        self.bannerView.autoRefresh = autoRefresh
         self.bannerView.load(adRequest.asVponAdRequest())
     }
     

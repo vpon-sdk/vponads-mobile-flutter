@@ -19,6 +19,7 @@ class _BannerExampleState extends State<BannerExample> {
   BannerAd? _bannerAd;
   bool _isLoaded = false;
   BannerAdSize? _adSize;
+  Key adWidgetKey = UniqueKey();
 
   set adSize(BannerAdSize newSize) {
     _adSize = newSize;
@@ -49,6 +50,7 @@ class _BannerExampleState extends State<BannerExample> {
         licenseKey: key,
         size: _adSize!,
         request: VponAdRequest(),
+        autoRefresh: true,
         listener: BannerAdListener(
           onAdLoaded: (Ad ad) async {
             BannerAd bannerAd = (ad as BannerAd);
@@ -57,6 +59,7 @@ class _BannerExampleState extends State<BannerExample> {
             setState(() {
               _bannerAd = bannerAd;
               _isLoaded = true;
+              adWidgetKey = UniqueKey();
             });
           },
           onAdFailedToLoad: (Ad ad, Map error) {
@@ -98,6 +101,7 @@ class _BannerExampleState extends State<BannerExample> {
             width: _adSize?.width.toDouble(),
             height: _adSize?.height.toDouble(),
             child: AdWidget(
+              key: adWidgetKey,
               ad: _bannerAd!,
             ),
           ));

@@ -66,7 +66,7 @@ abstract class FullScreenAdLoadCallback<T> {
 
 class InterstitialAdLoadCallback
     extends FullScreenAdLoadCallback<InterstitialAd> {
-   const InterstitialAdLoadCallback({
+  const InterstitialAdLoadCallback({
     required GenericAdEventCallback<InterstitialAd> onAdLoaded,
     required FullScreenAdLoadErrorCallback onAdFailedToLoad,
     GenericAdEventCallback<InterstitialAd>? onAdWillShowFullScreenContent,
@@ -74,11 +74,12 @@ class InterstitialAdLoadCallback
     GenericAdEventCallback<InterstitialAd>? onAdClicked,
     GenericAdEventCallback<InterstitialAd>? onAdWillDismissFullScreenContent,
     GenericAdEventCallback<InterstitialAd>? onAdDismissedFullScreenContent,
-  }) : _onAdWillShowFullScreenContent = onAdWillShowFullScreenContent,
-       _onAdImpression = onAdImpression,
-       _onAdClicked = onAdClicked,
-       _onAdWillDismissFullScreenContent = onAdWillDismissFullScreenContent,
-       _onAdDismissedFullScreenContent = onAdDismissedFullScreenContent, super(onAdLoaded: onAdLoaded, onAdFailedToLoad: onAdFailedToLoad);
+  })  : _onAdWillShowFullScreenContent = onAdWillShowFullScreenContent,
+        _onAdImpression = onAdImpression,
+        _onAdClicked = onAdClicked,
+        _onAdWillDismissFullScreenContent = onAdWillDismissFullScreenContent,
+        _onAdDismissedFullScreenContent = onAdDismissedFullScreenContent,
+        super(onAdLoaded: onAdLoaded, onAdFailedToLoad: onAdFailedToLoad);
 
   final GenericAdEventCallback<InterstitialAd>? _onAdWillShowFullScreenContent;
   final GenericAdEventCallback<InterstitialAd>? _onAdImpression;
@@ -86,7 +87,6 @@ class InterstitialAdLoadCallback
   final GenericAdEventCallback<InterstitialAd>? _onAdWillDismissFullScreenContent;
   final GenericAdEventCallback<InterstitialAd>? _onAdDismissedFullScreenContent;
 
-  
   void onAdWillShowFullScreenContent(InterstitialAd ad) {
     _onAdWillShowFullScreenContent?.call(ad);
   }

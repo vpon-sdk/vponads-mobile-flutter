@@ -190,13 +190,15 @@ public class VponPluginPocPlugin: NSObject, FlutterPlugin {
             if let key = arg["licenseKey"] as? String,
                let size = arg["size"] as? FlutterBannerAdSize,
                let adId = arg["adId"] as? Int,
-               let request = arg["request"] as? FlutterAdRequest {
+               let request = arg["request"] as? FlutterAdRequest,
+               let autoRefresh = arg["autoRefresh"] as? Bool {
                 
                 let ad = FlutterBannerAd(licenseKey: key,
                                          size: size,
                                          request: request,
                                          rootViewController: rootController,
-                                         adId: adId)
+                                         adId: adId,
+                                         autoRefresh: autoRefresh)
                 manager.loadAd(ad)
                 result(nil)
             } else {
