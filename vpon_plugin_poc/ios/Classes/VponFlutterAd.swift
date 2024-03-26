@@ -110,13 +110,6 @@ class VponFlutterBannerAdSize {
         self.height = height ?? 50
         self.size = VponAdSize(size: CGSize(width: Double(self.width), height: Double(self.height)))
     }
-    
-//    init(adSize size: VponAdSize) {
-//        self.size = size
-        #warning("Is VponAdSize necessary to have size interface?")
-//        self.width = size.size.width
-//        self.height = size.size.height
-//    }
 }
 
 class VponFlutterBannerAd: VponFlutterAd, FlutterPlatformView, VponBannerViewDelegate {
@@ -143,10 +136,6 @@ class VponFlutterBannerAd: VponFlutterAd, FlutterPlatformView, VponBannerViewDel
         self.bannerView.autoRefresh = autoRefresh
         self.bannerView.load(adRequest.asVponAdRequest())
     }
-    
-//    func getAdSize() -> FlutterBannerAdSize {
-//        return FlutterBannerAdSize(adSize: bannerView.adSize)
-//    }
     
     deinit {
         manager?.logToDart("FlutterBannerAd deinit")
