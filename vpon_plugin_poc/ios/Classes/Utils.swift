@@ -18,6 +18,7 @@ struct Constant {
     static let loadAdError = "loadAdError"
     static let errorDescription = "errorDescription"
     static let errorCode = "errorCode"
+    static let nativeLog = "nativeLog"
 }
 
 /// For handle FlutterMethodCall
@@ -41,12 +42,10 @@ extension String {
     static let showAdWithoutView = "showAdWithoutView"
 }
 
-struct Console {
-    
-    static func log(_ message: String, type: OSLogType = .debug) {
-        print("<Plugin> [iOS Native] \(message)")
-//        os_log("<Plugin> [iOS Native] %@", log: .default, type: type , message)
-    }
+enum LogType: String {
+    case info = "info"
+    case debug = "debug"
+    case error = "error"
 }
 
 extension FlutterError {

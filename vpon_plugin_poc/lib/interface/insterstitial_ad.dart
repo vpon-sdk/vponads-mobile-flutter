@@ -42,7 +42,6 @@ class InterstitialAd extends AdWithoutView {
   /// Set [fullScreenContentCallback] before calling this method to be
   /// notified of events that occur when showing the ad.
   Future<void> show() {
-    debugPrint('InterstitialAd call show()');
     return instanceManager.showAdWithoutView(this);
   }
 }

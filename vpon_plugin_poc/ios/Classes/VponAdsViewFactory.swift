@@ -9,9 +9,9 @@ import Flutter
 
 class VponAdsViewFactory: NSObject, FlutterPlatformViewFactory {
     
-    private let manager: AdInstanceManager
+    private let manager: VponAdInstanceManager
     
-    init(manager: AdInstanceManager) {
+    init(manager: VponAdInstanceManager) {
         self.manager = manager
     }
     

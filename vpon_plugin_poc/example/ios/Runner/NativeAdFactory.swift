@@ -8,7 +8,7 @@
 import VpadnSDKAdKit
 import vpon_plugin_poc
 
-class NativeAdFactory: FlutterNativeAdFactory {
+class NativeAdFactory: VponFlutterNativeAdFactory {
     
     func createNativeAd(nativeAd: VponNativeAd) -> VponNativeAdView? {
         guard let adView = Bundle.main.loadNibNamed("NativeAdView", owner: nil)?.first as? VponNativeAdView else {

@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:collection';
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:vpon_plugin_poc/interface/logger.dart';
 import 'ad_containers.dart';
 import 'ad_request.dart';
 import 'insterstitial_ad.dart';
@@ -22,19 +24,44 @@ class AdInstanceManager {
           StandardMethodCodec(AdMessageCodec()),
         ) {
     channel.setMethodCallHandler((MethodCall call) async {
-      debugPrint('channel.setMethodCallHandler $call');
-      assert(call.method == 'onAdEvent');
+      VponLogger.i('channel.setMethodCallHandler $call');
 
-      final int adId = call.arguments['adId'];
-      final String eventName = call.arguments['eventName'];
+      switch (call.method) {
+        case 'nativeLog':
+          final String message = call.arguments['message'];
+          final String type = call.arguments['type'];
+          _consoleLog(message, type);
 
-      final Ad? ad = adFor(adId);
-      if (ad != null) {
-        _onAdEvent(ad, eventName, call.arguments);
-      } else {
-        debugPrint('$Ad with id `$adId` is not available for $eventName.');
+        case 'onAdEvent':
+          final int adId = call.arguments['adId'];
+          final String eventName = call.arguments['eventName'];
+
+          final Ad? ad = adFor(adId);
+          if (ad != null) {
+            _onAdEvent(ad, eventName, call.arguments);
+          } else {
+            VponLogger.e(
+                '$Ad with id `$adId` is not available for $eventName.');
+          }
+          break;
+
+        default:
+          break;
       }
     });
+  }
+
+  void _consoleLog(String message, String type) {
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
+      switch (type) {
+        case 'info':
+          VponLogger.i('[native iOS] $message');
+        case 'debug':
+          VponLogger.d('[native iOS] $message');
+        case 'error':
+          VponLogger.e('[native iOS] $message');
+      }
+    }
   }
 
   int _nextAdId = 0;
@@ -81,7 +108,7 @@ class AdInstanceManager {
           await instanceManager.channel.invokeMethod('getVponID');
       id = result;
     } on PlatformException catch (e) {
-      debugPrint("Failed to get id: '${e.message}'.");
+      VponLogger.e("Failed to get id: '${e.message}'.");
     }
     return id;
   }
@@ -91,14 +118,13 @@ class AdInstanceManager {
       await instanceManager.channel
           .invokeMethod('setConsentStatus', <String, int>{'status': value});
     } on PlatformException catch (e) {
-      debugPrint("invokeMethod('setConsentStatus') failed: '${e.message}'.");
+      VponLogger.e("invokeMethod('setConsentStatus') failed: '${e.message}'.");
     }
   }
 
   /* ------------------------ Location Manager Service ------------------------ */
 
   Future<void> setLocationManagerEnable(bool isEnable) async {
-    debugPrint('setLocationManagerEnable $isEnable');
     await instanceManager.channel.invokeMethod(
         'setLocationManagerEnable', <String, bool>{'isEnable': isEnable});
   }
@@ -110,7 +136,7 @@ class AdInstanceManager {
       await instanceManager.channel.invokeMethod(
           'setAudioApplicationManaged', <String, bool>{'isManaged': isManaged});
     } on PlatformException catch (e) {
-      debugPrint(
+      VponLogger.e(
           "invokeMethod('setAudioApplicationManaged') failed: '${e.message}'.");
     }
   }
@@ -120,7 +146,7 @@ class AdInstanceManager {
       await instanceManager.channel
           .invokeMethod('noticeApplicationAudioWillStart');
     } on PlatformException catch (e) {
-      debugPrint(
+      VponLogger.e(
           "invokeMethod('noticeApplicationAudioWillStart') failed: '${e.message}'.");
     }
   }
@@ -130,7 +156,7 @@ class AdInstanceManager {
       await instanceManager.channel
           .invokeMethod('noticeApplicationAudioDidEnd');
     } on PlatformException catch (e) {
-      debugPrint(
+      VponLogger.e(
           "invokeMethod('noticeApplicationAudioDidEnd') failed: '${e.message}'.");
     }
   }
@@ -154,14 +180,13 @@ class AdInstanceManager {
   }
 
   void _onAdEventIOS(Ad ad, String eventName, Map<dynamic, dynamic> arguments) {
-    debugPrint(
+    VponLogger.d(
         'AdInstanceManager _onAdEventIOS called with $eventName and arg $arguments');
     switch (eventName) {
       case 'onAdLoaded':
         _invokeOnAdLoaded(ad, eventName, arguments);
         break;
       case 'onAdFailedToLoad':
-        debugPrint('onAdFailedToLoad triggered');
         _invokeOnAdFailedToLoad(ad, eventName, arguments);
         break;
       case 'adDidRecordClick':
@@ -182,17 +207,15 @@ class AdInstanceManager {
         if (ad is InterstitialAd) {
           ad.fullScreenContentCallback?.onAdWillDismissFullScreenContent
               ?.call(ad);
-          debugPrint('adWillDismissFullScreenContent');
         } else {
-          debugPrint('invalid ad : $ad, for event name: $eventName');
+          VponLogger.d('invalid ad : $ad, for event name: $eventName');
         }
         break;
       case 'didFailToPresentFullScreenContentWithError':
-        debugPrint('ad didFailToPresentFullScreenContentWithError');
         _invokeOnAdFailedToShowFullScreenContent(ad, eventName, arguments);
         break;
       default:
-        debugPrint('invalid ad event name: $eventName');
+        VponLogger.d('invalid ad event name: $eventName');
     }
   }
 
@@ -246,55 +269,50 @@ class AdInstanceManager {
 
   void _invokeOnAdLoaded(
       Ad ad, String eventName, Map<dynamic, dynamic> arguments) {
-    debugPrint('instanceManager _invokeOnAdLoaded');
     if (ad is AdWithView) {
       ad.listener.onAdLoaded?.call(ad);
     } else if (ad is InterstitialAd) {
       ad.adLoadCallback.onAdLoaded.call(ad);
     } else {
-      debugPrint('invalid ad: $ad, for event name: $eventName');
+      VponLogger.d('invalid ad: $ad, for event name: $eventName');
     }
   }
 
   void _invokeOnAdFailedToLoad(
       Ad ad, String eventName, Map<dynamic, dynamic> arguments) {
-    debugPrint('instanceManager _invokeOnAdFailedToLoad');
     if (ad is AdWithView) {
       ad.listener.onAdFailedToLoad?.call(ad, arguments['loadAdError']);
     } else if (ad is InterstitialAd) {
       ad.dispose();
       ad.adLoadCallback.onAdFailedToLoad.call(arguments['loadAdError']);
     } else {
-      debugPrint('invalid ad: $ad, for event name: $eventName');
+      VponLogger.d('invalid ad: $ad, for event name: $eventName');
     }
   }
 
   void _invokeOnAdWillShowFullScreenContent(Ad ad, String eventName) {
-    debugPrint('instanceManager _invokeOnAdWillShowFullScreenContent');
     if (ad is InterstitialAd) {
       ad.fullScreenContentCallback?.onAdWillShowFullScreenContent?.call(ad);
     } else {
-      debugPrint('invalid ad: $ad, for event name: $eventName');
+      VponLogger.d('invalid ad: $ad, for event name: $eventName');
     }
   }
 
   void _invokeOnAdDismissedFullScreenContent(Ad ad, String eventName) {
-    debugPrint('instanceManager _invokeOnAdDismissedFullScreenContent');
     if (ad is InterstitialAd) {
       ad.fullScreenContentCallback?.onAdDismissedFullScreenContent?.call(ad);
     } else {
-      debugPrint('invalid ad: $ad, for event name: $eventName');
+      VponLogger.d('invalid ad: $ad, for event name: $eventName');
     }
   }
 
   void _invokeOnAdFailedToShowFullScreenContent(
       Ad ad, String eventName, Map<dynamic, dynamic> arguments) {
-    debugPrint('instanceManager _invokeOnAdFailedToShowFullScreenContent');
     if (ad is InterstitialAd) {
       ad.fullScreenContentCallback?.onAdFailedToShowFullScreenContent
           ?.call(ad, arguments['error']);
     } else {
-      debugPrint('invalid ad: $ad, for event name: $eventName');
+      VponLogger.d('invalid ad: $ad, for event name: $eventName');
     }
   }
 
@@ -304,18 +322,17 @@ class AdInstanceManager {
     } else if (ad is InterstitialAd) {
       ad.fullScreenContentCallback?.onAdImpression?.call(ad);
     } else {
-      debugPrint('invalid ad: $ad, for event name: $eventName');
+      VponLogger.d('invalid ad: $ad, for event name: $eventName');
     }
   }
 
   void _invokeOnAdClicked(Ad ad, String eventName) {
-    debugPrint('instanceManager _invokeOnAdClicked');
     if (ad is AdWithView) {
       ad.listener.onAdClicked?.call(ad);
     } else if (ad is InterstitialAd) {
       ad.fullScreenContentCallback?.onAdClicked?.call(ad);
     } else {
-      debugPrint('invalid ad: $ad, for event name: $eventName');
+      VponLogger.d('invalid ad: $ad, for event name: $eventName');
     }
   }
 
@@ -367,7 +384,7 @@ class AdInstanceManager {
 
     final int adId = _nextAdId++;
     _loadedAds[adId] = ad;
-    debugPrint('channel.invokeMethod loadInterstitialAd, request: $ad');
+    VponLogger.d('channel.invokeMethod loadInterstitialAd, request: $ad');
     return channel.invokeMethod<void>(
       'loadInterstitialAd',
       <String, dynamic>{
@@ -419,7 +436,7 @@ class AdInstanceManager {
 
   /// Display an [AdWithoutView] that is overlaid on top of the application.
   Future<void> showAdWithoutView(AdWithoutView ad) {
-    debugPrint('instanceManager call showAdWithoutView');
+    VponLogger.d('instanceManager call showAdWithoutView');
     assert(
       adIdFor(ad) != null,
       '$Ad has not been loaded or has already been disposed.',
@@ -446,7 +463,6 @@ class AdMessageCodec extends StandardMessageCodec {
     if (value is BannerAdSize) {
       writeAdSize(buffer, value);
     } else if (value is VponAdRequest) {
-      debugPrint('writeValue AdRequest $value');
       buffer.putUint8(_valueAdRequest);
       writeValue(buffer, value.contentUrl);
       writeValue(buffer, value.contentData);
@@ -466,7 +482,6 @@ class AdMessageCodec extends StandardMessageCodec {
   }
 
   void writeAdSize(WriteBuffer buffer, BannerAdSize value) {
-    // debugPrint('writeAdSize, value = $value');
     buffer.putUint8(_valueAdSize);
     writeValue(buffer, value.width);
     writeValue(buffer, value.height);

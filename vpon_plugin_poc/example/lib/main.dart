@@ -36,7 +36,7 @@ class _MyAppState extends State<MyApp> {
 
     VponAdSDK.instance.setLogLevel(VponLogLevel.debug);
     VponAdSDK.instance.getVponID().then((id) {
-      debugPrint('id = $id');
+      debugPrint('Vpon id = $id');
     });
     VponAdSDK.instance.getVersionString().then((version) {
       debugPrint('version = $version');
@@ -47,10 +47,13 @@ class _MyAppState extends State<MyApp> {
     VponAdAudioManager.instance.noticeApplicationAudioDidEnd();
     VponUCB.instance.setConsentStatus(VponConsentStatus.personalized);
 
-    VponAdSDK.instance.updateRequestConfiguration(
-        VponRequestConfiguration(testDeviceIds: [testDeviceiOS]));
+    if (_isTestMode) {
+      VponAdSDK.instance.updateRequestConfiguration(
+          VponRequestConfiguration(testDeviceIds: [testDeviceiOS]));
+    }
   }
 
+  bool _isTestMode = true;
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -58,6 +61,19 @@ class _MyAppState extends State<MyApp> {
         return Scaffold(
           appBar: AppBar(
             title: const Text('Vpon Plugin Example'),
+            actions: <Widget>[
+              const Text('Test Mode'),
+              Switch(
+                  value: _isTestMode,
+                  activeColor: Colors.green,
+                  thumbColor:
+                      const MaterialStatePropertyAll<Color>(Colors.white),
+                  onChanged: (bool value) {
+                    setState(() {
+                      _isTestMode = value;
+                    });
+                  }),
+            ],
           ),
           body: Container(
             decoration: const BoxDecoration(

@@ -1,5 +1,5 @@
 //
-//  FlutterVponAdReaderWriter.swift
+//  VponFlutterReaderWriter.swift
 //  vpon_plugin_poc
 //
 //  Created by vponinc on 2024/1/30.
@@ -8,13 +8,13 @@
 import Flutter
 import VpadnSDKAdKit
 
-enum FlutterVponField: UInt8 {
+enum VponFlutterField: UInt8 {
     case bannerAdSize = 128
     case adRequest = 129
 }
 
 /// Bridge between Dart and VponAdRequest
-class FlutterAdRequest {
+class VponFlutterAdRequest {
     var contentURL: String?
     var contentData: [String: Any]?
     var keywords: [String]?
@@ -58,52 +58,51 @@ class FlutterAdRequest {
     }
 }
 
-class FlutterBannerAdSizeFactory: NSObject {
+class VponFlutterBannerAdSizeFactory: NSObject {
     
 }
 
 /// Translator for converting Dart objects to Vpon Ad SDK objects and vice versa.
-class FlutterVponAdReaderWriter: FlutterStandardReaderWriter {
+class VponFlutterReaderWriter: FlutterStandardReaderWriter {
     
-    let adSizeFactory: FlutterBannerAdSizeFactory
+    let adSizeFactory: VponFlutterBannerAdSizeFactory
     
-    init(factory: FlutterBannerAdSizeFactory) {
+    init(factory: VponFlutterBannerAdSizeFactory) {
         adSizeFactory = factory
         super.init()
     }
     
     convenience override init() {
-        self.init(factory: FlutterBannerAdSizeFactory())
+        self.init(factory: VponFlutterBannerAdSizeFactory())
     }
     
     override func reader(with data: Data) -> FlutterStandardReader {
-        let reader = FlutterVponAdReader(factory: adSizeFactory, data: data)
+        let reader = VponFlutterReader(factory: adSizeFactory, data: data)
         return reader
     }
     
     override func writer(with data: NSMutableData) -> FlutterStandardWriter {
-        return FlutterVponAdWriter(data: data)
+        return VponFlutterWriter(data: data)
     }
 }
 
-class FlutterVponAdReader: FlutterStandardReader {
+class VponFlutterReader: FlutterStandardReader {
     
-    let adSizeFactory: FlutterBannerAdSizeFactory
+    let adSizeFactory: VponFlutterBannerAdSizeFactory
     
-    init(factory: FlutterBannerAdSizeFactory, data: Data) {
+    init(factory: VponFlutterBannerAdSizeFactory, data: Data) {
         adSizeFactory = factory
         super.init(data: data)
     }
     
     override func readValue(ofType type: UInt8) -> Any? {
-        guard let field = FlutterVponField(rawValue: type) else {
-            Console.log("FlutterVponAdReader readValue of type \(type) isn't custom field.)")
+        guard let field = VponFlutterField(rawValue: type) else {
             return super.readValue(ofType: type)
         }
         
         switch field {
         case .adRequest:
-            let request = FlutterAdRequest()
+            let request = VponFlutterAdRequest()
             request.contentURL = self.readValue(ofType: self.readByte()) as? String
             request.contentData = self.readValue(ofType: self.readByte()) as? [String: Any]
             request.keywords = self.readValue(ofType: self.readByte()) as? [String]
@@ -113,35 +112,42 @@ class FlutterVponAdReader: FlutterStandardReader {
             return request
             
         case .bannerAdSize:
-            return FlutterBannerAdSize(width: readValue(ofType: readByte()) as? Int,
+            return VponFlutterBannerAdSize(width: readValue(ofType: readByte()) as? Int,
                                        height: readValue(ofType: readByte()) as? Int)
-            
         }
     }
 }
 
-class FlutterVponAdWriter: FlutterStandardWriter {
+class VponFlutterWriter: FlutterStandardWriter {
     
     override func writeValue(_ value: Any) {
         switch value {
-        case is FlutterAdRequest:
-            Console.log("writeValue FlutterAdRequest")
-            writeByte(FlutterVponField.adRequest.rawValue)
-            let request = value as! FlutterAdRequest
-            self.writeValue(request.keywords ?? [])
-            self.writeValue(request.contentURL ?? "")
-            
-        case is FlutterBannerAdSize:
-            writeAdSize(value: value as! FlutterBannerAdSize)
+            // 目前沒有呼叫到
+//        case is VponFlutterAdRequest:
+//            print("writeValue VponFlutterAdRequest \(value)")
+//            writeByte(VponFlutterField.adRequest.rawValue)
+//            let request = value as! VponFlutterAdRequest
+//            if let keywords = request.keywords {
+//                self.writeValue(keywords)
+//            }
+//            if let contentURL = request.contentURL {
+//                self.writeValue(contentURL)
+//            }
+//            if let contentData = request.contentData {
+//                self.writeValue(contentData)
+//            }
+//            if let age = request.userInfoAge {
+//                self.writeValue(age)
+//            }
+//            if let gender = request.userInfoGender {
+//                self.writeValue(gender)
+//            }
+//            if let bday = request.userInfoBirthday {
+//                self.writeValue(bday)
+//            }
             
         default:
-            Console.log("writeValue default \(value)")
             super.writeValue(value)
         }
-    }
-    
-    /// Helper method especially for banner size
-    private func writeAdSize(value: FlutterBannerAdSize) {
-        Console.log("writeAdSize trigger: \(value)")
     }
 }

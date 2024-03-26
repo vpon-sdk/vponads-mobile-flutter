@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'ad_instance_manager.dart';
 import 'ad_listeners.dart';
 import 'banner_ad.dart';
+import 'logger.dart';
 
 /// The base class for all ads.
 ///
@@ -94,10 +95,10 @@ class _AdWidgetState extends State<AdWidget> {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint('_AdWidgetState build triggered');
+    VponLogger.d('_AdWidgetState build triggered');
     AdWithView ad = widget.ad;
     if (ad is BannerAd && ad.autoRefresh == true) {
-      debugPrint('Banner gets auto refreshed');
+      VponLogger.d('Banner gets auto refreshed');
     } else if (_adIdAlreadyMounted) {
       throw FlutterError.fromParts(<DiagnosticsNode>[
         ErrorSummary('This AdWidget is already in the Widget tree'),
@@ -140,7 +141,7 @@ class _AdWidgetState extends State<AdWidget> {
         },
       );
     }
-    debugPrint('_AdWidgetState build return UiKitView');
+    VponLogger.d('_AdWidgetState build return UiKitView');
     return UiKitView(
       viewType: '${instanceManager.channel.name}/ad_widget',
       creationParams: instanceManager.adIdFor(widget.ad),

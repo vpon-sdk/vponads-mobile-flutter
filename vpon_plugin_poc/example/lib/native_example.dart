@@ -35,7 +35,6 @@ class NativeExampleState extends State<NativeExample> {
   void initState() {
     super.initState();
 
-    _loadNativeAd();
   }
 
   /// Loads a native ad.
@@ -48,7 +47,7 @@ class NativeExampleState extends State<NativeExample> {
         licenseKey: _format == 0
             ? '8a80854b806fa8710180ff4abd7d1b56'
             : '8a80854b79a9f2ce0179c098ae104b7d',
-        factoryId: 'adFactoryExample',
+        factoryId: 'VponNativeAdFactory',
         listener: NativeAdListener(
           onAdLoaded: (ad) {
             context.showToast(context, 'onAdLoaded invoked');

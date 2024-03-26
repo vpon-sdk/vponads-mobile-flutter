@@ -7,6 +7,6 @@
 
 import VpadnSDKAdKit
 
-public protocol FlutterNativeAdFactory {
+@objc public protocol VponFlutterNativeAdFactory {
     func createNativeAd(nativeAd: VponNativeAd) -> VponNativeAdView?
 }

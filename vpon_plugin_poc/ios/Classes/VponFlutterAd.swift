@@ -1,5 +1,5 @@
 //
-//  FlutterInterstitialAd.swift
+//  VponFlutterInterstitialAd.swift
 //  vpon_plugin_poc
 //
 //  Created by vponinc on 2024/1/29.
@@ -9,14 +9,14 @@ import Foundation
 import Flutter
 import VpadnSDKAdKit
 
-protocol FlutterAdWithoutView {
+protocol VponFlutterAdWithoutView {
     func show()
 }
 
-class FlutterAd: NSObject {
+class VponFlutterAd: NSObject {
     
     var adId: Int
-    weak var manager: AdInstanceManager?
+    weak var manager: VponAdInstanceManager?
     
     init(adId: Int) {
         self.adId = adId
@@ -25,9 +25,9 @@ class FlutterAd: NSObject {
     func load() {}
 }
 
-class FlutterFullScreenAd: FlutterAd, FlutterAdWithoutView, VponFullScreenContentDelegate {
+class VponFlutterFullScreenAd: VponFlutterAd, VponFlutterAdWithoutView, VponFullScreenContentDelegate {
     
-    // MARK: - FlutterAdWithoutView
+    // MARK: - VponFlutterAdWithoutView
     
     func show() {
         // Must be overridden by subclasses
@@ -62,14 +62,14 @@ class FlutterFullScreenAd: FlutterAd, FlutterAdWithoutView, VponFullScreenConten
 }
 
 /// Bridge between Dart and VponInterstitialAd
-class FlutterInterstitialAd: FlutterFullScreenAd {
+class VponFlutterInterstitialAd: VponFlutterFullScreenAd {
     
     private var interstitial: VponInterstitialAd?
     private var licenseKey: String
-    private var request: FlutterAdRequest
+    private var request: VponFlutterAdRequest
     private var rootViewController: UIViewController
     
-    init(licenseKey: String, request: FlutterAdRequest, rootViewController: UIViewController, adId: Int) {
+    init(licenseKey: String, request: VponFlutterAdRequest, rootViewController: UIViewController, adId: Int) {
         self.licenseKey = licenseKey
         self.request = request
         self.rootViewController = rootViewController
@@ -82,7 +82,6 @@ class FlutterInterstitialAd: FlutterFullScreenAd {
                                 request: request.asVponAdRequest()) { interstitial, error in
             
             if let error {
-                Console.log("FlutterInterstitialAd load error", type: .error)
                 self.manager?.onAdFailed(toLoad: self, error: error)
                 return
             }
@@ -96,12 +95,12 @@ class FlutterInterstitialAd: FlutterFullScreenAd {
         if let interstitial {
             interstitial.present(fromRootViewController: rootViewController)
         } else {
-            Console.log("InterstitialAd failed to show because the ad was not ready.")
+            manager?.logToDart("InterstitialAd failed to show because the ad was not ready.", type: .error)
         }
     }
 }
 
-class FlutterBannerAdSize {
+class VponFlutterBannerAdSize {
     var size: VponAdSize?
     var width: Int
     var height: Int
@@ -120,15 +119,15 @@ class FlutterBannerAdSize {
 //    }
 }
 
-class FlutterBannerAd: FlutterAd, FlutterPlatformView, VponBannerViewDelegate {
+class VponFlutterBannerAd: VponFlutterAd, FlutterPlatformView, VponBannerViewDelegate {
     
     private let bannerView: VponBannerView
-    private let adRequest: FlutterAdRequest
+    private let adRequest: VponFlutterAdRequest
     private let licenseKey: String
     private let autoRefresh: Bool
    
     
-    init(licenseKey: String, size: FlutterBannerAdSize, request: FlutterAdRequest, rootViewController: UIViewController, adId: Int, autoRefresh: Bool) {
+    init(licenseKey: String, size: VponFlutterBannerAdSize, request: VponFlutterAdRequest, rootViewController: UIViewController, adId: Int, autoRefresh: Bool) {
         self.bannerView = VponBannerView(adSize: size.size ?? .banner())
         self.adRequest = request
         self.licenseKey = licenseKey
@@ -150,7 +149,7 @@ class FlutterBannerAd: FlutterAd, FlutterPlatformView, VponBannerViewDelegate {
 //    }
     
     deinit {
-        Console.log("FlutterBannerAd deinit")
+        manager?.logToDart("FlutterBannerAd deinit")
     }
     
     // MARK: - FlutterPlatformView
@@ -178,17 +177,17 @@ class FlutterBannerAd: FlutterAd, FlutterPlatformView, VponBannerViewDelegate {
     }
 }
 
-class FlutterNativeAd: FlutterAd, FlutterPlatformView, VponNativeAdLoaderDelegate, VponNativeAdDelegate {
+class VponFlutterNativeAd: VponFlutterAd, FlutterPlatformView, VponNativeAdLoaderDelegate, VponNativeAdDelegate {
     
     private let licenseKey: String
-    private let adRequest: FlutterAdRequest
-    private let nativeAdFactory: FlutterNativeAdFactory
+    private let adRequest: VponFlutterAdRequest
+    private let nativeAdFactory: VponFlutterNativeAdFactory
     private var adView: UIView?
     private let adLoader: VponNativeAdLoader
     
     init(licenseKey: String,
-         adRequest: FlutterAdRequest,
-         nativeAdFactory: FlutterNativeAdFactory,
+         adRequest: VponFlutterAdRequest,
+         nativeAdFactory: VponFlutterNativeAdFactory,
          rootViewController: UIViewController,
          adId: Int) {
         

@@ -6,15 +6,15 @@ import AdSupport
 public class VponPluginPocPlugin: NSObject, FlutterPlugin {
     
     var channel: FlutterMethodChannel?
-    var manager: AdInstanceManager
-    var readerWriter: FlutterVponAdReaderWriter?
-    private var nativeAdFactories: [String: FlutterNativeAdFactory] = [:]
+    var manager: VponAdInstanceManager
+    var readerWriter: VponFlutterReaderWriter?
+    private var nativeAdFactories: [String: VponFlutterNativeAdFactory] = [:]
     
     public static func register(with registrar: FlutterPluginRegistrar) {
         let plugin = VponPluginPocPlugin(binaryMessenger: registrar.messenger())
         registrar.publish(plugin)
         
-        let readerWriter = FlutterVponAdReaderWriter()
+        let readerWriter = VponFlutterReaderWriter()
         plugin.readerWriter = readerWriter
         
         let codec = FlutterStandardMethodCodec(readerWriter: readerWriter)
@@ -31,10 +31,10 @@ public class VponPluginPocPlugin: NSObject, FlutterPlugin {
     }
     
     init(binaryMessenger: FlutterBinaryMessenger) {
-        manager = AdInstanceManager(binaryMessenger: binaryMessenger)
+        manager = VponAdInstanceManager(binaryMessenger: binaryMessenger)
     }
     
-    public static func registerNativeAdFactory(registry: FlutterPluginRegistry, factoryId: String, nativeAdFactory: FlutterNativeAdFactory) -> Bool {
+    public static func registerNativeAdFactory(registry: FlutterPluginRegistry, factoryId: String, nativeAdFactory: VponFlutterNativeAdFactory) -> Bool {
         let pluginClassName = String(describing: VponPluginPocPlugin.self)
         guard let vponPlugin = registry.valuePublished(byPlugin: pluginClassName) as? VponPluginPocPlugin else {
             let reason = String(format: "Could not find a \(pluginClassName) instance. The plugin may have not been registered.")
@@ -43,7 +43,7 @@ public class VponPluginPocPlugin: NSObject, FlutterPlugin {
         }
         
         if vponPlugin.nativeAdFactories[factoryId] != nil {
-            Console.log("A NativeAdFactory with factoryId: \(factoryId) already exists", type: .error)
+            vponPlugin.manager.logToDart("A NativeAdFactory with factoryId: \(factoryId) already exists", type: .error)
             return false
         }
         
@@ -170,12 +170,12 @@ public class VponPluginPocPlugin: NSObject, FlutterPlugin {
             }
             if let key = arg["licenseKey"] as? String,
                let adId = arg["adId"] as? Int,
-               let request = arg["request"] as? FlutterAdRequest {
+               let request = arg["request"] as? VponFlutterAdRequest {
                 
-                let ad = FlutterInterstitialAd(licenseKey: key,
-                                               request: request,
-                                               rootViewController: rootController,
-                                               adId: adId)
+                let ad = VponFlutterInterstitialAd(licenseKey: key,
+                                                   request: request,
+                                                   rootViewController: rootController,
+                                                   adId: adId)
                 manager.loadAd(ad)
                 result(nil)
             } else {
@@ -188,17 +188,17 @@ public class VponPluginPocPlugin: NSObject, FlutterPlugin {
                 return
             }
             if let key = arg["licenseKey"] as? String,
-               let size = arg["size"] as? FlutterBannerAdSize,
+               let size = arg["size"] as? VponFlutterBannerAdSize,
                let adId = arg["adId"] as? Int,
-               let request = arg["request"] as? FlutterAdRequest,
+               let request = arg["request"] as? VponFlutterAdRequest,
                let autoRefresh = arg["autoRefresh"] as? Bool {
                 
-                let ad = FlutterBannerAd(licenseKey: key,
-                                         size: size,
-                                         request: request,
-                                         rootViewController: rootController,
-                                         adId: adId,
-                                         autoRefresh: autoRefresh)
+                let ad = VponFlutterBannerAd(licenseKey: key,
+                                             size: size,
+                                             request: request,
+                                             rootViewController: rootController,
+                                             adId: adId,
+                                             autoRefresh: autoRefresh)
                 manager.loadAd(ad)
                 result(nil)
             } else {
@@ -220,12 +220,12 @@ public class VponPluginPocPlugin: NSObject, FlutterPlugin {
             
             if let key = arg["licenseKey"] as? String,
                let adId = arg["adId"] as? Int,
-               let request = arg["request"] as? FlutterAdRequest {
-                let nativeAd = FlutterNativeAd(licenseKey: key,
-                                               adRequest: request,
-                                               nativeAdFactory: factory,
-                                               rootViewController: rootController,
-                                               adId: adId)
+               let request = arg["request"] as? VponFlutterAdRequest {
+                let nativeAd = VponFlutterNativeAd(licenseKey: key,
+                                                   adRequest: request,
+                                                   nativeAdFactory: factory,
+                                                   rootViewController: rootController,
+                                                   adId: adId)
                 manager.loadAd(nativeAd)
                 result(nil)
             } else {

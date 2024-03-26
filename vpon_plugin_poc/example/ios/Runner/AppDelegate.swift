@@ -11,7 +11,7 @@ import Flutter
         GeneratedPluginRegistrant.register(with: self)
         
         let nativeAdFactory = NativeAdFactory()
-        VponPluginPocPlugin.registerNativeAdFactory(registry: self, factoryId: "adFactoryExample", nativeAdFactory: nativeAdFactory)
+        let _ = VponPluginPocPlugin.registerNativeAdFactory(registry: self, factoryId: "VponNativeAdFactory", nativeAdFactory: nativeAdFactory)
         
         return super.application(application, didFinishLaunchingWithOptions: launchOptions)
     }
