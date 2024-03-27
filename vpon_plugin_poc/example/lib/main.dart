@@ -3,6 +3,7 @@ import 'package:vpon_plugin_poc/vpon_ad_sdk.dart';
 import 'package:vpon_plugin_poc_example/banner_example.dart';
 import 'package:vpon_plugin_poc_example/interstitial_example.dart';
 import 'package:vpon_plugin_poc_example/native_example.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,6 +25,23 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  bool _isTestMode = true;
+
+  // Update test mode
+  set isTestMode(bool value) {
+    _isTestMode = value;
+
+    _saveTestMode(value);
+
+    if (value) {
+      VponAdSDK.instance.updateRequestConfiguration(
+          VponRequestConfiguration(testDeviceIds: [testDeviceiOS]));
+    } else {
+      VponAdSDK.instance.updateRequestConfiguration(
+          VponRequestConfiguration(testDeviceIds: []));
+    }
+  }
+
   static const interstitial = 'Interstitial';
   static const banner = 'Banner';
   static const native = 'Native';
@@ -47,13 +65,21 @@ class _MyAppState extends State<MyApp> {
     VponAdAudioManager.instance.noticeApplicationAudioDidEnd();
     VponUCB.instance.setConsentStatus(VponConsentStatus.personalized);
 
-    if (_isTestMode) {
-      VponAdSDK.instance.updateRequestConfiguration(
-          VponRequestConfiguration(testDeviceIds: [testDeviceiOS]));
-    }
+    _loadTestMode();
   }
 
-  bool _isTestMode = true;
+  Future<void> _saveTestMode(bool value) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('testMode', value);
+  }
+
+  void _loadTestMode() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      isTestMode = prefs.getBool('testMode') ?? false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -70,7 +96,7 @@ class _MyAppState extends State<MyApp> {
                       const MaterialStatePropertyAll<Color>(Colors.white),
                   onChanged: (bool value) {
                     setState(() {
-                      _isTestMode = value;
+                      isTestMode = value;
                     });
                   }),
             ],

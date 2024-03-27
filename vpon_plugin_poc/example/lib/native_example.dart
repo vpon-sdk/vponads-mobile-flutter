@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:vpon_plugin_poc/vpon_ad_sdk.dart';
 import 'package:vpon_plugin_poc_example/context_extensions.dart';
 
+import 'constants.dart';
+
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   VponAdSDK.instance.initialize();
@@ -34,7 +36,6 @@ class NativeExampleState extends State<NativeExample> {
   @override
   void initState() {
     super.initState();
-
   }
 
   /// Loads a native ad.
@@ -115,26 +116,45 @@ class NativeExampleState extends State<NativeExample> {
           title: const Text('Native Demo'),
         ),
         body: Center(
-          child: Column(
-            children: [
-              _getFormatSegmentedButtonWidget(),
-              Stack(children: [
-                SizedBox(height: 300, width: MediaQuery.of(context).size.width),
-                if (_nativeAdIsLoaded && _nativeAd != null)
-                  SizedBox(
-                      height: 400,
-                      width: MediaQuery.of(context).size.width,
-                      child: AdWidget(ad: _nativeAd!))
-              ]),
-              ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    backgroundColor: Colors.black38,
-                  ),
-                  onPressed: _loadNativeAd,
-                  child: const Text("Refresh Ad")),
-              if (_versionString != null) Text(_versionString!)
-            ],
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: ListView.separated(
+              itemCount: 3,
+              separatorBuilder: (BuildContext context, int index) {
+                return Container(
+                  height: 40,
+                );
+              },
+              itemBuilder: (BuildContext context, int index) {
+                switch (index) {
+                  case 0:
+                    return _getFormatSegmentedButtonWidget();
+                  case 1:
+                    return const Text(
+                      Constants.placeholderText,
+                      style: TextStyle(fontSize: 14),
+                    );
+                  case 2:
+                    return (_nativeAdIsLoaded && _nativeAd != null)
+                        ? Column(
+                            children: [
+                              SizedBox(
+                                  height: 400,
+                                  width: MediaQuery.of(context).size.width,
+                                  child: AdWidget(ad: _nativeAd!)),
+                              ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    foregroundColor: Colors.white,
+                                    backgroundColor: Colors.black38,
+                                  ),
+                                  onPressed: _loadNativeAd,
+                                  child: const Text("Refresh Ad"))
+                            ],
+                          )
+                        : Container();
+                }
+              },
+            ),
           ),
         ));
   }

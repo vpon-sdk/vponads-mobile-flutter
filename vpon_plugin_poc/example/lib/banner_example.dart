@@ -171,12 +171,12 @@ class _BannerExampleState extends State<BannerExample> {
                 if (index == 0) {
                   return _getAdSizeSegmentedButtonWidget();
                 } else if (index == 1) {
-                  return _getBannerAdWidget();
+                  return const Text(
+                    Constants.placeholderText,
+                    style: TextStyle(fontSize: 14),
+                  );
                 }
-                return const Text(
-                  Constants.placeholderText,
-                  style: TextStyle(fontSize: 14),
-                );
+                return _getBannerAdWidget();
               },
             ),
           ),
