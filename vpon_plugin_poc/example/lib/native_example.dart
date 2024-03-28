@@ -43,6 +43,12 @@ class NativeExampleState extends State<NativeExample> {
     setState(() {
       _nativeAdIsLoaded = false;
     });
+    VponAdRequest request = VponAdRequest();
+    request.contentUrl = 'https://www.vpon.com';
+    request.contentData = {"testKey": "testValue"};
+    request.addContentData(key: "testKey2", value: "testValue2");
+    request.addKeyword('testKeyword');
+
     if (_format != null) {
       _nativeAd = NativeAd(
         licenseKey: _format == 0
@@ -66,7 +72,7 @@ class NativeExampleState extends State<NativeExample> {
           onAdClicked: (ad) {},
           onAdImpression: (ad) {},
         ),
-        request: VponAdRequest(),
+        request: request,
       )..load();
     } else {
       debugPrint('Format is null!');

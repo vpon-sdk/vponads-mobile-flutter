@@ -30,10 +30,7 @@ class _InterstitialExampleState extends State<InterstitialExample> {
 
   void _loadInterstitialAd() {
     VponAdRequest request = VponAdRequest();
-    request.userInfoAge = 30;
-    request.setUserInfoBirthday(year: 2000, month: 6, day: 20);
-    request.userInfoGender = VponUserInfoGender.male.value;
-    request.contentUrl = 'https://google.com';
+    request.contentUrl = 'https://www.vpon.com';
     request.contentData = {"testKey": "testValue"};
     request.addContentData(key: "testKey2", value: "testValue2");
     request.addKeyword('testKeyword');

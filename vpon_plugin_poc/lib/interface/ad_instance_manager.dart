@@ -467,9 +467,6 @@ class AdMessageCodec extends StandardMessageCodec {
       writeValue(buffer, value.contentUrl);
       writeValue(buffer, value.contentData);
       writeValue(buffer, value.keywords);
-      writeValue(buffer, value.userInfoAge);
-      writeValue(buffer, value.userInfoGender);
-      writeValue(buffer, value.userInfoBirthday);
     } else if (value is VponRequestConfiguration) {
       buffer.putUint8(_valueRequestConfigurationParams);
       writeValue(buffer, value.maxAdContentRating);

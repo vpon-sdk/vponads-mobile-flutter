@@ -4,18 +4,6 @@ class VponAdRequest {
   Map<String, dynamic> extraData = {};
   Map<String, dynamic> contentData = {};
 
-  int? userInfoAge;
-  Map<String, int> userInfoBirthday = {};
-  int userInfoGender = VponUserInfoGender.unspecified.value;
-
-  /// Set user birthday
-  void setUserInfoBirthday(
-      {required int year, required int month, required int day}) {
-    userInfoBirthday['year'] = year;
-    userInfoBirthday['month'] = month;
-    userInfoBirthday['day'] = day;
-  }
-
   /// Add content data
   void addContentData({required String key, required String value}) {
     contentData[key] = value;
@@ -54,16 +42,6 @@ class VponAdRequest {
   //       mapEquals<String, String>(contentData, other.contentData) &&
   //       format == other.format;
   // }
-}
-
-enum VponUserInfoGender {
-  unspecified(-1),
-  male(0),
-  female(1),
-  unknown(2);
-
-  const VponUserInfoGender(this.value);
-  final int value;
 }
 
 class VponRequestConfiguration {

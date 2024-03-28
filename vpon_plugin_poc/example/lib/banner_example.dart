@@ -45,11 +45,17 @@ class _BannerExampleState extends State<BannerExample> {
         key = '8a80854b79a9f2ce0179c096a4f94b78';
     }
 
+    VponAdRequest request = VponAdRequest();
+    request.contentUrl = 'https://www.vpon.com';
+    request.contentData = {"testKey": "testValue"};
+    request.addContentData(key: "testKey2", value: "testValue2");
+    request.addKeyword('testKeyword');
+
     if (_adSize != null) {
       _bannerAd = BannerAd(
         licenseKey: key,
         size: _adSize!,
-        request: VponAdRequest(),
+        request: request,
         autoRefresh: false,
         listener: BannerAdListener(
           onAdLoaded: (Ad ad) async {

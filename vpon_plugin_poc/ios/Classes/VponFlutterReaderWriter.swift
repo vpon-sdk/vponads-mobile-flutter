@@ -18,9 +18,6 @@ class VponFlutterAdRequest {
     var contentURL: String?
     var contentData: [String: Any]?
     var keywords: [String]?
-    var userInfoAge: Int?
-    var userInfoBirthday: [String: Int]?
-    var userInfoGender: Int?
     
     func asVponAdRequest() -> VponAdRequest {
         let request = VponAdRequest()
@@ -37,21 +34,6 @@ class VponFlutterAdRequest {
             for keyword in keywords {
                 request.addKeyword(keyword)
             }
-        }
-        
-        if let userInfoAge {
-            request.setUserInfoAge(userInfoAge)
-        }
-        
-        if let userInfoBirthday,
-           let year = userInfoBirthday["year"],
-           let month = userInfoBirthday["month"],
-           let day = userInfoBirthday["day"] {
-            request.setUserInfoBirthday(year: year, month: month, day: day)
-        }
-        
-        if let userInfoGender, let vponGender = VponUserGender(rawValue: userInfoGender) {
-            request.setUserInfoGender(vponGender)
         }
         
         return request
@@ -106,9 +88,6 @@ class VponFlutterReader: FlutterStandardReader {
             request.contentURL = self.readValue(ofType: self.readByte()) as? String
             request.contentData = self.readValue(ofType: self.readByte()) as? [String: Any]
             request.keywords = self.readValue(ofType: self.readByte()) as? [String]
-            request.userInfoAge = self.readValue(ofType: self.readByte()) as? Int
-            request.userInfoGender = self.readValue(ofType: self.readByte()) as? Int
-            request.userInfoBirthday = self.readValue(ofType: self.readByte()) as? [String: Int]
             return request
             
         case .bannerAdSize:
