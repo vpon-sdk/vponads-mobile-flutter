@@ -221,6 +221,14 @@ class AdInstanceManager {
 
   void _onAdEventAndroid(
       Ad ad, String eventName, Map<dynamic, dynamic> arguments) {
+    switch (eventName) {
+      case 'onAdLoaded':
+        _invokeOnAdLoaded(ad, eventName, arguments);
+        break;
+      case 'onAdFailedToLoad':
+        _invokeOnAdFailedToLoad(ad, eventName, arguments);
+        break;
+    }
     // switch (eventName) {
     //   case 'onAdLoaded':
     //     _invokeOnAdLoaded(ad, eventName, arguments);

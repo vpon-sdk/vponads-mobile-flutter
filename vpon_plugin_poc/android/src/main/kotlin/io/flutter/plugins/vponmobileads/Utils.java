@@ -15,4 +15,11 @@ class Utils {
     final static String setConsentStatus = "setConsentStatus";
     final static String updateRequestConfiguration = "updateRequestConfiguration";
     final static String loadInterstitialAd = "loadInterstitialAd";
+
+    final static String adId = "adId";
+    final static String eventName = "eventName";
+    final static String onAdEvent = "onAdEvent";
+    final static String loadAdError = "loadAdError";
+    final static String errorDescription = "errorDescription";
+    final static String errorCode = "errorCode";
 }
