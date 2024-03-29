@@ -35,8 +35,8 @@ flutter:
   plugin:
     platforms:
       android:
-        package: com.example.vpon_plugin_poc
-        pluginClass: VponPluginPocPlugin
+        package: io.flutter.plugins.vponmobileads
+        pluginClass: VponMobileAdsPlugin
       ios:
         pluginClass: VponPluginPocPlugin
 
