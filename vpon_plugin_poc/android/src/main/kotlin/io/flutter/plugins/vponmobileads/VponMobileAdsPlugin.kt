@@ -53,7 +53,7 @@ class VponMobileAdsPlugin : FlutterPlugin {
                         val interstitial = VponFlutterInterstitialAd(
                             call.argument("adId")!!,
                             adInstanceManager,
-                            call.argument("adUnitId"),
+                            call.argument("licenseKey"),
                             call.argument("request"), VponFlutterAdLoader(context)
                         )
                         interstitial.load()
