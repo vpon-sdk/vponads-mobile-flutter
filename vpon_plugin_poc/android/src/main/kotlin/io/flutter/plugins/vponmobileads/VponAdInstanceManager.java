@@ -30,27 +30,30 @@ class VponAdInstanceManager {
     void onAdLoaded(VponFlutterAd vponFlutterAd) {
         Log.e(TAG, "VponAdInstanceManager invoke onAdEvent onAdLoaded");
         Map<Object, Object> arguments = new HashMap<>();
-        arguments.put(Utils.adId, vponFlutterAd.adId);
-        arguments.put(Utils.eventName, "onAdLoaded");
+        arguments.put(Constants.CHANNEL_ARGUMENT_ADID, vponFlutterAd.adId);
+        arguments.put(Constants.CHANNEL_ARGUMENT_EVENT_NAME, "onAdLoaded");
         invokeOnAdEvent(arguments);
     }
 
     void onAdFailedToLoad(VponFlutterAd vponFlutterAd
-            , VponAdRequest.VponErrorCode vponErrorCode){
-        Log.e(TAG, "VponAdInstanceManager invoke onAdEvent onAdLoaded");
+            , VponAdRequest.VponErrorCode vponErrorCode) {
+        Log.e(TAG, "VponAdInstanceManager invoke onAdEvent " +
+                "onAdFailedToLoad(" + vponErrorCode.getErrorCode() + ")");
         Map<Object, Object> arguments = new HashMap<>();
-        arguments.put(Utils.adId, vponFlutterAd.adId);
+        arguments.put(Constants.CHANNEL_ARGUMENT_ADID, vponFlutterAd.adId);
         Map<Object, Object> errors = new HashMap<>();
-        errors.put(Utils.errorDescription, vponErrorCode.getErrorDescription());
-        errors.put(Utils.errorCode, vponErrorCode.getErrorCode());
-        arguments.put(Utils.loadAdError, errors);
+        errors.put(Constants.CHANNEL_ARGUMENT_ERROR_DESCRIPTION
+                , vponErrorCode.getErrorDescription());
+        errors.put(Constants.CHANNEL_ARGUMENT_ERROR_CODE, vponErrorCode.getErrorCode());
+        arguments.put(Constants.CHANNEL_ARGUMENT_LOAD_AD_ERROR, errors);
         invokeOnAdEvent(arguments);
     }
 
 
     private void invokeOnAdEvent(final Map<Object, Object> arguments) {
         new Handler(Looper.getMainLooper())
-                .post(() -> channelToDart.invokeMethod(Utils.onAdEvent, arguments));
+                .post(() -> channelToDart
+                        .invokeMethod(Constants.CHANNEL_ARGUMENT_ON_AD_EVENT, arguments));
     }
 
 

@@ -42,10 +42,10 @@ class VponMobileAdsPlugin : FlutterPlugin {
                     result.success("Android ${android.os.Build.VERSION.RELEASE}")
                 }
 
-                Utils.getVersionString -> result.success(VponAdRequest.VERSION)
-                Utils.getVponID -> result.success(VponMobileAds.getVponID(context))
-                Utils.setConsentStatus -> result.success(null)
-                Utils.loadInterstitialAd ->                     // check arguments
+                Constants.METHOD_GET_VERSION_STRING -> result.success(VponAdRequest.VERSION)
+                Constants.METHOD_GET_VPON_ID -> result.success(VponMobileAds.getVponID(context))
+                Constants.METHOD_SET_CONSENT_STATUS -> result.success(null)
+                Constants.METHOD_LOAD_INTERSTITIAL_AD ->                     // check arguments
                     if (call.hasArgument("licenseKey")
                         && call.hasArgument("adId") && call.hasArgument("request")
                     ) {
@@ -64,7 +64,7 @@ class VponMobileAdsPlugin : FlutterPlugin {
                         )
                     }
 
-                Utils._init, Utils.initializeSDK, Utils.setLogLevel, Utils.setLocationManagerEnable, Utils.setAudioApplicationManaged, Utils.noticeApplicationAudioDidEnd, Utils.updateRequestConfiguration -> result.success(
+                Constants._init, Constants.METHOD_INITIALIZE_SDK, Constants.METHOD_SET_LOG_LEVEL, Constants.METHOD_ENABLE_LOCATION_MANAGER, Constants.METHOD_SET_AUDIO_MANAGER, Constants.METHOD_NOTICE_APPLICATION_AUDIO_DID_END, Constants.METHOD_UPDATE_REQUEST_CONFIGURATION -> result.success(
                     null
                 )
 
@@ -81,7 +81,7 @@ class VponMobileAdsPlugin : FlutterPlugin {
         Log.e(TAG, "onAttachedToEngine invoked!!")
         channel = MethodChannel(
             flutterPluginBinding.binaryMessenger,
-            Utils.channelName,
+            Constants.CHANNEL_NAME_TO_FLUTTER,
             StandardMethodCodec(VponAdMessageCodec())
         )
 
