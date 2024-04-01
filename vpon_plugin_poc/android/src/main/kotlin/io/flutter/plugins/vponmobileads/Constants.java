@@ -15,8 +15,13 @@ class Constants {
     final static String METHOD_SET_CONSENT_STATUS = "setConsentStatus";
     final static String METHOD_UPDATE_REQUEST_CONFIGURATION = "updateRequestConfiguration";
     final static String METHOD_LOAD_INTERSTITIAL_AD = "loadInterstitialAd";
+    final static String METHOD_LOAD_BANNER_AD = "loadBannerAd";
+    final static String METHOD_DISPOSE_AD = "disposeAd";
 
     final static String CHANNEL_ARGUMENT_ADID = "adId";
+    final static String CHANNEL_ARGUMENT_LICENSE_KEY = "licenseKey";
+    final static String CHANNEL_ARGUMENT_AD_REQUEST = "request";
+    final static String CHANNEL_ARGUMENT_AD_SIZE = "size";
     final static String CHANNEL_ARGUMENT_EVENT_NAME = "eventName";
     final static String CHANNEL_ARGUMENT_ON_AD_EVENT = "onAdEvent";
     final static String CHANNEL_ARGUMENT_LOAD_AD_ERROR = "loadAdError";

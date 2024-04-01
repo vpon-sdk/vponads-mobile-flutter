@@ -29,10 +29,21 @@ class VponAdInstanceManager {
 
     void onAdLoaded(VponFlutterAd vponFlutterAd) {
         Log.e(TAG, "VponAdInstanceManager invoke onAdEvent onAdLoaded");
+
+        trackAd(vponFlutterAd.adId, vponFlutterAd);
+
         Map<Object, Object> arguments = new HashMap<>();
         arguments.put(Constants.CHANNEL_ARGUMENT_ADID, vponFlutterAd.adId);
         arguments.put(Constants.CHANNEL_ARGUMENT_EVENT_NAME, "onAdLoaded");
         invokeOnAdEvent(arguments);
+    }
+
+    private void trackAd(int adId, VponFlutterAd vponFlutterAd) {
+        if (ads.get(adId) != null) {
+            throw new IllegalArgumentException(
+                    String.format("Ad for following adId already exists: %d", adId));
+        }
+        ads.put(adId, vponFlutterAd);
     }
 
     void onAdFailedToLoad(VponFlutterAd vponFlutterAd
@@ -54,6 +65,26 @@ class VponAdInstanceManager {
         new Handler(Looper.getMainLooper())
                 .post(() -> channelToDart
                         .invokeMethod(Constants.CHANNEL_ARGUMENT_ON_AD_EVENT, arguments));
+    }
+
+    void disposeAd(int adId) {
+        if (!ads.containsKey(adId)) {
+            return;
+        }
+        VponFlutterAd ad = ads.get(adId);
+        if (ad != null) {
+            ad.dispose();
+        }
+        ads.remove(adId);
+    }
+
+    void disposeAllAds() {
+        for (Map.Entry<Integer, VponFlutterAd> entry : ads.entrySet()) {
+            if (entry.getValue() != null) {
+                entry.getValue().dispose();
+            }
+        }
+        ads.clear();
     }
 
 

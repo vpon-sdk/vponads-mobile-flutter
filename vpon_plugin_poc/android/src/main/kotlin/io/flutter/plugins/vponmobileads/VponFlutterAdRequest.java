@@ -9,7 +9,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 
 class VponFlutterAdRequest {
     @Nullable
@@ -93,6 +92,7 @@ class VponFlutterAdRequest {
         if (keywords != null) {
             builder.addKeywords(new HashSet<>(keywords));
         }
+        builder.setAutoRefresh(false);
         return builder.build();
     }
 

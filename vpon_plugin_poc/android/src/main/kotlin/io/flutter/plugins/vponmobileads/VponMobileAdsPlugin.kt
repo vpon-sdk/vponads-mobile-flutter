@@ -45,16 +45,50 @@ class VponMobileAdsPlugin : FlutterPlugin {
                 Constants.METHOD_GET_VERSION_STRING -> result.success(VponAdRequest.VERSION)
                 Constants.METHOD_GET_VPON_ID -> result.success(VponMobileAds.getVponID(context))
                 Constants.METHOD_SET_CONSENT_STATUS -> result.success(null)
+                Constants.METHOD_DISPOSE_AD ->
+                    if (call.hasArgument(Constants.CHANNEL_ARGUMENT_ADID)) {
+                        adInstanceManager
+                            .disposeAd(call.argument(Constants.CHANNEL_ARGUMENT_ADID)!!)
+                        result.success(null)
+                    } else {
+                        result.error(
+                            "invalidArgument", "invalidArgument", null
+                        )
+                    }
+                Constants.METHOD_LOAD_BANNER_AD ->
+                    if (call.hasArgument(Constants.CHANNEL_ARGUMENT_LICENSE_KEY)
+                        && call.hasArgument(Constants.CHANNEL_ARGUMENT_ADID)
+                        && call.hasArgument(Constants.CHANNEL_ARGUMENT_AD_REQUEST)
+                        && call.hasArgument(Constants.CHANNEL_ARGUMENT_AD_SIZE)
+                    ) {
+                        val bannerAd = VponFlutterBannerAd(
+                            context,
+                            call.argument(Constants.CHANNEL_ARGUMENT_ADID)!!,
+                            adInstanceManager,
+                            call.argument(Constants.CHANNEL_ARGUMENT_LICENSE_KEY),
+                            call.argument(Constants.CHANNEL_ARGUMENT_AD_REQUEST),
+                            call.argument(Constants.CHANNEL_ARGUMENT_AD_SIZE)
+                        )
+                        bannerAd.load()
+                        result.success(null)
+                    } else {
+                        result.error(
+                            "invalidArgument", "invalidArgument", null
+                        )
+                    }
+
                 Constants.METHOD_LOAD_INTERSTITIAL_AD ->                     // check arguments
-                    if (call.hasArgument("licenseKey")
-                        && call.hasArgument("adId") && call.hasArgument("request")
+                    if (call.hasArgument(Constants.CHANNEL_ARGUMENT_LICENSE_KEY)
+                        && call.hasArgument(Constants.CHANNEL_ARGUMENT_ADID)
+                        && call.hasArgument(Constants.CHANNEL_ARGUMENT_AD_REQUEST)
                     ) {
 
                         val interstitial = VponFlutterInterstitialAd(
-                            call.argument("adId")!!,
+                            call.argument(Constants.CHANNEL_ARGUMENT_ADID)!!,
                             adInstanceManager,
-                            call.argument("licenseKey"),
-                            call.argument("request"), VponFlutterAdLoader(context)
+                            call.argument(Constants.CHANNEL_ARGUMENT_LICENSE_KEY),
+                            call.argument(Constants.CHANNEL_ARGUMENT_AD_REQUEST),
+                            VponFlutterAdLoader(context)
                         )
                         interstitial.load()
                         result.success(null)
