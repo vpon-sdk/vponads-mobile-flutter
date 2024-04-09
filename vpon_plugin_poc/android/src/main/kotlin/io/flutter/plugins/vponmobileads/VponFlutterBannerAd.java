@@ -2,7 +2,11 @@ package io.flutter.plugins.vponmobileads;
 
 import android.content.Context;
 
+import androidx.annotation.Nullable;
+
 import com.vpon.ads.VponBanner;
+
+import io.flutter.plugin.platform.PlatformView;
 
 class VponFlutterBannerAd extends VponFlutterAd implements VponFlutterAdLoadedListener {
 
@@ -48,5 +52,14 @@ class VponFlutterBannerAd extends VponFlutterAd implements VponFlutterAdLoadedLi
         if (vponBanner != null) {
             adInstanceManager.onAdLoaded(this);
         }
+    }
+
+    @Nullable
+    @Override
+    PlatformView getPlatformView() {
+        if(vponBanner != null){
+            return new VponFlutterPlatformView(vponBanner);
+        }
+        return super.getPlatformView();
     }
 }

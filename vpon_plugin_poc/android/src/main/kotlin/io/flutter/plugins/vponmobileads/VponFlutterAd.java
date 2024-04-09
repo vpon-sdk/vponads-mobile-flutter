@@ -1,5 +1,9 @@
 package io.flutter.plugins.vponmobileads;
 
+import androidx.annotation.Nullable;
+
+import io.flutter.plugin.platform.PlatformView;
+
 abstract class VponFlutterAd {
 
     protected final int adId;
@@ -10,6 +14,11 @@ abstract class VponFlutterAd {
 
     abstract void load();
     abstract void dispose();
+
+    @Nullable
+    PlatformView getPlatformView() {
+        return null;
+    }
 
     abstract static class VponFlutterOverlayAd extends VponFlutterAd {
 
