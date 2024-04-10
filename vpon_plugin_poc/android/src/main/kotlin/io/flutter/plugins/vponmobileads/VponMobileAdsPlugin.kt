@@ -120,11 +120,18 @@ class VponMobileAdsPlugin : FlutterPlugin {
         )
 
         channel?.let {
+            val instanceManager = VponAdInstanceManager(it)
             it.setMethodCallHandler(
                 PluginMethodCallHandler(
-                    flutterPluginBinding.applicationContext, VponAdInstanceManager(it)
+                    flutterPluginBinding.applicationContext, instanceManager
                 )
             )
+            flutterPluginBinding
+                .platformViewRegistry
+                .registerViewFactory(
+                    "${Constants.CHANNEL_NAME_TO_FLUTTER}/ad_widget",
+                    VponMobileAdsViewFactory(instanceManager)
+                )
         }
     }
 

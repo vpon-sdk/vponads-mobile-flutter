@@ -5,6 +5,7 @@ import android.os.Looper;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.vpon.ads.VponAdRequest;
 
@@ -87,5 +88,8 @@ class VponAdInstanceManager {
         ads.clear();
     }
 
-
+    @Nullable
+    VponFlutterAd adForId(int id) {
+        return ads.get(id);
+    }
 }

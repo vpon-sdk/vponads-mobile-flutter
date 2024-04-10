@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:vpon_plugin_poc/vpon_ad_sdk.dart';
@@ -36,7 +37,8 @@ class _BannerExampleState extends State<BannerExample> {
     String key = '';
     switch (_adSize) {
       case BannerAdSize.banner:
-        key = '8a80854b79a9f2ce0179c095a3394b75';
+        key = (defaultTargetPlatform == TargetPlatform.iOS)?
+        '8a80854b79a9f2ce0179c095a3394b75':'8a80854b75ab2b0101761cfb398671c6';
       case BannerAdSize.largeBanner:
         key = '8a80854b79a9f2ce0179c09661714b77';
       case BannerAdSize.mediumRectangle:
