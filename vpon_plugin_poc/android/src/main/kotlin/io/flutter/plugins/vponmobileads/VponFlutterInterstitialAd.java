@@ -50,7 +50,15 @@ class VponFlutterInterstitialAd extends VponFlutterAd.VponFlutterOverlayAd {
 
     @Override
     void show() {
-        //TODO
+        if(vponInterstitialAd == null) {
+            Log.e(TAG, "Error showing interstitial - the interstitial ad wasn't loaded yet.");
+            return;
+        }
+        if(adInstanceManager != null) {
+            vponInterstitialAd
+                    .setFullScreenContentCallback(new VponFlutterFullScreenContentCallback(adInstanceManager, adId));
+            vponInterstitialAd.show();
+        }
     }
 
     private void onAdLoaded(VponInterstitialAd vponInterstitialAd) {

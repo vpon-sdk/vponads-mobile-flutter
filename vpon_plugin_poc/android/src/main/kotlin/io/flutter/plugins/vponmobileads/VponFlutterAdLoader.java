@@ -29,7 +29,7 @@ class VponFlutterAdLoader {
         VponInterstitialAd.load(context, licenseKey, vponAdRequest, vponInterstitialAdLoadCallback);
     }
 
-    public void loadNativeAd(
+    void loadNativeAd(
             @NonNull final String licenseKey,
             @NonNull final VponNativeAd.OnNativeAdLoadedListener onNativeAdLoadedListener,
             @NonNull final VponAdListener adListener,

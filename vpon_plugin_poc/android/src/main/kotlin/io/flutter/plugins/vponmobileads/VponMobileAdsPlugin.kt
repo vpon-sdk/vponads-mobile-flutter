@@ -108,7 +108,22 @@ class VponMobileAdsPlugin : FlutterPlugin, MethodCallHandler {
 
         when (method) {
             "getPlatformVersion" -> {
+                // TODO remove after develop
                 result.success("Android ${android.os.Build.VERSION.RELEASE}")
+            }
+
+            Constants.METHOD_SHOW_AD_WITHOUT_VIEW -> {
+                if (call.hasArgument(Constants.CHANNEL_ARGUMENT_ADID)) {
+                    val adid = call.argument(Constants.CHANNEL_ARGUMENT_ADID) as Int?
+                    adid?.let {
+                        adInstanceManager?.showAd(it)
+                        result.success(null)
+                    }
+                } else {
+                    result.error(
+                        "invalidArgument", "invalidArgument", null
+                    )
+                }
             }
 
             Constants._init -> {
@@ -153,7 +168,7 @@ class VponMobileAdsPlugin : FlutterPlugin, MethodCallHandler {
                     && call.hasArgument(Constants.CHANNEL_ARGUMENT_AD_REQUEST)
                     && call.hasArgument(Constants.CHANNEL_ARGUMENT_AD_SIZE)
                 ) {
-                    val bannerAd = VponFlutterBannerAd(
+                    val vponFlutterBannerAd = VponFlutterBannerAd(
                         context,
                         call.argument(Constants.CHANNEL_ARGUMENT_ADID)!!,
                         adInstanceManager,
@@ -161,7 +176,7 @@ class VponMobileAdsPlugin : FlutterPlugin, MethodCallHandler {
                         call.argument(Constants.CHANNEL_ARGUMENT_AD_REQUEST),
                         call.argument(Constants.CHANNEL_ARGUMENT_AD_SIZE)
                     )
-                    bannerAd.load()
+                    vponFlutterBannerAd.load()
                     result.success(null)
                 } else {
                     result.error(
@@ -174,15 +189,14 @@ class VponMobileAdsPlugin : FlutterPlugin, MethodCallHandler {
                     && call.hasArgument(Constants.CHANNEL_ARGUMENT_ADID)
                     && call.hasArgument(Constants.CHANNEL_ARGUMENT_AD_REQUEST)
                 ) {
-
-                    val interstitial = VponFlutterInterstitialAd(
+                    val vponFlutterInterstitialAd = VponFlutterInterstitialAd(
                         call.argument(Constants.CHANNEL_ARGUMENT_ADID)!!,
                         adInstanceManager,
                         call.argument(Constants.CHANNEL_ARGUMENT_LICENSE_KEY),
                         call.argument(Constants.CHANNEL_ARGUMENT_AD_REQUEST),
                         VponFlutterAdLoader(context)
                     )
-                    interstitial.load()
+                    vponFlutterInterstitialAd.load()
                     result.success(null)
                 } else {
                     result.error(
@@ -198,17 +212,21 @@ class VponMobileAdsPlugin : FlutterPlugin, MethodCallHandler {
                 ) {
                     val factory =
                         nativeAdFactories[call.argument(Constants.CHANNEL_ARGUMENT_FACTORY_ID)]
-                    context?.let {
-                        val nativeAd = VponFlutterNativeAd.Builder()
-                            .setManager(adInstanceManager!!)
-                            .setAdFactory(factory!!)
-                            .setId(call.argument(Constants.CHANNEL_ARGUMENT_ADID)!!)
-                            .setLicenseKey(call.argument(Constants.CHANNEL_ARGUMENT_LICENSE_KEY)!!)
-                            .setFlutterAdLoader(VponFlutterAdLoader(it))
-                            .setRequest(call.argument(Constants.CHANNEL_ARGUMENT_AD_REQUEST)!!)
-                            .build()
-                        nativeAd.load()
-                        result.success(null)
+                    adInstanceManager?.let { manager ->
+                        factory?.let { factory ->
+                            context?.let {
+                                val vponFlutterNativeAd = VponFlutterNativeAd.Builder()
+                                    .setManager(manager)
+                                    .setAdFactory(factory)
+                                    .setId(call.argument(Constants.CHANNEL_ARGUMENT_ADID)!!)
+                                    .setLicenseKey(call.argument(Constants.CHANNEL_ARGUMENT_LICENSE_KEY)!!)
+                                    .setFlutterAdLoader(VponFlutterAdLoader(it))
+                                    .setRequest(call.argument(Constants.CHANNEL_ARGUMENT_AD_REQUEST)!!)
+                                    .build()
+                                vponFlutterNativeAd.load()
+                                result.success(null)
+                            }
+                        }
                     }
                 } else {
                     result.error(

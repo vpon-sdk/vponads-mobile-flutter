@@ -18,6 +18,7 @@ class Constants {
     final static String METHOD_LOAD_BANNER_AD = "loadBannerAd";
     final static String METHOD_LOAD_NATIVE_AD = "loadNativeAd";
     final static String METHOD_DISPOSE_AD = "disposeAd";
+    final static String METHOD_SHOW_AD_WITHOUT_VIEW = "showAdWithoutView";
 
     final static String CHANNEL_ARGUMENT_ADID = "adId";
     final static String CHANNEL_ARGUMENT_LICENSE_KEY = "licenseKey";
@@ -27,6 +28,7 @@ class Constants {
     final static String CHANNEL_ARGUMENT_EVENT_NAME = "eventName";
     final static String CHANNEL_ARGUMENT_ON_AD_EVENT = "onAdEvent";
     final static String CHANNEL_ARGUMENT_LOAD_AD_ERROR = "loadAdError";
+    final static String CHANNEL_ARGUMENT_ERROR = "error";
     final static String CHANNEL_ARGUMENT_ERROR_DESCRIPTION = "errorDescription";
     final static String CHANNEL_ARGUMENT_ERROR_CODE = "errorCode";
 }

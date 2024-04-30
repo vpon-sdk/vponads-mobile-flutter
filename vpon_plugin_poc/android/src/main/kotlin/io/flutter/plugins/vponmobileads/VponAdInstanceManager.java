@@ -61,6 +61,62 @@ class VponAdInstanceManager {
         invokeOnAdEvent(arguments);
     }
 
+    void onFailedToShowFullScreenContent(int adId
+            , int vponErrorCode) {
+        Log.e(TAG, "VponAdInstanceManager invoke onAdEvent " +
+                "onFailedToShowFullScreenContent(" + vponErrorCode + ")");
+        final Map<Object, Object> arguments = new HashMap<>();
+        arguments.put(Constants.CHANNEL_ARGUMENT_ADID, adId);
+        Map<Object, Object> errors = new HashMap<>();
+        errors.put(Constants.CHANNEL_ARGUMENT_ERROR_DESCRIPTION, "onFailedToShowFullScreenContent");
+        errors.put(Constants.CHANNEL_ARGUMENT_ERROR_CODE, vponErrorCode);
+        arguments.put(Constants.CHANNEL_ARGUMENT_EVENT_NAME, "onFailedToShowFullScreenContent");
+        arguments.put(Constants.CHANNEL_ARGUMENT_ERROR, errors);
+        invokeOnAdEvent(arguments);
+    }
+
+    void showAd(int adId) {
+
+        if (!ads.containsKey(adId)) {
+            return;
+        }
+        VponFlutterAd.VponFlutterOverlayAd ad = (VponFlutterAd.VponFlutterOverlayAd)ads.get(adId);
+        if(ad != null){
+            ad.show();
+        }
+    }
+
+    void onAdClicked(int adId) {
+        Log.e(TAG, "VponAdInstanceManager invoke onAdEvent onAdClicked");
+        Map<Object, Object> arguments = new HashMap<>();
+        arguments.put(Constants.CHANNEL_ARGUMENT_ADID, adId);
+        arguments.put(Constants.CHANNEL_ARGUMENT_EVENT_NAME, "onAdClicked");
+        invokeOnAdEvent(arguments);
+    }
+
+    void onAdDismissedFullScreenContent(int adId) {
+        Log.e(TAG, "VponAdInstanceManager invoke onAdEvent onAdDismissedFullScreenContent");
+        Map<Object, Object> arguments = new HashMap<>();
+        arguments.put(Constants.CHANNEL_ARGUMENT_ADID, adId);
+        arguments.put(Constants.CHANNEL_ARGUMENT_EVENT_NAME, "onAdDismissedFullScreenContent");
+        invokeOnAdEvent(arguments);
+    }
+
+    void onAdImpression(int adId) {
+        Log.e(TAG, "VponAdInstanceManager invoke onAdEvent onAdImpression");
+        Map<Object, Object> arguments = new HashMap<>();
+        arguments.put(Constants.CHANNEL_ARGUMENT_ADID, adId);
+        arguments.put(Constants.CHANNEL_ARGUMENT_EVENT_NAME, "onAdImpression");
+        invokeOnAdEvent(arguments);
+    }
+
+    void onAdShowedFullScreenContent(int adId){
+        Log.e(TAG, "VponAdInstanceManager invoke onAdEvent onAdShowedFullScreenContent");
+        Map<Object, Object> arguments = new HashMap<>();
+        arguments.put(Constants.CHANNEL_ARGUMENT_ADID, adId);
+        arguments.put(Constants.CHANNEL_ARGUMENT_EVENT_NAME, "onAdShowedFullScreenContent");
+        invokeOnAdEvent(arguments);
+    }
 
     private void invokeOnAdEvent(final Map<Object, Object> arguments) {
         new Handler(Looper.getMainLooper())
