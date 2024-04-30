@@ -35,17 +35,16 @@ class VponAdMessageCodec extends StandardMessageCodec {
     @Override
     protected void writeValue(@NonNull ByteArrayOutputStream stream, @Nullable Object value) {
         if (value instanceof VponFlutterAdSize) {
-            Log.e(TAG, "writeValue.case VponFlutterAdSize");
+            Log.d(TAG, "writeValue.case VponFlutterAdSize");
             writeAdSize(stream, (VponFlutterAdSize) value);
         } else if (value instanceof VponFlutterAdRequest) {
-            Log.e(TAG, "writeValue.case VponFlutterAdRequest");
+            Log.d(TAG, "writeValue.case VponFlutterAdRequest");
             stream.write(VALUE_AD_REQUEST);
             final VponFlutterAdRequest request = (VponFlutterAdRequest) value;
             writeValue(stream, request.getContentUrl());
             writeValue(stream, request.getContentData());
             writeValue(stream, request.getKeywords());
         } else {
-            Log.e(TAG, "writeValue.case Others");
             super.writeValue(stream, value);
         }
     }
@@ -56,22 +55,21 @@ class VponAdMessageCodec extends StandardMessageCodec {
     protected Object readValueOfType(byte type, @NonNull ByteBuffer buffer) {
         switch (type) {
             case VALUE_SMART_BANNER_AD_SIZE:
-                Log.e(TAG, "readValueOfType.case VALUE_SMART_BANNER_AD_SIZE");
+                Log.d(TAG, "readValueOfType.case VALUE_SMART_BANNER_AD_SIZE");
                 return new VponFlutterAdSize.SmartBannerAdSize();
             case VALUE_AD_SIZE:
-                Log.e(TAG, "readValueOfType.case VALUE_AD_SIZE");
+                Log.d(TAG, "readValueOfType.case VALUE_AD_SIZE");
                 return new VponFlutterAdSize(
                         (Integer) readValueOfType(buffer.get(), buffer),
                         (Integer) readValueOfType(buffer.get(), buffer));
             case VALUE_AD_REQUEST:
-                Log.e(TAG, "readValueOfType.case VALUE_AD_REQUEST");
+                Log.d(TAG, "readValueOfType.case VALUE_AD_REQUEST");
                 return new VponFlutterAdRequest.Builder()
                         .setContentUrl((String) readValueOfType(buffer.get(), buffer))
                         .setContentData((HashMap<String, Object>) readValueOfType(buffer.get(), buffer))
                         .setKeywords((List<String>) readValueOfType(buffer.get(), buffer))
                         .build();
             default:
-                Log.e(TAG, "readValueOfType.case Others");
                 return super.readValueOfType(type, buffer);
         }
     }

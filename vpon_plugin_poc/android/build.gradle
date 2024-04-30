@@ -62,6 +62,7 @@ android {
         testImplementation 'org.mockito:mockito-core:5.2.0'
 
         api 'com.vpon:vpadnSDK:latest.release'
+        api 'com.google.android.gms:play-services-ads-identifier:18.0.1'
     }
 
     testOptions {

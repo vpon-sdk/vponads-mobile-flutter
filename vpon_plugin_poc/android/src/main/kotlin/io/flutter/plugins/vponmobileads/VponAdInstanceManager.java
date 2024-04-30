@@ -29,7 +29,7 @@ class VponAdInstanceManager {
     }
 
     void onAdLoaded(VponFlutterAd vponFlutterAd) {
-        Log.e(TAG, "VponAdInstanceManager invoke onAdEvent onAdLoaded");
+        Log.d(TAG, "VponAdInstanceManager invoke onAdEvent onAdLoaded");
 
         trackAd(vponFlutterAd.adId, vponFlutterAd);
 
@@ -49,7 +49,7 @@ class VponAdInstanceManager {
 
     void onAdFailedToLoad(VponFlutterAd vponFlutterAd
             , VponAdRequest.VponErrorCode vponErrorCode) {
-        Log.e(TAG, "VponAdInstanceManager invoke onAdEvent " +
+        Log.d(TAG, "VponAdInstanceManager invoke onAdEvent " +
                 "onAdFailedToLoad(" + vponErrorCode.getErrorCode() + ")");
         Map<Object, Object> arguments = new HashMap<>();
         arguments.put(Constants.CHANNEL_ARGUMENT_ADID, vponFlutterAd.adId);
@@ -63,7 +63,7 @@ class VponAdInstanceManager {
 
     void onFailedToShowFullScreenContent(int adId
             , int vponErrorCode) {
-        Log.e(TAG, "VponAdInstanceManager invoke onAdEvent " +
+        Log.d(TAG, "VponAdInstanceManager invoke onAdEvent " +
                 "onFailedToShowFullScreenContent(" + vponErrorCode + ")");
         final Map<Object, Object> arguments = new HashMap<>();
         arguments.put(Constants.CHANNEL_ARGUMENT_ADID, adId);
@@ -87,7 +87,7 @@ class VponAdInstanceManager {
     }
 
     void onAdClicked(int adId) {
-        Log.e(TAG, "VponAdInstanceManager invoke onAdEvent onAdClicked");
+        Log.d(TAG, "VponAdInstanceManager invoke onAdEvent onAdClicked");
         Map<Object, Object> arguments = new HashMap<>();
         arguments.put(Constants.CHANNEL_ARGUMENT_ADID, adId);
         arguments.put(Constants.CHANNEL_ARGUMENT_EVENT_NAME, "onAdClicked");
@@ -95,7 +95,7 @@ class VponAdInstanceManager {
     }
 
     void onAdDismissedFullScreenContent(int adId) {
-        Log.e(TAG, "VponAdInstanceManager invoke onAdEvent onAdDismissedFullScreenContent");
+        Log.d(TAG, "VponAdInstanceManager invoke onAdEvent onAdDismissedFullScreenContent");
         Map<Object, Object> arguments = new HashMap<>();
         arguments.put(Constants.CHANNEL_ARGUMENT_ADID, adId);
         arguments.put(Constants.CHANNEL_ARGUMENT_EVENT_NAME, "onAdDismissedFullScreenContent");
@@ -103,7 +103,7 @@ class VponAdInstanceManager {
     }
 
     void onAdImpression(int adId) {
-        Log.e(TAG, "VponAdInstanceManager invoke onAdEvent onAdImpression");
+        Log.d(TAG, "VponAdInstanceManager invoke onAdEvent onAdImpression");
         Map<Object, Object> arguments = new HashMap<>();
         arguments.put(Constants.CHANNEL_ARGUMENT_ADID, adId);
         arguments.put(Constants.CHANNEL_ARGUMENT_EVENT_NAME, "onAdImpression");
@@ -111,7 +111,7 @@ class VponAdInstanceManager {
     }
 
     void onAdShowedFullScreenContent(int adId){
-        Log.e(TAG, "VponAdInstanceManager invoke onAdEvent onAdShowedFullScreenContent");
+        Log.d(TAG, "VponAdInstanceManager invoke onAdEvent onAdShowedFullScreenContent");
         Map<Object, Object> arguments = new HashMap<>();
         arguments.put(Constants.CHANNEL_ARGUMENT_ADID, adId);
         arguments.put(Constants.CHANNEL_ARGUMENT_EVENT_NAME, "onAdShowedFullScreenContent");

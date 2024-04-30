@@ -29,7 +29,7 @@ class VponMobileAdsPlugin : FlutterPlugin, MethodCallHandler {
     private var adInstanceManager: VponAdInstanceManager? = null
 
     override fun onAttachedToEngine(flutterPluginBinding: FlutterPluginBinding) {
-        Log.e(TAG, "onAttachedToEngine invoked!!")
+        Log.d(TAG, "onAttachedToEngine invoked!!")
         context = flutterPluginBinding.applicationContext
 
         channel = MethodChannel(
@@ -53,7 +53,7 @@ class VponMobileAdsPlugin : FlutterPlugin, MethodCallHandler {
     }
 
     override fun onDetachedFromEngine(binding: FlutterPluginBinding) {
-        Log.e(TAG, "onDetachedFromEngine invoked!!")
+        Log.d(TAG, "onDetachedFromEngine invoked!!")
         channel!!.setMethodCallHandler(null)
     }
 
@@ -103,7 +103,7 @@ class VponMobileAdsPlugin : FlutterPlugin, MethodCallHandler {
     }
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
-        Log.e(TAG, "onMethodCall:" + call.method)
+        Log.d(TAG, "onMethodCall:" + call.method)
         val method = call.method
 
         when (method) {

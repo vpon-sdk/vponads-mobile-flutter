@@ -25,7 +25,7 @@ class VponFlutterAdLoader {
     void loadInterstitial(@NonNull final String licenseKey
             , @NonNull final VponAdRequest vponAdRequest
             , final VponInterstitialAdLoadCallback vponInterstitialAdLoadCallback) {
-        Log.e(TAG, "loadInterstitial invoked!!");
+        Log.d(TAG, "loadInterstitial invoked!!");
         VponInterstitialAd.load(context, licenseKey, vponAdRequest, vponInterstitialAdLoadCallback);
     }
 
@@ -34,7 +34,7 @@ class VponFlutterAdLoader {
             @NonNull final VponNativeAd.OnNativeAdLoadedListener onNativeAdLoadedListener,
             @NonNull final VponAdListener adListener,
             @NonNull final VponAdRequest adRequest) {
-        Log.e(TAG, "loadNativeAd invoked!!");
+        Log.d(TAG, "loadNativeAd invoked!!");
         new VponAdLoader
                 .Builder(context, licenseKey)
                 .withAdListener(adListener)

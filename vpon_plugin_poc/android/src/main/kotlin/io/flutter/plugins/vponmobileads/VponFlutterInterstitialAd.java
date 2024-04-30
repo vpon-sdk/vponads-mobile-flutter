@@ -35,7 +35,7 @@ class VponFlutterInterstitialAd extends VponFlutterAd.VponFlutterOverlayAd {
 
     @Override
     void load() {
-        Log.e(TAG, "load invoked!!");
+        Log.d(TAG, "load invoked!!");
         if (adInstanceManager != null && licenseKey != null && flutterAdRequest != null) {
             adLoader.loadInterstitial(
                     licenseKey, flutterAdRequest.asVponAdRequest()
@@ -51,7 +51,7 @@ class VponFlutterInterstitialAd extends VponFlutterAd.VponFlutterOverlayAd {
     @Override
     void show() {
         if(vponInterstitialAd == null) {
-            Log.e(TAG, "Error showing interstitial - the interstitial ad wasn't loaded yet.");
+            Log.d(TAG, "Error showing interstitial - the interstitial ad wasn't loaded yet.");
             return;
         }
         if(adInstanceManager != null) {
@@ -62,13 +62,13 @@ class VponFlutterInterstitialAd extends VponFlutterAd.VponFlutterOverlayAd {
     }
 
     private void onAdLoaded(VponInterstitialAd vponInterstitialAd) {
-        Log.e(TAG, "onAdLoaded invoked!!");
+        Log.d(TAG, "onAdLoaded invoked!!");
         this.vponInterstitialAd = vponInterstitialAd;
         adInstanceManager.onAdLoaded(this);
     }
 
     void onAdFailedToLoad(VponAdRequest.VponErrorCode vponErrorCode) {
-        Log.e(TAG, "onAdFailedToLoad("+vponErrorCode.getErrorCode()
+        Log.d(TAG, "onAdFailedToLoad("+vponErrorCode.getErrorCode()
                 +"/"+vponErrorCode.getErrorDescription()+") invoked!!");
         adInstanceManager.onAdFailedToLoad(this,vponErrorCode);
     }
@@ -97,5 +97,4 @@ class VponFlutterInterstitialAd extends VponFlutterAd.VponFlutterOverlayAd {
             }
         }
     }
-
 }
