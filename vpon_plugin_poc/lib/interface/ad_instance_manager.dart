@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:collection';
-import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
@@ -228,51 +227,24 @@ class AdInstanceManager {
       case 'onAdFailedToLoad':
         _invokeOnAdFailedToLoad(ad, eventName, arguments);
         break;
+      case 'onFailedToShowFullScreenContent':
+        _invokeOnAdFailedToShowFullScreenContent(ad, eventName, arguments);
+        break;
+      case 'onAdClicked':
+        _invokeOnAdClicked(ad, eventName);
+        break;
+      case 'onAdDismissedFullScreenContent':
+        _invokeOnAdDismissedFullScreenContent(ad, eventName);
+        break;
+      case 'onAdImpression':
+        _invokeOnAdImpression(ad, eventName);
+        break;
+      case 'onAdShowedFullScreenContent':
+        _invokeOnAdWillShowFullScreenContent(ad, eventName);
+        break;
+      default:
+        debugPrint('invalid ad event name: $eventName');
     }
-    // switch (eventName) {
-    //   case 'onAdLoaded':
-    //     _invokeOnAdLoaded(ad, eventName, arguments);
-    //     break;
-    //   case 'onAdFailedToLoad':
-    //     _invokeOnAdFailedToLoad(ad, eventName, arguments);
-    //     break;
-    //   case 'onAdOpened':
-    //     _invokeOnAdOpened(ad, eventName);
-    //     break;
-    //   case 'onAdClosed':
-    //     _invokeOnAdClosed(ad, eventName);
-    //     break;
-    //   case 'onAppEvent':
-    //     _invokeOnAppEvent(ad, eventName, arguments);
-    //     break;
-    //   case 'onRewardedAdUserEarnedReward':
-    //   case 'onRewardedInterstitialAdUserEarnedReward':
-    //     _invokeOnUserEarnedReward(ad, eventName, arguments);
-    //     break;
-    //   case 'onAdImpression':
-    //     _invokeOnAdImpression(ad, eventName);
-    //     break;
-    //   case 'onFailedToShowFullScreenContent':
-    //     _invokeOnAdFailedToShowFullScreenContent(ad, eventName, arguments);
-    //     break;
-    //   case 'onAdShowedFullScreenContent':
-    //     _invokeOnAdShowedFullScreenContent(ad, eventName);
-    //     break;
-    //   case 'onAdDismissedFullScreenContent':
-    //     _invokeOnAdDismissedFullScreenContent(ad, eventName);
-    //     break;
-    //   case 'onPaidEvent':
-    //     _invokePaidEvent(ad, eventName, arguments);
-    //     break;
-    //   case 'onFluidAdHeightChanged':
-    //     _invokeFluidAdHeightChanged(ad, arguments);
-    //     break;
-    //   case 'onAdClicked':
-    //     _invokeOnAdClicked(ad, eventName);
-    //     break;
-    //   default:
-    //     debugPrint('invalid ad event name: $eventName');
-    // }
   }
 
   void _invokeOnAdLoaded(
