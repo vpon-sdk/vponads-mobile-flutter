@@ -1,86 +1,84 @@
-package io.flutter.plugins.vponmobileads;
+package io.flutter.plugins.vponmobileads
 
-import android.content.Context;
-import android.util.Log;
+import android.util.Log
+import io.flutter.plugin.common.StandardMessageCodec
+import java.io.ByteArrayOutputStream
+import java.nio.ByteBuffer
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+internal class VponAdMessageCodec : StandardMessageCodec() {
 
-import java.io.ByteArrayOutputStream;
-import java.nio.ByteBuffer;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
+    override fun writeValue(stream: ByteArrayOutputStream, value: Any?) {
 
-import io.flutter.plugin.common.StandardMessageCodec;
+        when (value) {
+            is VponFlutterAdSize -> {
+                Log.d(TAG, "writeValue.case VponFlutterAdSize")
+                writeAdSize(stream, value)
+            }
 
-class VponAdMessageCodec extends StandardMessageCodec {
+            is VponFlutterAdRequest -> {
+                Log.d(TAG, "writeValue.case VponFlutterAdRequest")
+                stream.write(VALUE_AD_REQUEST.toInt())
+                writeValue(stream, value.getContentUrl())
+                writeValue(stream, value.getContentData())
+                writeValue(stream, value.getKeywords())
+            }
 
-    private static final String TAG = "VponAdMessageCodec";
+            else -> {
+                super.writeValue(stream, value)
+            }
+        }
 
-    // The type values below must be consistent for each platform.
-    private static final byte VALUE_AD_SIZE = (byte) 128;
-    private static final byte VALUE_SMART_BANNER_AD_SIZE = (byte) 143;
-    private static final byte VALUE_AD_REQUEST = (byte) 129;
-
-    private Context context = null;
-
-    VponAdMessageCodec() {
-    }
-    VponAdMessageCodec(
-            @NonNull Context context) {
-        this.context = context;
     }
 
-    @Override
-    protected void writeValue(@NonNull ByteArrayOutputStream stream, @Nullable Object value) {
-        if (value instanceof VponFlutterAdSize) {
-            Log.d(TAG, "writeValue.case VponFlutterAdSize");
-            writeAdSize(stream, (VponFlutterAdSize) value);
-        } else if (value instanceof VponFlutterAdRequest) {
-            Log.d(TAG, "writeValue.case VponFlutterAdRequest");
-            stream.write(VALUE_AD_REQUEST);
-            final VponFlutterAdRequest request = (VponFlutterAdRequest) value;
-            writeValue(stream, request.getContentUrl());
-            writeValue(stream, request.getContentData());
-            writeValue(stream, request.getKeywords());
+    override fun readValueOfType(type: Byte, buffer: ByteBuffer): Any? {
+        return when (type) {
+            VALUE_SMART_BANNER_AD_SIZE -> {
+                Log.d(TAG, "readValueOfType.case VALUE_SMART_BANNER_AD_SIZE")
+                VponFlutterAdSize.SmartBannerAdSize()
+            }
+
+            VALUE_AD_SIZE -> {
+                Log.d(TAG, "readValueOfType.case VALUE_AD_SIZE")
+                VponFlutterAdSize(
+                    (readValueOfType(buffer.get(), buffer) as Int?)!!,
+                    (readValueOfType(buffer.get(), buffer) as Int?)!!
+                )
+            }
+
+            VALUE_AD_REQUEST -> {
+                Log.d(TAG, "readValueOfType.case VALUE_AD_REQUEST")
+                @Suppress("UNCHECKED_CAST")
+                VponFlutterAdRequest.Builder()
+                    .setContentUrl(readValueOfType(buffer.get(), buffer) as String?)
+                    .setContentData(
+                        readValueOfType(
+                            buffer.get(),
+                            buffer
+                        ) as HashMap<String, Any>?
+                    )
+                    .setKeywords(readValueOfType(buffer.get(), buffer) as List<String>?)
+                    .build()
+            }
+
+            else ->
+                super.readValueOfType(type, buffer)
+        }
+    }
+
+    private fun writeAdSize(stream: ByteArrayOutputStream, flutterAdSize: VponFlutterAdSize) {
+        if (flutterAdSize is VponFlutterAdSize.SmartBannerAdSize) {
+            stream.write(VALUE_SMART_BANNER_AD_SIZE.toInt())
         } else {
-            super.writeValue(stream, value);
+            stream.write(VALUE_AD_SIZE.toInt())
+            writeValue(stream, flutterAdSize.width)
+            writeValue(stream, flutterAdSize.height)
         }
     }
 
-    /** @noinspection unchecked, DataFlowIssue */
-    @Nullable
-    @Override
-    protected Object readValueOfType(byte type, @NonNull ByteBuffer buffer) {
-        switch (type) {
-            case VALUE_SMART_BANNER_AD_SIZE:
-                Log.d(TAG, "readValueOfType.case VALUE_SMART_BANNER_AD_SIZE");
-                return new VponFlutterAdSize.SmartBannerAdSize();
-            case VALUE_AD_SIZE:
-                Log.d(TAG, "readValueOfType.case VALUE_AD_SIZE");
-                return new VponFlutterAdSize(
-                        (Integer) readValueOfType(buffer.get(), buffer),
-                        (Integer) readValueOfType(buffer.get(), buffer));
-            case VALUE_AD_REQUEST:
-                Log.d(TAG, "readValueOfType.case VALUE_AD_REQUEST");
-                return new VponFlutterAdRequest.Builder()
-                        .setContentUrl((String) readValueOfType(buffer.get(), buffer))
-                        .setContentData((HashMap<String, Object>) readValueOfType(buffer.get(), buffer))
-                        .setKeywords((List<String>) readValueOfType(buffer.get(), buffer))
-                        .build();
-            default:
-                return super.readValueOfType(type, buffer);
-        }
-    }
-
-    protected void writeAdSize(ByteArrayOutputStream stream, VponFlutterAdSize value) {
-        if (value instanceof VponFlutterAdSize.SmartBannerAdSize) {
-            stream.write(VALUE_SMART_BANNER_AD_SIZE);
-        } else {
-            stream.write(VALUE_AD_SIZE);
-            writeValue(stream, value.width);
-            writeValue(stream, value.height);
-        }
+    companion object {
+        private const val TAG = "VponAdMessageCodec"
+        private const val VALUE_AD_SIZE = 128.toByte()
+        private const val VALUE_SMART_BANNER_AD_SIZE = 143.toByte()
+        private const val VALUE_AD_REQUEST = 129.toByte()
     }
 }

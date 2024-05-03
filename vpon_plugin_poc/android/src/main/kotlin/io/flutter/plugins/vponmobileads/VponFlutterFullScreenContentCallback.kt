@@ -1,42 +1,29 @@
-package io.flutter.plugins.vponmobileads;
+package io.flutter.plugins.vponmobileads
 
-import androidx.annotation.NonNull;
+import com.vpon.ads.VponFullScreenContentCallback
 
-import com.vpon.ads.VponFullScreenContentCallback;
+internal class VponFlutterFullScreenContentCallback(
+    private val vponAdInstanceManager: VponAdInstanceManager,
+    private val adid: Int
+) : VponFullScreenContentCallback() {
 
-class VponFlutterFullScreenContentCallback extends VponFullScreenContentCallback {
-
-    @NonNull protected final VponAdInstanceManager manager;
-
-    protected final int adId;
-
-    VponFlutterFullScreenContentCallback(@NonNull VponAdInstanceManager manager, int adId) {
-        this.manager = manager;
-        this.adId = adId;
+    override fun onAdClicked() {
+        vponAdInstanceManager.onAdClicked(adid)
     }
 
-    @Override
-    public void onAdClicked() {
-        manager.onAdClicked(adId);
+    override fun onAdDismissedFullScreenContent() {
+        vponAdInstanceManager.onAdDismissedFullScreenContent(adid)
     }
 
-    @Override
-    public void onAdDismissedFullScreenContent() {
-        manager.onAdDismissedFullScreenContent(adId);
+    override fun onAdFailedToShowFullScreenContent(errorCode: Int) {
+        vponAdInstanceManager.onFailedToShowFullScreenContent(adid, errorCode)
     }
 
-    @Override
-    public void onAdFailedToShowFullScreenContent(int errorCode) {
-        manager.onFailedToShowFullScreenContent(adId, errorCode);
+    override fun onAdImpression() {
+        vponAdInstanceManager.onAdImpression(adid)
     }
 
-    @Override
-    public void onAdImpression() {
-        manager.onAdImpression(adId);
-    }
-
-    @Override
-    public void onAdShowedFullScreenContent() {
-        manager.onAdShowedFullScreenContent(adId);
+    override fun onAdShowedFullScreenContent() {
+        vponAdInstanceManager.onAdShowedFullScreenContent(adid)
     }
 }

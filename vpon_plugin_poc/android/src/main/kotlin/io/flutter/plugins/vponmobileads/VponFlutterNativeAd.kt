@@ -1,138 +1,71 @@
-package io.flutter.plugins.vponmobileads;
+package io.flutter.plugins.vponmobileads
 
-import android.view.View;
+import android.view.View
+import com.vpon.ads.VponNativeAd
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+internal class VponFlutterNativeAd(
+    adId: Int,
+    private val manager: VponAdInstanceManager,
+    private val licenseKey: String,
+    private val adFactory: VponMobileAdsPlugin.NativeAdFactory,
+    private val request: VponFlutterAdRequest,
+    private val flutterAdLoader: VponFlutterAdLoader
+) : VponFlutterAd(adId) {
 
-import com.vpon.ads.VponAdListener;
-import com.vpon.ads.VponNativeAd;
+    private var nativeAdView: View? = null
 
-import io.flutter.plugin.platform.PlatformView;
-
-class VponFlutterNativeAd extends VponFlutterAd {
-
-    @NonNull
-    private final VponAdInstanceManager manager;
-    @NonNull
-    private final String licenseKey;
-    @NonNull
-    private final VponMobileAdsPlugin.NativeAdFactory adFactory;
-    @NonNull
-    private final VponFlutterAdLoader flutterAdLoader;
-    @NonNull
-    private final VponFlutterAdRequest request;
-    @Nullable
-    private View nativeAdView;
-
-    VponFlutterNativeAd(
-            int adId,
-            @NonNull VponAdInstanceManager manager,
-            @NonNull String licenseKey,
-            @NonNull VponMobileAdsPlugin.NativeAdFactory adFactory,
-            @NonNull VponFlutterAdRequest request,
-            @NonNull VponFlutterAdLoader flutterAdLoader) {
-        super(adId);
-        this.manager = manager;
-        this.licenseKey = licenseKey;
-        this.adFactory = adFactory;
-        this.request = request;
-        this.flutterAdLoader = flutterAdLoader;
+    override fun load() {
+        flutterAdLoader.loadNativeAd(
+            licenseKey,
+            VponFlutterNativeAdLoadedListener(this),
+            VponFlutterNativeAdListener(adId, manager),
+            request.asVponAdRequest()
+        )
     }
 
-    @Override
-    void load() {
-        final VponNativeAd.OnNativeAdLoadedListener loadedListener =
-                new VponFlutterNativeAdLoadedListener(this);
-        final VponAdListener adListener = new VponFlutterNativeAdListener(adId, manager);
-        flutterAdLoader.loadNativeAd(licenseKey, loadedListener, adListener
-                , request.asVponAdRequest());
+    override fun dispose() {
+        nativeAdView = null
     }
 
-    @Override
-    void dispose() {
-        nativeAdView = null;
+    fun onNativeAdLoaded(vponNativeAd: VponNativeAd?) {
+        nativeAdView = adFactory.createNativeAd(vponNativeAd!!)
+        manager.onAdLoaded(this)
     }
 
-    void onNativeAdLoaded(VponNativeAd vponNativeAd) {
-        nativeAdView = adFactory.createNativeAd(vponNativeAd);
-        manager.onAdLoaded(this);
-    }
+    internal class Builder {
+        private var manager: VponAdInstanceManager? = null
+        private var adFactory: VponMobileAdsPlugin.NativeAdFactory? = null
+        private var licenseKey: String? = null
+        private var request: VponFlutterAdRequest? = null
+        private var adId: Int? = null
+        private var flutterAdLoader: VponFlutterAdLoader? = null
 
-    @Override
-    @Nullable
-    public PlatformView getPlatformView() {
-        if (nativeAdView != null) {
-            return new VponFlutterPlatformView(nativeAdView);
-        }
-        return null;
-    }
+        fun setManager(manager: VponAdInstanceManager?) = apply { this.manager = manager }
+        fun setAdFactory(adFactory: VponMobileAdsPlugin.NativeAdFactory?) =
+            apply { this.adFactory = adFactory }
 
-    static class Builder {
+        fun setId(adId: Int?) = apply { this.adId = adId }
+        fun setLicenseKey(licenseKey: String?) = apply { this.licenseKey = licenseKey }
+        fun setRequest(request: VponFlutterAdRequest?) = apply { this.request = request }
+        fun setFlutterAdLoader(flutterAdLoader: VponFlutterAdLoader?) =
+            apply { this.flutterAdLoader = flutterAdLoader }
 
-        @Nullable
-        private VponAdInstanceManager manager;
-        @Nullable
-        private String licenseKey;
-        @Nullable
-        private VponMobileAdsPlugin.NativeAdFactory adFactory;
-        @Nullable
-        private VponFlutterAdRequest request;
-        @Nullable
-        private Integer id;
-        @Nullable
-        private VponFlutterAdLoader flutterAdLoader;
-
-        public Builder setManager(@NonNull VponAdInstanceManager manager) {
-            this.manager = manager;
-            return this;
-        }
-        public Builder setAdFactory(@NonNull VponMobileAdsPlugin.NativeAdFactory adFactory) {
-            this.adFactory = adFactory;
-            return this;
-        }
-
-        public Builder setId(int id) {
-            this.id = id;
-            return this;
-        }
-
-        public Builder setLicenseKey(@NonNull String licenseKey) {
-            this.licenseKey = licenseKey;
-            return this;
-        }
-
-        public Builder setRequest(@NonNull VponFlutterAdRequest request) {
-            this.request = request;
-            return this;
-        }
-
-        public Builder setFlutterAdLoader(@NonNull VponFlutterAdLoader flutterAdLoader) {
-            this.flutterAdLoader = flutterAdLoader;
-            return this;
-        }
-
-        VponFlutterNativeAd build() {
-            if (manager == null) {
-                throw new IllegalStateException("VponAdInstanceManager cannot be null.");
-            } else if (licenseKey == null) {
-                throw new IllegalStateException("licenseKey cannot be null.");
-            } else if (adFactory == null) {
-                throw new IllegalStateException("NativeAdFactory cannot be null.");
-            } else if (request == null) {
-                throw new IllegalStateException("adRequest must be non-null.");
-            }
-
-            final VponFlutterNativeAd nativeAd;
-            nativeAd =
-                    new VponFlutterNativeAd(
-                            id,
-                            manager,
-                            licenseKey,
-                            adFactory,
-                            request,
-                            flutterAdLoader);
-            return nativeAd;
+        fun build(): VponFlutterNativeAd {
+            require(adId == null) { "adId cannot be null." }
+            require(manager == null) { "VponAdInstanceManager cannot be null." }
+            require(licenseKey == null) { "licenseKey cannot be null." }
+            require(adFactory == null) { "NativeAdFactory cannot be null." }
+            require(request == null) { "VponFlutterAdRequest cannot be null." }
+            require(flutterAdLoader == null) { "VponFlutterAdLoader cannot be null." }
+            return VponFlutterNativeAd(
+                adId!!,
+                manager!!,
+                licenseKey!!,
+                adFactory!!,
+                request!!,
+                flutterAdLoader!!
+            )
         }
     }
+
 }

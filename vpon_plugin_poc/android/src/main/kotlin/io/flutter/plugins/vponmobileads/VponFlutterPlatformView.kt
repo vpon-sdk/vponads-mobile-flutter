@@ -1,30 +1,14 @@
-package io.flutter.plugins.vponmobileads;
+package io.flutter.plugins.vponmobileads
 
-import android.view.View;
+import android.view.View
+import io.flutter.plugin.platform.PlatformView
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
-import io.flutter.plugin.platform.PlatformView;
-
-class VponFlutterPlatformView implements PlatformView {
-
-    @Nullable
-    private View view;
-
-    VponFlutterPlatformView(@NonNull View view) {
-        this.view = view;
+internal class VponFlutterPlatformView(private var view: View?) : PlatformView {
+    override fun getView(): View? {
+        return view
     }
 
-    @Nullable
-    @Override
-    public View getView() {
-        return view;
+    override fun dispose() {
+        view = null
     }
-
-    @Override
-    public void dispose() {
-        this.view = null;
-    }
-
 }

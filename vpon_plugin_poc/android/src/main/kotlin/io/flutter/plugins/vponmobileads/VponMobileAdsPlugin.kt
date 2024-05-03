@@ -168,16 +168,31 @@ class VponMobileAdsPlugin : FlutterPlugin, MethodCallHandler {
                     && call.hasArgument(Constants.CHANNEL_ARGUMENT_AD_REQUEST)
                     && call.hasArgument(Constants.CHANNEL_ARGUMENT_AD_SIZE)
                 ) {
-                    val vponFlutterBannerAd = VponFlutterBannerAd(
-                        context,
-                        call.argument(Constants.CHANNEL_ARGUMENT_ADID)!!,
-                        adInstanceManager,
-                        call.argument(Constants.CHANNEL_ARGUMENT_LICENSE_KEY),
-                        call.argument(Constants.CHANNEL_ARGUMENT_AD_REQUEST),
-                        call.argument(Constants.CHANNEL_ARGUMENT_AD_SIZE)
-                    )
-                    vponFlutterBannerAd.load()
-                    result.success(null)
+                    val adId = call.argument(Constants.CHANNEL_ARGUMENT_ADID) as Int?
+                    val licenseKey =
+                        call.argument(Constants.CHANNEL_ARGUMENT_LICENSE_KEY) as String?
+                    val vponFlutterAdRequest =
+                        call.argument(Constants.CHANNEL_ARGUMENT_AD_REQUEST) as VponFlutterAdRequest?
+                    val vponFlutterAdSize =
+                        call.argument(Constants.CHANNEL_ARGUMENT_AD_SIZE) as VponFlutterAdSize?
+                    if (adId != null && licenseKey != null && vponFlutterAdRequest != null && vponFlutterAdSize != null
+                    ) {
+                        context?.let { ctx ->
+                            adInstanceManager?.let { manager ->
+                                val vponFlutterBannerAd = VponFlutterBannerAd(
+                                    ctx,
+                                    adId,
+                                    manager,
+                                    licenseKey,
+                                    vponFlutterAdRequest,
+                                    vponFlutterAdSize
+                                )
+                                vponFlutterBannerAd.load()
+                                result.success(null)
+                            }
+                        }
+                    }
+
                 } else {
                     result.error(
                         "invalidArgument", "invalidArgument", null
@@ -189,15 +204,27 @@ class VponMobileAdsPlugin : FlutterPlugin, MethodCallHandler {
                     && call.hasArgument(Constants.CHANNEL_ARGUMENT_ADID)
                     && call.hasArgument(Constants.CHANNEL_ARGUMENT_AD_REQUEST)
                 ) {
-                    val vponFlutterInterstitialAd = VponFlutterInterstitialAd(
-                        call.argument(Constants.CHANNEL_ARGUMENT_ADID)!!,
-                        adInstanceManager,
-                        call.argument(Constants.CHANNEL_ARGUMENT_LICENSE_KEY),
-                        call.argument(Constants.CHANNEL_ARGUMENT_AD_REQUEST),
-                        VponFlutterAdLoader(context)
-                    )
-                    vponFlutterInterstitialAd.load()
-                    result.success(null)
+                    val adId = call.argument(Constants.CHANNEL_ARGUMENT_ADID) as Int?
+                    val licenseKey =
+                        call.argument(Constants.CHANNEL_ARGUMENT_LICENSE_KEY) as String?
+                    val vponFlutterAdRequest =
+                        call.argument(Constants.CHANNEL_ARGUMENT_AD_REQUEST) as VponFlutterAdRequest?
+                    if (adId != null && licenseKey != null && vponFlutterAdRequest != null
+                    ) {
+                        context?.let { ctx ->
+                            adInstanceManager?.let { manager ->
+                                val vponFlutterInterstitialAd = VponFlutterInterstitialAd(
+                                    adId,
+                                    manager,
+                                    licenseKey,
+                                    vponFlutterAdRequest,
+                                    VponFlutterAdLoader(ctx)
+                                )
+                                vponFlutterInterstitialAd.load()
+                                result.success(null)
+                            }
+                        }
+                    }
                 } else {
                     result.error(
                         "invalidArgument", "invalidArgument", null
@@ -238,6 +265,7 @@ class VponMobileAdsPlugin : FlutterPlugin, MethodCallHandler {
             Constants.METHOD_INITIALIZE_SDK, Constants.METHOD_SET_LOG_LEVEL, Constants.METHOD_ENABLE_LOCATION_MANAGER, Constants.METHOD_SET_AUDIO_MANAGER, Constants.METHOD_NOTICE_APPLICATION_AUDIO_DID_END, Constants.METHOD_UPDATE_REQUEST_CONFIGURATION -> result.success(
                 null
             )
+
             else -> result.notImplemented()
         }
     }

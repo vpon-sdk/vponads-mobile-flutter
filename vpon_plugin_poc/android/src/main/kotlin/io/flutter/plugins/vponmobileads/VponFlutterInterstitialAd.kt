@@ -1,100 +1,80 @@
-package io.flutter.plugins.vponmobileads;
+package io.flutter.plugins.vponmobileads
 
-import android.util.Log;
+import android.util.Log
+import com.vpon.ads.VponAdRequest
+import com.vpon.ads.VponInterstitialAd
+import com.vpon.ads.VponInterstitialAdLoadCallback
+import java.lang.ref.WeakReference
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+internal class VponFlutterInterstitialAd(
+    adId: Int,
+    private val adInstanceManager: VponAdInstanceManager,
+    private val licenseKey: String,
+    private val flutterAdRequest: VponFlutterAdRequest, private val adLoader: VponFlutterAdLoader
+) : VponFlutterAd.VponFlutterOverlayAd(adId) {
 
-import com.vpon.ads.VponAdRequest;
-import com.vpon.ads.VponInterstitialAd;
-import com.vpon.ads.VponInterstitialAdLoadCallback;
+    private var vponInterstitialAd: VponInterstitialAd? = null
 
-import java.lang.ref.WeakReference;
-
-class VponFlutterInterstitialAd extends VponFlutterAd.VponFlutterOverlayAd {
-
-    private static final String TAG = "VFlutterInterstitialAd";
-
-    private final String licenseKey;
-    private final VponFlutterAdRequest flutterAdRequest;
-    private final VponAdInstanceManager adInstanceManager;
-    private final VponFlutterAdLoader adLoader;
-
-    @Nullable
-    private VponInterstitialAd vponInterstitialAd;
-
-    VponFlutterInterstitialAd(int adSeqId, VponAdInstanceManager adInstanceManager
-            , String licenseKey, VponFlutterAdRequest adRequest, VponFlutterAdLoader adLoader) {
-        super(adSeqId);
-        this.licenseKey = licenseKey;
-        this.flutterAdRequest = adRequest;
-
-        this.adLoader = adLoader;
-        this.adInstanceManager = adInstanceManager;
+    override fun load() {
+        Log.d(TAG, "load invoked!!")
+        adLoader.loadInterstitial(
+            licenseKey,
+            flutterAdRequest.asVponAdRequest(),
+            DelegatingInterstitialAdLoadCallback(this)
+        )
     }
 
-    @Override
-    void load() {
-        Log.d(TAG, "load invoked!!");
-        if (adInstanceManager != null && licenseKey != null && flutterAdRequest != null) {
-            adLoader.loadInterstitial(
-                    licenseKey, flutterAdRequest.asVponAdRequest()
-                    , new DelegatingInterstitialAdLoadCallback(this));
+    override fun show() {
+        Log.d(TAG, "show invoked!!")
+        if (vponInterstitialAd == null) {
+            Log.d(
+                TAG,
+                "Error showing interstitial - the interstitial ad wasn't loaded yet."
+            )
+            return
         }
+        vponInterstitialAd?.fullScreenContentCallback =
+            VponFlutterFullScreenContentCallback(adInstanceManager, adId)
     }
 
-    @Override
-    void dispose() {
-        vponInterstitialAd = null;
+    override fun dispose() {
+        vponInterstitialAd = null
     }
 
-    @Override
-    void show() {
-        if(vponInterstitialAd == null) {
-            Log.d(TAG, "Error showing interstitial - the interstitial ad wasn't loaded yet.");
-            return;
-        }
-        if(adInstanceManager != null) {
-            vponInterstitialAd
-                    .setFullScreenContentCallback(new VponFlutterFullScreenContentCallback(adInstanceManager, adId));
-            vponInterstitialAd.show();
-        }
+    private fun onAdLoaded(vponInterstitialAd: VponInterstitialAd) {
+        Log.d(TAG, "onAdLoaded invoked!!")
+        this.vponInterstitialAd = vponInterstitialAd
+        adInstanceManager.onAdLoaded(this)
     }
 
-    private void onAdLoaded(VponInterstitialAd vponInterstitialAd) {
-        Log.d(TAG, "onAdLoaded invoked!!");
-        this.vponInterstitialAd = vponInterstitialAd;
-        adInstanceManager.onAdLoaded(this);
+    private fun onAdFailedToLoad(vponErrorCode: VponAdRequest.VponErrorCode) {
+        Log.d(
+            TAG,
+            "onAdFailedToLoad($vponErrorCode.errorCode " +
+                    "/$vponErrorCode.errorDescription) invoked!!"
+
+        )
+        adInstanceManager.onAdFailedToLoad(this, vponErrorCode)
     }
 
-    void onAdFailedToLoad(VponAdRequest.VponErrorCode vponErrorCode) {
-        Log.d(TAG, "onAdFailedToLoad("+vponErrorCode.getErrorCode()
-                +"/"+vponErrorCode.getErrorDescription()+") invoked!!");
-        adInstanceManager.onAdFailedToLoad(this,vponErrorCode);
+    private class DelegatingInterstitialAdLoadCallback(
+        vponFlutterInterstitialAd: VponFlutterInterstitialAd
+    ) :
+        VponInterstitialAdLoadCallback() {
+
+        val delegate = WeakReference(vponFlutterInterstitialAd)
+
+        override fun onAdFailedToLoad(adError: VponAdRequest.VponErrorCode) {
+            delegate.get()?.onAdFailedToLoad(adError)
+        }
+
+        override fun onAdLoaded(ad: VponInterstitialAd) {
+            delegate.get()?.onAdLoaded(ad)
+        }
+
     }
 
-    private static final class DelegatingInterstitialAdLoadCallback
-            extends VponInterstitialAdLoadCallback {
-
-        private final WeakReference<VponFlutterInterstitialAd> delegate;
-
-        DelegatingInterstitialAdLoadCallback(VponFlutterInterstitialAd vponFlutterInterstitialAd) {
-            delegate = new WeakReference<>(vponFlutterInterstitialAd);
-        }
-
-
-        @Override
-        public void onAdFailedToLoad(@NonNull VponAdRequest.VponErrorCode vponErrorCode) {
-            if (delegate.get() != null) {
-                delegate.get().onAdFailedToLoad(vponErrorCode);
-            }
-        }
-
-        @Override
-        public void onAdLoaded(VponInterstitialAd vponInterstitialAd) {
-            if (delegate.get() != null) {
-                delegate.get().onAdLoaded(vponInterstitialAd);
-            }
-        }
+    companion object {
+        private const val TAG = "VFlutterInterstitialAd"
     }
 }

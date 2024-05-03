@@ -1,31 +1,17 @@
-package io.flutter.plugins.vponmobileads;
+package io.flutter.plugins.vponmobileads
 
-import androidx.annotation.Nullable;
+import io.flutter.plugin.platform.PlatformView
 
-import io.flutter.plugin.platform.PlatformView;
+internal abstract class VponFlutterAd(val adId: Int) {
 
-abstract class VponFlutterAd {
+    abstract fun load()
+    abstract fun dispose()
 
-    protected final int adId;
-
-    VponFlutterAd(int adId) {
-        this.adId = adId;
+    open fun getPlatformView(): PlatformView? {
+        return null
     }
 
-    abstract void load();
-    abstract void dispose();
-
-    @Nullable
-    PlatformView getPlatformView() {
-        return null;
-    }
-
-    abstract static class VponFlutterOverlayAd extends VponFlutterAd {
-
-        abstract void show();
-
-        VponFlutterOverlayAd(int adId) {
-            super(adId);
-        }
+    abstract class VponFlutterOverlayAd(adId: Int) : VponFlutterAd(adId) {
+        abstract fun show()
     }
 }

@@ -1,65 +1,45 @@
-package io.flutter.plugins.vponmobileads;
+package io.flutter.plugins.vponmobileads
 
-import android.content.Context;
+import android.content.Context
+import com.vpon.ads.VponBanner
+import io.flutter.plugin.platform.PlatformView
 
-import androidx.annotation.Nullable;
+internal class VponFlutterBannerAd(
+    private val context: Context,
+    adId: Int,
+    private val adInstanceManager: VponAdInstanceManager,
+    private val licenseKey: String,
+    private val adRequest: VponFlutterAdRequest, private val flutterAdSize: VponFlutterAdSize
+) : VponFlutterAd(adId), VponFlutterAdLoadedListener {
 
-import com.vpon.ads.VponBanner;
+    private var vponBanner: VponBanner? = null
 
-import io.flutter.plugin.platform.PlatformView;
 
-class VponFlutterBannerAd extends VponFlutterAd implements VponFlutterAdLoadedListener {
-
-    private final String licenseKey;
-    private final VponFlutterAdRequest flutterAdRequest;
-    private final VponFlutterAdSize flutterAdSize;
-    private final VponAdInstanceManager adInstanceManager;
-    private final Context context;
-    private VponBanner vponBanner = null;
-
-    VponFlutterBannerAd(Context context, int adId, VponAdInstanceManager adInstanceManager
-            , String licenseKey
-            , VponFlutterAdRequest adRequest, VponFlutterAdSize size) {
-        super(adId);
-        this.licenseKey = licenseKey;
-        this.flutterAdRequest = adRequest;
-        this.flutterAdSize = size;
-
-        this.context = context;
-        this.adInstanceManager = adInstanceManager;
-    }
-
-    @Override
-    void load() {
-        vponBanner = new VponBanner(context);
-        vponBanner.setLicenseKey(licenseKey);
-        vponBanner.setAdSize(flutterAdSize.getAdSize());
-        vponBanner.setAdListener(new VponFlutterBannerAdListener(adId, adInstanceManager
-                , this));
-        vponBanner.loadAd(flutterAdRequest.asVponAdRequest());
-    }
-
-    @Override
-    void dispose() {
-        if (vponBanner != null) {
-            vponBanner.destroy();
-            vponBanner = null;
+    override fun load() {
+        vponBanner = VponBanner(context)
+        vponBanner?.let {
+            it.licenseKey = licenseKey
+            it.adSize = flutterAdSize.vponAdSize
+            it.setAdListener(
+                VponFlutterBannerAdListener(
+                    adId, adInstanceManager, this
+                )
+            )
+            it.loadAd(adRequest.asVponAdRequest())
         }
     }
 
-    @Override
-    public void onAdLoaded() {
-        if (vponBanner != null) {
-            adInstanceManager.onAdLoaded(this);
-        }
+    override fun dispose() {
+        vponBanner?.destroy()
+        vponBanner = null
     }
 
-    @Nullable
-    @Override
-    PlatformView getPlatformView() {
-        if(vponBanner != null){
-            return new VponFlutterPlatformView(vponBanner);
-        }
-        return super.getPlatformView();
+    override fun onAdLoaded() {
+        vponBanner?.let { adInstanceManager.onAdLoaded(this) }
+    }
+
+    override fun getPlatformView(): PlatformView? {
+        vponBanner?.let { return VponFlutterPlatformView(it) }
+        return super.getPlatformView()
     }
 }

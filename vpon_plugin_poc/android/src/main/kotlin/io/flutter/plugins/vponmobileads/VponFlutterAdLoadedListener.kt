@@ -1,62 +1,40 @@
-package io.flutter.plugins.vponmobileads;
+package io.flutter.plugins.vponmobileads
 
-import com.vpon.ads.VponAdListener;
-import com.vpon.ads.VponNativeAd;
-
-import java.lang.ref.WeakReference;
+import com.vpon.ads.VponAdListener
+import com.vpon.ads.VponNativeAd
+import java.lang.ref.WeakReference
 
 interface VponFlutterAdLoadedListener {
-    void onAdLoaded();
+    fun onAdLoaded()
 }
 
-class VponFlutterAdListener extends VponAdListener {
+internal open class VponFlutterAdListener(
+    protected val adId: Int,
+    protected val vponAdInstanceManager: VponAdInstanceManager
+) : VponAdListener()
 
-    protected final int adId;
-    protected final VponAdInstanceManager adInstanceManager;
+internal class VponFlutterBannerAdListener(
+    adId: Int,
+    vponAdInstanceManager: VponAdInstanceManager,
+    vponFlutterAdLoadedListener: VponFlutterAdLoadedListener
+) : VponFlutterAdListener(adId, vponAdInstanceManager) {
+    private val adLoadedListenerWeakReference = WeakReference(vponFlutterAdLoadedListener)
 
-    VponFlutterAdListener(int adId, VponAdInstanceManager adInstanceManager) {
-        this.adId = adId;
-        this.adInstanceManager = adInstanceManager;
-    }
-
-}
-
-class VponFlutterBannerAdListener extends VponFlutterAdListener {
-
-    final WeakReference<VponFlutterAdLoadedListener> adLoadedListenerWeakReference;
-
-    VponFlutterBannerAdListener(int adId, VponAdInstanceManager adInstanceManager
-            , VponFlutterAdLoadedListener vponFlutterAdLoadedListener) {
-        super(adId, adInstanceManager);
-        adLoadedListenerWeakReference = new WeakReference<>(vponFlutterAdLoadedListener);
-    }
-
-    @Override
-    public void onAdLoaded() {
-        adLoadedListenerWeakReference.get().onAdLoaded();
+    override fun onAdLoaded() {
+        adLoadedListenerWeakReference.get()?.onAdLoaded()
     }
 }
 
-class VponFlutterNativeAdListener extends VponFlutterAdListener {
+internal class VponFlutterNativeAdListener(
+    adId: Int,
+    vponAdInstanceManager: VponAdInstanceManager
+) : VponFlutterAdListener(adId, vponAdInstanceManager)
 
-    VponFlutterNativeAdListener(int adId, VponAdInstanceManager adInstanceManager) {
-        super(adId, adInstanceManager);
+internal class VponFlutterNativeAdLoadedListener(flutterNativeAd: VponFlutterNativeAd) :
+    VponNativeAd.OnNativeAdLoadedListener() {
+    private val nativeAdWeakReference = WeakReference(flutterNativeAd)
+
+    override fun onNativeAdLoaded(nativeAd: VponNativeAd?) {
+        nativeAdWeakReference.get()?.onNativeAdLoaded(nativeAd)
     }
 }
-
-class VponFlutterNativeAdLoadedListener extends VponNativeAd.OnNativeAdLoadedListener {
-
-    private final WeakReference<VponFlutterNativeAd>nativeAdWeakReference;
-    VponFlutterNativeAdLoadedListener(VponFlutterNativeAd flutterNativeAd) {
-        nativeAdWeakReference = new WeakReference<>(flutterNativeAd);
-    }
-
-    @Override
-    public void onNativeAdLoaded( VponNativeAd nativeAd) {
-        if (nativeAdWeakReference.get() != null) {
-            nativeAdWeakReference.get().onNativeAdLoaded(nativeAd);
-        }
-    }
-
-}
-

@@ -1,34 +1,33 @@
-package io.flutter.plugins.vponmobileads;
+package io.flutter.plugins.vponmobileads
 
-class Constants {
+internal object Constants {
+    const val CHANNEL_NAME_TO_FLUTTER: String = "plugins.flutter.io/vpon"
 
-    final static String CHANNEL_NAME_TO_FLUTTER = "plugins.flutter.io/vpon";
+    const val METHOD_GET_VERSION_STRING: String = "getVersionString"
+    const val METHOD_GET_VPON_ID: String = "getVponID"
+    const val _init: String = "_init"
+    const val METHOD_INITIALIZE_SDK: String = "initializeSDK"
+    const val METHOD_SET_LOG_LEVEL: String = "setLogLevel"
+    const val METHOD_ENABLE_LOCATION_MANAGER: String = "setLocationManagerEnable"
+    const val METHOD_SET_AUDIO_MANAGER: String = "setAudioApplicationManaged"
+    const val METHOD_NOTICE_APPLICATION_AUDIO_DID_END: String = "noticeApplicationAudioDidEnd"
+    const val METHOD_SET_CONSENT_STATUS: String = "setConsentStatus"
+    const val METHOD_UPDATE_REQUEST_CONFIGURATION: String = "updateRequestConfiguration"
+    const val METHOD_LOAD_INTERSTITIAL_AD: String = "loadInterstitialAd"
+    const val METHOD_LOAD_BANNER_AD: String = "loadBannerAd"
+    const val METHOD_LOAD_NATIVE_AD: String = "loadNativeAd"
+    const val METHOD_DISPOSE_AD: String = "disposeAd"
+    const val METHOD_SHOW_AD_WITHOUT_VIEW: String = "showAdWithoutView"
 
-    final static String METHOD_GET_VERSION_STRING = "getVersionString";
-    final static String METHOD_GET_VPON_ID = "getVponID";
-    final static String _init = "_init";
-    final static String METHOD_INITIALIZE_SDK = "initializeSDK";
-    final static String METHOD_SET_LOG_LEVEL = "setLogLevel";
-    final static String METHOD_ENABLE_LOCATION_MANAGER = "setLocationManagerEnable";
-    final static String METHOD_SET_AUDIO_MANAGER = "setAudioApplicationManaged";
-    final static String METHOD_NOTICE_APPLICATION_AUDIO_DID_END = "noticeApplicationAudioDidEnd";
-    final static String METHOD_SET_CONSENT_STATUS = "setConsentStatus";
-    final static String METHOD_UPDATE_REQUEST_CONFIGURATION = "updateRequestConfiguration";
-    final static String METHOD_LOAD_INTERSTITIAL_AD = "loadInterstitialAd";
-    final static String METHOD_LOAD_BANNER_AD = "loadBannerAd";
-    final static String METHOD_LOAD_NATIVE_AD = "loadNativeAd";
-    final static String METHOD_DISPOSE_AD = "disposeAd";
-    final static String METHOD_SHOW_AD_WITHOUT_VIEW = "showAdWithoutView";
-
-    final static String CHANNEL_ARGUMENT_ADID = "adId";
-    final static String CHANNEL_ARGUMENT_LICENSE_KEY = "licenseKey";
-    final static String CHANNEL_ARGUMENT_AD_REQUEST = "request";
-    final static String CHANNEL_ARGUMENT_FACTORY_ID = "factoryId";
-    final static String CHANNEL_ARGUMENT_AD_SIZE = "size";
-    final static String CHANNEL_ARGUMENT_EVENT_NAME = "eventName";
-    final static String CHANNEL_ARGUMENT_ON_AD_EVENT = "onAdEvent";
-    final static String CHANNEL_ARGUMENT_LOAD_AD_ERROR = "loadAdError";
-    final static String CHANNEL_ARGUMENT_ERROR = "error";
-    final static String CHANNEL_ARGUMENT_ERROR_DESCRIPTION = "errorDescription";
-    final static String CHANNEL_ARGUMENT_ERROR_CODE = "errorCode";
+    const val CHANNEL_ARGUMENT_ADID: String = "adId"
+    const val CHANNEL_ARGUMENT_LICENSE_KEY: String = "licenseKey"
+    const val CHANNEL_ARGUMENT_AD_REQUEST: String = "request"
+    const val CHANNEL_ARGUMENT_FACTORY_ID: String = "factoryId"
+    const val CHANNEL_ARGUMENT_AD_SIZE: String = "size"
+    const val CHANNEL_ARGUMENT_EVENT_NAME: String = "eventName"
+    const val CHANNEL_ARGUMENT_ON_AD_EVENT: String = "onAdEvent"
+    const val CHANNEL_ARGUMENT_LOAD_AD_ERROR: String = "loadAdError"
+    const val CHANNEL_ARGUMENT_ERROR: String = "error"
+    const val CHANNEL_ARGUMENT_ERROR_DESCRIPTION: String = "errorDescription"
+    const val CHANNEL_ARGUMENT_ERROR_CODE: String = "errorCode"
 }

@@ -1,133 +1,51 @@
-package io.flutter.plugins.vponmobileads;
+package io.flutter.plugins.vponmobileads
 
-import androidx.annotation.Nullable;
+import com.vpon.ads.VponAdRequest
 
-import com.vpon.ads.VponAdRequest;
+internal class VponFlutterAdRequest private constructor(
+    private val keywords: List<String>?,
+    private val contentUrl: String?,
+    private val contentData: HashMap<String, Any>?
+) {
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-
-class VponFlutterAdRequest {
-    @Nullable
-    private final List<String> keywords;
-    @Nullable
-    private final String contentUrl;
-
-    @Nullable
-    private final HashMap<String, Object> contentData;
-
-    protected static class Builder {
-        @Nullable
-        private List<String> keywords;
-        @Nullable
-        private String contentUrl;
-        @Nullable
-        private HashMap<String, Object> contentData = new HashMap<>();
-
-        Builder setKeywords(@Nullable List<String> keywords) {
-            this.keywords = keywords;
-            return this;
-        }
-
-        Builder setContentUrl(@Nullable String contentUrl) {
-            this.contentUrl = contentUrl;
-            return this;
-        }
-
-        Builder setContentData(@Nullable HashMap<String, Object> contentData) {
-            this.contentData = contentData;
-            return this;
-        }
-
-        Builder addContentData(String key, Object value) {
-            if (this.contentData != null) {
-                this.contentData.put(key, value);
-            }
-            return this;
-        }
-
-        @Nullable
-        protected List<String> getKeywords() {
-            return keywords;
-        }
-
-        @Nullable
-        protected String getContentUrl() {
-            return contentUrl;
-        }
-
-        @Nullable
-        protected HashMap<String, Object> getContentData() {
-            return contentData;
-        }
-
-        VponFlutterAdRequest build() {
-            return new VponFlutterAdRequest(
-                    keywords,
-                    contentUrl,
-                    contentData);
-        }
+    fun getKeywords(): List<String>? {
+        return keywords
     }
 
-    protected VponFlutterAdRequest(
-            @Nullable List<String> keywords,
-            @Nullable String contentUrl,
-            @Nullable HashMap<String, Object> contentData) {
-        this.keywords = keywords;
-        this.contentUrl = contentUrl;
-        this.contentData = contentData;
+    fun getContentUrl(): String? {
+        return contentUrl
     }
 
-    VponAdRequest asVponAdRequest() {
-        VponAdRequest.Builder builder = new VponAdRequest.Builder();
-        if (contentData != null) {
-            builder.setContentData(contentData);
+    fun getContentData(): HashMap<String, Any>? {
+        return contentData
+    }
+
+    fun asVponAdRequest(): VponAdRequest {
+        val vponAdRequestBuilder = VponAdRequest.Builder()
+        contentData?.let { vponAdRequestBuilder.setContentData(it) }
+        contentUrl?.let { vponAdRequestBuilder.setContentUrl(it) }
+        keywords?.let { vponAdRequestBuilder.addKeywords(HashSet<String>(it)) }
+        return vponAdRequestBuilder.build()
+    }
+
+    internal class Builder {
+
+        var keywords: List<String>? = null
+            private set
+        var contentUrl: String? = null
+            private set
+        var contentData: HashMap<String, Any>? = HashMap()
+            private set
+
+        fun setKeywords(keywords: List<String>?) = apply { this.keywords = keywords }
+        fun setContentUrl(contentUrl: String?) = apply { this.contentUrl = contentUrl }
+        fun setContentData(contentData: HashMap<String, Any>?) =
+            apply { this.contentData = contentData }
+
+        fun addContentData(key: String, value: Any) = apply { this.contentData?.set(key, value) }
+
+        fun build(): VponFlutterAdRequest {
+            return VponFlutterAdRequest(keywords, contentUrl, contentData)
         }
-        if (contentUrl != null) {
-            builder.setContentUrl(contentUrl);
-        }
-        if (keywords != null) {
-            builder.addKeywords(new HashSet<>(keywords));
-        }
-        builder.setAutoRefresh(false);
-        return builder.build();
-    }
-
-    @Nullable
-    protected List<String> getKeywords() {
-        return keywords;
-    }
-
-    @Nullable
-    protected String getContentUrl() {
-        return contentUrl;
-    }
-
-    @Nullable
-    protected Map<String, Object> getContentData() {
-        return contentData;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        } else if (!(o instanceof VponFlutterAdRequest)) {
-            return false;
-        }
-
-        VponFlutterAdRequest request = (VponFlutterAdRequest) o;
-        return Objects.equals(keywords, request.keywords)
-                && Objects.equals(contentUrl, request.contentUrl)
-                && Objects.equals(contentData, request.contentData);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(
-                keywords, contentUrl, contentData);
     }
 }
