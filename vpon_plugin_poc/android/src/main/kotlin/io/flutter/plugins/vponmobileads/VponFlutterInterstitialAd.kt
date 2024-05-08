@@ -33,8 +33,11 @@ internal class VponFlutterInterstitialAd(
             )
             return
         }
-        vponInterstitialAd?.fullScreenContentCallback =
-            VponFlutterFullScreenContentCallback(adInstanceManager, adId)
+        vponInterstitialAd?.let {
+            it.fullScreenContentCallback = VponFlutterFullScreenContentCallback(adInstanceManager
+                , adId)
+            it.show()
+        }
     }
 
     override fun dispose() {

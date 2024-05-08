@@ -15,14 +15,10 @@ internal class VponAdInstanceManager(private val channelToDart: MethodChannel) {
     fun showAd(adId: Int) {
         Log.d(TAG, "showAd($adId) invoked!!")
         if (!ads.containsKey(adId)) {
-            Log.e(TAG, "BP-1")
             return
         }
-        Log.e(TAG, "BP-2")
         val ad = ads[adId] as VponFlutterOverlayAd?
-        Log.e(TAG, "ad is null ? "+(ad == null))
         ad?.show()
-        Log.e(TAG, "BP-3")
     }
 
     fun onAdLoaded(vponFlutterAd: VponFlutterAd) {
