@@ -12,18 +12,7 @@ interface VponFlutterAdLoadedListener {
 internal open class VponFlutterAdListener(
     protected val adId: Int,
     protected val vponAdInstanceManager: VponAdInstanceManager
-) : VponAdListener()
-
-internal class VponFlutterBannerAdListener(
-    adId: Int,
-    vponAdInstanceManager: VponAdInstanceManager,
-    vponFlutterAdLoadedListener: VponFlutterAdLoadedListener
-) : VponFlutterAdListener(adId, vponAdInstanceManager) {
-    private val adLoadedListenerWeakReference = WeakReference(vponFlutterAdLoadedListener)
-
-    override fun onAdLoaded() {
-        adLoadedListenerWeakReference.get()?.onAdLoaded()
-    }
+) : VponAdListener() {
     override fun onAdFailedToLoad(errorCode: Int) {
         var vponErrorCode : VponAdRequest.VponErrorCode = VponAdRequest.VponErrorCode.NO_FILL
         when (errorCode) {
@@ -36,10 +25,28 @@ internal class VponFlutterBannerAdListener(
     }
 }
 
+internal class VponFlutterBannerAdListener(
+    adId: Int,
+    vponAdInstanceManager: VponAdInstanceManager,
+    vponFlutterAdLoadedListener: VponFlutterAdLoadedListener
+) : VponFlutterAdListener(adId, vponAdInstanceManager) {
+    private val adLoadedListenerWeakReference = WeakReference(vponFlutterAdLoadedListener)
+
+    override fun onAdLoaded() {
+        adLoadedListenerWeakReference.get()?.onAdLoaded()
+    }
+}
+
 internal class VponFlutterNativeAdListener(
     adId: Int,
     vponAdInstanceManager: VponAdInstanceManager
-) : VponFlutterAdListener(adId, vponAdInstanceManager)
+) : VponFlutterAdListener(adId, vponAdInstanceManager){
+
+    override fun onAdLoaded() {
+        val vponFlutterAd = vponAdInstanceManager.adForId(adId)
+        vponFlutterAd?.let { vponAdInstanceManager.onAdLoaded(it) }
+    }
+}
 
 internal class VponFlutterNativeAdLoadedListener(flutterNativeAd: VponFlutterNativeAd) :
     VponNativeAd.OnNativeAdLoadedListener() {

@@ -1,7 +1,6 @@
 package io.flutter.plugins.vponmobileads
 
 import android.content.Context
-import android.content.SharedPreferences
 import android.util.Log
 import android.view.View
 import com.vpon.ads.VponAdRequest
@@ -107,10 +106,6 @@ class VponMobileAdsPlugin : FlutterPlugin, MethodCallHandler {
         val method = call.method
 
         when (method) {
-            "getPlatformVersion" -> {
-                // TODO remove after develop
-                result.success("Android ${android.os.Build.VERSION.RELEASE}")
-            }
 
             Constants.METHOD_SHOW_AD_WITHOUT_VIEW -> {
                 if (call.hasArgument(Constants.CHANNEL_ARGUMENT_ADID)) {
@@ -127,25 +122,8 @@ class VponMobileAdsPlugin : FlutterPlugin, MethodCallHandler {
             }
 
             Constants._init -> {
-                // cef23de9-9ed9-41dd-9cb2-e568c5053e4e
-                // TODO remove after develop
-                Log.e(TAG, "_init has been called!!")
-                context?.let {
-                    val sharedPreferences: SharedPreferences = it
-                        .getSharedPreferences(
-                            "_vpon_advertisingId",
-                            Context.MODE_PRIVATE
-                        )
-
-                    sharedPreferences.edit()
-                        .putString(
-                            "_vpon_advertisingId",
-                            "cef23de9-9ed9-41dd-9cb2-e568c5053e4e"
-                        ).apply()
-                    val _tmp = sharedPreferences.getString("_vpon_advertisingId", "XXXXX")
-                    Log.e(TAG, "_tmp : $_tmp")
-                }
-
+                adInstanceManager?.disposeAllAds()
+                result.success(null)
             }
 
             Constants.METHOD_GET_VERSION_STRING -> result.success(VponAdRequest.VERSION)
@@ -262,7 +240,12 @@ class VponMobileAdsPlugin : FlutterPlugin, MethodCallHandler {
                 }
             }
 
-            Constants.METHOD_INITIALIZE_SDK, Constants.METHOD_SET_LOG_LEVEL, Constants.METHOD_ENABLE_LOCATION_MANAGER, Constants.METHOD_SET_AUDIO_MANAGER, Constants.METHOD_NOTICE_APPLICATION_AUDIO_DID_END, Constants.METHOD_UPDATE_REQUEST_CONFIGURATION -> result.success(
+            Constants.METHOD_INITIALIZE_SDK -> {
+                VponMobileAds.initialize(context)
+                result.success(null)
+            }
+
+            Constants.METHOD_SET_LOG_LEVEL, Constants.METHOD_ENABLE_LOCATION_MANAGER, Constants.METHOD_SET_AUDIO_MANAGER, Constants.METHOD_NOTICE_APPLICATION_AUDIO_DID_END, Constants.METHOD_UPDATE_REQUEST_CONFIGURATION -> result.success(
                 null
             )
 

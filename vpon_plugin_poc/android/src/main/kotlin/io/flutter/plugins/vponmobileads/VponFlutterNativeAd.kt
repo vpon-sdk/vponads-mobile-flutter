@@ -51,12 +51,12 @@ internal class VponFlutterNativeAd(
             apply { this.flutterAdLoader = flutterAdLoader }
 
         fun build(): VponFlutterNativeAd {
-            require(adId == null) { "adId cannot be null." }
-            require(manager == null) { "VponAdInstanceManager cannot be null." }
-            require(licenseKey == null) { "licenseKey cannot be null." }
-            require(adFactory == null) { "NativeAdFactory cannot be null." }
-            require(request == null) { "VponFlutterAdRequest cannot be null." }
-            require(flutterAdLoader == null) { "VponFlutterAdLoader cannot be null." }
+            require(adId != null) { "adId cannot be null." }
+            require(manager != null) { "VponAdInstanceManager cannot be null." }
+            require(licenseKey != null) { "licenseKey cannot be null." }
+            require(adFactory != null) { "NativeAdFactory cannot be null." }
+            require(request != null) { "VponFlutterAdRequest cannot be null." }
+            require(flutterAdLoader != null) { "VponFlutterAdLoader cannot be null." }
             return VponFlutterNativeAd(
                 adId!!,
                 manager!!,
