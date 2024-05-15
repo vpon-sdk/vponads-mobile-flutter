@@ -37,10 +37,8 @@ class VponFlutterNativeAd: VponFlutterAd, FlutterPlatformView, VponNativeAdLoade
     // MARK: - FlutterPlatformView
     
     func view() -> UIView {
-        let test = UIView()
-        test.backgroundColor = .red
-        #warning("What to do if adView is nil?")
-        return adView ?? test
+        // If adView is nil, return empty view
+        return adView ?? UIView()
     }
     
     // MARK: - VponNativeAdLoaderDelegate
