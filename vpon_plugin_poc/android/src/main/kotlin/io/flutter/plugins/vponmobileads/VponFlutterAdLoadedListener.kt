@@ -1,6 +1,7 @@
 package io.flutter.plugins.vponmobileads
 
 import com.vpon.ads.VponAdListener
+import com.vpon.ads.VponAdRequest
 import com.vpon.ads.VponNativeAd
 import java.lang.ref.WeakReference
 
@@ -22,6 +23,16 @@ internal class VponFlutterBannerAdListener(
 
     override fun onAdLoaded() {
         adLoadedListenerWeakReference.get()?.onAdLoaded()
+    }
+    override fun onAdFailedToLoad(errorCode: Int) {
+        var vponErrorCode : VponAdRequest.VponErrorCode = VponAdRequest.VponErrorCode.NO_FILL
+        when (errorCode) {
+            0 -> vponErrorCode = VponAdRequest.VponErrorCode.INTERNAL_ERROR
+            1 -> vponErrorCode = VponAdRequest.VponErrorCode.INVALID_REQUEST
+            2 -> vponErrorCode = VponAdRequest.VponErrorCode.NETWORK_ERROR
+            3 -> vponErrorCode = VponAdRequest.VponErrorCode.NO_FILL
+        }
+        vponAdInstanceManager.onAdFailedToLoad(adId,vponErrorCode)
     }
 }
 

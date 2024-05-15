@@ -57,7 +57,7 @@ internal class VponFlutterInterstitialAd(
                     "/$vponErrorCode.errorDescription) invoked!!"
 
         )
-        adInstanceManager.onAdFailedToLoad(this, vponErrorCode)
+        adInstanceManager.onAdFailedToLoad(adId, vponErrorCode)
     }
 
     private class DelegatingInterstitialAdLoadCallback(

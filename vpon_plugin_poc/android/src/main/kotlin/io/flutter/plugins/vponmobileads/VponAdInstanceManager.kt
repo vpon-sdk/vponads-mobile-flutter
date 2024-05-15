@@ -33,7 +33,7 @@ internal class VponAdInstanceManager(private val channelToDart: MethodChannel) {
     }
 
     fun onAdFailedToLoad(
-        vponFlutterAd: VponFlutterAd,
+        adId: Int,
         vponErrorCode: VponAdRequest.VponErrorCode
     ) {
         Log.d(
@@ -41,7 +41,7 @@ internal class VponAdInstanceManager(private val channelToDart: MethodChannel) {
                     "onAdFailedToLoad($vponErrorCode.errorCode)"
         )
         val arguments: MutableMap<Any, Any> = HashMap()
-        arguments[Constants.CHANNEL_ARGUMENT_ADID] = vponFlutterAd.adId
+        arguments[Constants.CHANNEL_ARGUMENT_ADID] = adId
         val errors: MutableMap<Any, Any> = HashMap()
         errors[Constants.CHANNEL_ARGUMENT_ERROR_DESCRIPTION] =
             vponErrorCode.errorDescription!!

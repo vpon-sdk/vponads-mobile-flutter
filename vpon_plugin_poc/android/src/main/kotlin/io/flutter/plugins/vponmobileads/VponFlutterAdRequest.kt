@@ -22,6 +22,7 @@ internal class VponFlutterAdRequest private constructor(
 
     fun asVponAdRequest(): VponAdRequest {
         val vponAdRequestBuilder = VponAdRequest.Builder()
+        vponAdRequestBuilder.setAutoRefresh(false)
         contentData?.let { vponAdRequestBuilder.setContentData(it) }
         contentUrl?.let { vponAdRequestBuilder.setContentUrl(it) }
         keywords?.let { vponAdRequestBuilder.addKeywords(HashSet<String>(it)) }
