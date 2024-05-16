@@ -9,57 +9,35 @@ import 'ad_listeners.dart';
 import 'banner_ad.dart';
 import 'logger.dart';
 
-/// The base class for all ads.
-///
-/// A valid [licenseKey] is required.
 abstract class Ad {
-  /// Default constructor, used by subclasses.
+
   Ad({required this.licenseKey});
 
-  /// Identifies the source of [Ad]s for your application.
   final String licenseKey;
 
-  /// Frees the plugin resources associated with this ad.
   Future<void> dispose() {
     return instanceManager.disposeAd(this);
   }
 }
 
 abstract class AdWithView extends Ad {
-  /// Default constructor, used by subclasses.
+
   AdWithView({required String licenseKey, required this.listener})
       : super(licenseKey: licenseKey);
 
-  /// The [AdWithViewListener] for the ad.
   final AdWithViewListener listener;
 
-  /// Starts loading this ad.
-  ///
-  /// Loading callbacks are sent to this [Ad]'s [listener].
   Future<void> load();
 }
 
-/// An [Ad] that is overlaid on top of the UI.
 abstract class AdWithoutView extends Ad {
-  /// Default constructor used by subclasses.
   AdWithoutView({required String licenseKey}) : super(licenseKey: licenseKey);
 }
 
-/// Displays an [Ad] as a Flutter widget.
-///
-/// This widget takes ads inheriting from [AdWithView]
-/// (e.g. [BannerAd] and [NativeAd]) and allows them to be added to the Flutter
-/// widget tree.
-///
-/// Must call `load()` first before showing the widget. Otherwise, a
-/// [PlatformException] will be thrown.
 class AdWidget extends StatefulWidget {
-  /// Default constructor for [AdWidget].
-  ///
-  /// [ad] must be loaded before this is added to the widget tree.
+
   const AdWidget({Key? key, required this.ad}) : super(key: key);
 
-  /// Ad to be displayed as a widget.
   final AdWithView ad;
 
   @override

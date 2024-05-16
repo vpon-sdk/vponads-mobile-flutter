@@ -15,8 +15,6 @@ AdInstanceManager instanceManager = AdInstanceManager(
   'plugins.flutter.io/vpon',
 );
 
-/// Maintains access to loaded [Ad] instances and handles sending/receiving
-/// messages to platform code.
 class AdInstanceManager {
   AdInstanceManager(String channelName)
       : channel = MethodChannel(
@@ -67,7 +65,6 @@ class AdInstanceManager {
   int _nextAdId = 0;
   final _BiMap<int, Ad> _loadedAds = _BiMap<int, Ad>();
 
-  /// Invokes load and dispose calls.
   final MethodChannel channel;
 
   Future<void> initialize() async {
@@ -81,7 +78,6 @@ class AdInstanceManager {
         .invokeMethod('setLogLevel', <String, int>{'level': level});
   }
 
-  /// Set the [VponRequestConfiguration] to apply for future ad requests.
   Future<void> updateRequestConfiguration(
       VponRequestConfiguration requestConfiguration) {
     return channel.invokeMethod<void>(
@@ -338,21 +334,16 @@ class AdInstanceManager {
 
   /* ----------------------------- Load & Show Ad ----------------------------- */
 
-  /// Returns null if an invalid [adId] was passed in.
   Ad? adFor(int adId) => _loadedAds[adId];
 
-  /// Returns null if an invalid [Ad] was passed in.
   int? adIdFor(Ad ad) => _loadedAds.inverse[ad];
 
   final Set<int> _mountedWidgetAdIds = <int>{};
 
-  /// Returns true if the [adId] is already mounted in a [WidgetAd].
   bool isWidgetAdIdMounted(int adId) => _mountedWidgetAdIds.contains(adId);
 
-  /// Indicates that [adId] is mounted in widget tree.
   void mountWidgetAdId(int adId) => _mountedWidgetAdIds.add(adId);
 
-  /// Indicates that [adId] is unmounted from the widget tree.
   void unmountWidgetAdId(int adId) => _mountedWidgetAdIds.remove(adId);
 
   /// Starts loading the ad if not previously loaded.
@@ -394,9 +385,6 @@ class AdInstanceManager {
     );
   }
 
-  /// Starts loading the ad if not previously loaded.
-  ///
-  /// Loading also terminates if ad is already in the process of loading.
   Future<void> loadNativeAd(NativeAd ad) {
     if (adIdFor(ad) != null) {
       return Future<void>.value();
@@ -415,10 +403,6 @@ class AdInstanceManager {
     );
   }
 
-  /// Free the plugin resources associated with this ad.
-  ///
-  /// Disposing a banner ad that's been shown removes it from the screen.
-  /// Interstitial ads can't be programmatically removed from view.
   Future<void> disposeAd(Ad ad) {
     final int? adId = adIdFor(ad);
     final Ad? disposedAd = _loadedAds.remove(adId);
@@ -433,7 +417,6 @@ class AdInstanceManager {
     );
   }
 
-  /// Display an [AdWithoutView] that is overlaid on top of the application.
   Future<void> showAdWithoutView(AdWithoutView ad) {
     VponLogger.d('instanceManager call showAdWithoutView');
     assert(
@@ -452,7 +435,6 @@ class AdInstanceManager {
 
 @visibleForTesting
 class AdMessageCodec extends StandardMessageCodec {
-  // The type values below must be consistent for each platform.
   static const int _valueAdSize = 128;
   static const int _valueAdRequest = 129;
   static const int _valueRequestConfigurationParams = 148;
