@@ -97,9 +97,7 @@ class _AdWidgetState extends State<AdWidget> {
   Widget build(BuildContext context) {
     VponLogger.d('_AdWidgetState build triggered');
     AdWithView ad = widget.ad;
-    if (ad is BannerAd && ad.autoRefresh == true) {
-      VponLogger.d('Banner gets auto refreshed');
-    } else if (_adIdAlreadyMounted) {
+    if (_adIdAlreadyMounted) {
       throw FlutterError.fromParts(<DiagnosticsNode>[
         ErrorSummary('This AdWidget is already in the Widget tree'),
         ErrorHint(

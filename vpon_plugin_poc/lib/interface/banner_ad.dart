@@ -11,8 +11,7 @@ class BannerAd extends AdWithView {
     required String licenseKey,
     required this.listener,
     required this.request,
-    bool? autoRefresh,
-  }) : autoRefresh = autoRefresh ?? false, super(licenseKey: licenseKey, listener: listener);
+  }) : super(licenseKey: licenseKey, listener: listener);
 
   /// Targeting information used to fetch an [Ad].
   final VponAdRequest request;
@@ -29,11 +28,10 @@ class BannerAd extends AdWithView {
   /// assume the size of the first ad size until an ad is loaded.
   final BannerAdSize size;
 
-  bool autoRefresh = false;
 
   @override
   Future<void> load() async {
-    await instanceManager.loadBannerAd(this, autoRefresh: autoRefresh);
+    await instanceManager.loadBannerAd(this);
   }
 
   /// Returns the AdSize of the associated platform ad object.

@@ -358,7 +358,7 @@ class AdInstanceManager {
   /// Starts loading the ad if not previously loaded.
   ///
   /// Does nothing if we have already tried to load the ad.
-  Future<void> loadBannerAd(BannerAd ad, {required bool autoRefresh}) {
+  Future<void> loadBannerAd(BannerAd ad) {
     if (adIdFor(ad) != null) {
       return Future<void>.value();
     }
@@ -372,7 +372,6 @@ class AdInstanceManager {
         'licenseKey': ad.licenseKey,
         'request': ad.request,
         'size': ad.size,
-        'autoRefresh': autoRefresh,
       },
     );
   }

@@ -56,7 +56,6 @@ class _BannerExampleState extends State<BannerExample> {
         licenseKey: key,
         size: _adSize!,
         request: request,
-        autoRefresh: false,
         listener: BannerAdListener(
           onAdLoaded: (Ad ad) async {
             BannerAd bannerAd = (ad as BannerAd);
