@@ -346,9 +346,6 @@ class AdInstanceManager {
 
   void unmountWidgetAdId(int adId) => _mountedWidgetAdIds.remove(adId);
 
-  /// Starts loading the ad if not previously loaded.
-  ///
-  /// Does nothing if we have already tried to load the ad.
   Future<void> loadBannerAd(BannerAd ad) {
     if (adIdFor(ad) != null) {
       return Future<void>.value();
