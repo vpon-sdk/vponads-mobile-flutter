@@ -14,9 +14,6 @@ void main() {
   ));
 }
 
-const String testDeviceiOS =
-    '00000000-0000-0000-0000-000000000000'; // iOS simulator
-
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
@@ -25,22 +22,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  bool _isTestMode = true;
-
-  // Update test mode
-  set isTestMode(bool value) {
-    _isTestMode = value;
-
-    _saveTestMode(value);
-
-    if (value) {
-      VponAdSDK.instance.updateRequestConfiguration(
-          VponRequestConfiguration(testDeviceIds: [testDeviceiOS]));
-    } else {
-      VponAdSDK.instance.updateRequestConfiguration(
-          VponRequestConfiguration(testDeviceIds: []));
-    }
-  }
 
   static const interstitial = 'Interstitial';
   static const banner = 'Banner';
@@ -64,20 +45,6 @@ class _MyAppState extends State<MyApp> {
     VponAdAudioManager.instance.setIsAudioApplicationManaged(true);
     VponAdAudioManager.instance.noticeApplicationAudioDidEnd();
     VponUCB.instance.setConsentStatus(VponConsentStatus.personalized);
-
-    _loadTestMode();
-  }
-
-  Future<void> _saveTestMode(bool value) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('testMode', value);
-  }
-
-  void _loadTestMode() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      isTestMode = prefs.getBool('testMode') ?? false;
-    });
   }
 
   @override
@@ -87,19 +54,6 @@ class _MyAppState extends State<MyApp> {
         return Scaffold(
           appBar: AppBar(
             title: const Text('Vpon Plugin Example'),
-            actions: <Widget>[
-              const Text('Test Mode'),
-              Switch(
-                  value: _isTestMode,
-                  activeColor: Colors.green,
-                  thumbColor:
-                      const MaterialStatePropertyAll<Color>(Colors.white),
-                  onChanged: (bool value) {
-                    setState(() {
-                      isTestMode = value;
-                    });
-                  }),
-            ],
           ),
           body: Container(
             decoration: const BoxDecoration(
