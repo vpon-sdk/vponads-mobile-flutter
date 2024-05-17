@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:vpon_plugin_poc/vpon_ad_sdk.dart';
 import 'package:vpon_plugin_poc_example/context_extensions.dart';
@@ -23,19 +25,13 @@ class NativeExample extends StatefulWidget {
 class NativeExampleState extends State<NativeExample> {
   late BuildContext scaffoldContext;
   NativeAd? _nativeAd;
-  int? _format;
-
-  set format(int newFormat) {
-    _format = newFormat;
-    _loadNativeAd();
-  }
 
   bool _nativeAdIsLoaded = false;
-  String? _versionString;
 
   @override
   void initState() {
     super.initState();
+    _loadNativeAd();
   }
 
   /// Loads a native ad.
@@ -49,34 +45,30 @@ class NativeExampleState extends State<NativeExample> {
     request.addContentData(key: "testKey2", value: "testValue2");
     request.addKeyword('testKeyword');
 
-    if (_format != null) {
-      _nativeAd = NativeAd(
-        licenseKey: _format == 0
-            ? '8a80854b806fa8710180ff4abd7d1b56'
-            : '8a80854b79a9f2ce0179c098ae104b7d',
-        factoryId: 'VponNativeAdFactory',
-        listener: NativeAdListener(
-          onAdLoaded: (ad) {
-            context.showToast(context, 'onAdLoaded invoked');
-            setState(() {
-              _nativeAdIsLoaded = true;
-            });
-          },
-          onAdFailedToLoad: (ad, error) {
-            String description = error['errorDescription'];
-            int code = error['errorCode'];
+    _nativeAd = NativeAd(
+      licenseKey: Platform.isAndroid
+          ? '8a80854b6a90b5bc016ad81ca1336534'
+          : '8a80854b6a90b5bc016ad81ac68c6530',
+      factoryId: 'VponNativeAdFactory',
+      listener: NativeAdListener(
+        onAdLoaded: (ad) {
+          context.showToast(context, 'onAdLoaded invoked');
+          setState(() {
+            _nativeAdIsLoaded = true;
+          });
+        },
+        onAdFailedToLoad: (ad, error) {
+          String description = error['errorDescription'];
+          int code = error['errorCode'];
 
-            context.showToast(context, 'Error code: $code | $description');
-            ad.dispose();
-          },
-          onAdClicked: (ad) {},
-          onAdImpression: (ad) {},
-        ),
-        request: request,
-      )..load();
-    } else {
-      debugPrint('Format is null!');
-    }
+          context.showToast(context, 'Error code: $code | $description');
+          ad.dispose();
+        },
+        onAdClicked: (ad) {},
+        onAdImpression: (ad) {},
+      ),
+      request: request,
+    )..load();
   }
 
   @override
@@ -86,33 +78,6 @@ class NativeExampleState extends State<NativeExample> {
   }
 
 /* --------------------------------- Widget --------------------------------- */
-
-  Widget _getFormatSegmentedButtonWidget() {
-    return SegmentedButton<int?>(
-      style: SegmentedButton.styleFrom(
-        backgroundColor: Colors.black12,
-        foregroundColor: Colors.black,
-        selectedBackgroundColor: Colors.orange,
-        selectedForegroundColor: Colors.white,
-      ),
-      segments: const <ButtonSegment<int>>[
-        ButtonSegment<int>(
-            value: 0, label: Text('Display'), icon: Icon(Icons.ad_units)),
-        ButtonSegment<int>(
-            value: 1, label: Text('Video'), icon: Icon(Icons.ad_units)),
-      ],
-      selected: <int?>{_format},
-      onSelectionChanged: (Set<int?> newFormat) {
-        if (newFormat.isNotEmpty) {
-          setState(() {
-            format = newFormat.first!;
-          });
-        }
-      },
-      multiSelectionEnabled: false,
-      emptySelectionAllowed: true,
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -125,7 +90,7 @@ class NativeExampleState extends State<NativeExample> {
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: ListView.separated(
-              itemCount: 3,
+              itemCount: 2,
               separatorBuilder: (BuildContext context, int index) {
                 return Container(
                   height: 40,
@@ -134,13 +99,11 @@ class NativeExampleState extends State<NativeExample> {
               itemBuilder: (BuildContext context, int index) {
                 switch (index) {
                   case 0:
-                    return _getFormatSegmentedButtonWidget();
-                  case 1:
                     return const Text(
                       Constants.placeholderText,
                       style: TextStyle(fontSize: 14),
                     );
-                  case 2:
+                  case 1:
                     return (_nativeAdIsLoaded && _nativeAd != null)
                         ? Column(
                             children: [

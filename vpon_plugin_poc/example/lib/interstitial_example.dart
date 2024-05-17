@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:vpon_plugin_poc/vpon_ad_sdk.dart';
 import 'package:vpon_plugin_poc_example/constants.dart';
@@ -16,16 +18,11 @@ class _InterstitialExampleState extends State<InterstitialExample> {
   late BuildContext scaffoldContext;
 
   InterstitialAd? _interstitialAd;
-  int? _format;
-
-  set format(int newFormat) {
-    _format = newFormat;
-    _loadInterstitialAd();
-  }
 
   @override
   void initState() {
     super.initState();
+    _loadInterstitialAd();
   }
 
   void _loadInterstitialAd() {
@@ -35,46 +32,42 @@ class _InterstitialExampleState extends State<InterstitialExample> {
     request.addContentData(key: "testKey2", value: "testValue2");
     request.addKeyword('testKeyword');
 
-    if (_format != null) {
-      InterstitialAd.load(
-        licenseKey: _format == 0
-            ? '8a80854b79a9f2ce0179c09793ab4b79'
-            : '8a80854b79a9f2ce0179c097d26e4b7a',
-        request: request,
-        adLoadCallback: InterstitialAdLoadCallback(
-          onAdLoaded: (InterstitialAd ad) {
-            debugPrint('$ad loaded');
-            context.showToast(scaffoldContext, 'InterstitialAd onAdLoaded');
-            _interstitialAd = ad;
-            _showInterstitial();
-          },
-          onAdFailedToLoad: (Map error) {
-            String description = error['errorDescription'];
-            int code = error['errorCode'];
+    InterstitialAd.load(
+      licenseKey: Platform.isAndroid
+          ? '8a80854b75ab2b0101761cfb968d71c7'
+          : '8a80854b6a90b5bc016ad81a98cf652e',
+      request: request,
+      adLoadCallback: InterstitialAdLoadCallback(
+        onAdLoaded: (InterstitialAd ad) {
+          debugPrint('$ad loaded');
+          context.showToast(scaffoldContext, 'InterstitialAd onAdLoaded');
+          _interstitialAd = ad;
+          _showInterstitial();
+        },
+        onAdFailedToLoad: (Map error) {
+          String description = error['errorDescription'];
+          int code = error['errorCode'];
 
-            context.showToast(context, 'Error code: $code | $description');
-            _interstitialAd = null;
-          },
-          onAdImpression: (InterstitialAd ad) {
-            debugPrint('onAdImpression');
-          },
-          onAdClicked: (InterstitialAd ad) {
-            debugPrint('onAdClicked');
-          },
-          onAdWillDismissFullScreenContent: (InterstitialAd ad) {
-            debugPrint('onAdWillDismissFullScreenContent');
-          },
-          onAdDismissedFullScreenContent: (InterstitialAd ad) {
-            debugPrint('onAdDismissedFullScreenContent');
-          },
-          onAdWillShowFullScreenContent: (InterstitialAd ad) {
-            debugPrint('onAdWillShowFullScreenContent');
-          },
-        ),
-      );
-    } else {
-      context.showToast(scaffoldContext, 'Format is null!');
-    }
+          context.showToast(context, 'Error code: $code | $description');
+          _interstitialAd = null;
+        },
+        onAdImpression: (InterstitialAd ad) {
+          debugPrint('onAdImpression');
+        },
+        onAdClicked: (InterstitialAd ad) {
+          debugPrint('onAdClicked');
+        },
+        onAdWillDismissFullScreenContent: (InterstitialAd ad) {
+          debugPrint('onAdWillDismissFullScreenContent');
+        },
+        onAdDismissedFullScreenContent: (InterstitialAd ad) {
+          debugPrint('onAdDismissedFullScreenContent');
+        },
+        onAdWillShowFullScreenContent: (InterstitialAd ad) {
+          debugPrint('onAdWillShowFullScreenContent');
+        },
+      ),
+    );
   }
 
   void _showInterstitial() {
@@ -114,34 +107,6 @@ class _InterstitialExampleState extends State<InterstitialExample> {
 
 /* --------------------------------- Widget --------------------------------- */
 
-  Widget _getFormatSegmentedButtonWidget() {
-    return SegmentedButton<int?>(
-      style: SegmentedButton.styleFrom(
-        backgroundColor: Colors.black12,
-        foregroundColor: Colors.black,
-        selectedBackgroundColor: Colors.orange,
-        selectedForegroundColor: Colors.white,
-      ),
-      segments: const <ButtonSegment<int>>[
-        ButtonSegment<int>(
-            value: 0, label: Text('Display'), icon: Icon(Icons.ad_units)),
-        ButtonSegment<int>(
-            value: 1, label: Text('Video'), icon: Icon(Icons.ad_units)),
-      ],
-      selected: <int?>{_format},
-      onSelectionChanged: (Set<int?> newFormat) {
-        if (newFormat.isNotEmpty) {
-          setState(() {
-            format = newFormat.first!;
-            _format = null;
-          });
-        }
-      },
-      multiSelectionEnabled: false,
-      emptySelectionAllowed: true,
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     scaffoldContext = context;
@@ -153,16 +118,13 @@ class _InterstitialExampleState extends State<InterstitialExample> {
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: ListView.separated(
-              itemCount: 3,
+              itemCount: 1,
               separatorBuilder: (BuildContext context, int index) {
                 return Container(
                   height: 40,
                 );
               },
               itemBuilder: (BuildContext context, int index) {
-                if (index == 0) {
-                  return _getFormatSegmentedButtonWidget();
-                }
                 return const Text(
                   Constants.placeholderText,
                   style: TextStyle(fontSize: 14),
