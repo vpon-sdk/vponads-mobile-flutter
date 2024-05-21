@@ -2,6 +2,7 @@ package io.flutter.plugins.vponmobileads
 
 import android.view.View
 import com.vpon.ads.VponNativeAd
+import io.flutter.plugin.platform.PlatformView
 
 internal class VponFlutterNativeAd(
     adId: Int,
@@ -30,6 +31,13 @@ internal class VponFlutterNativeAd(
     fun onNativeAdLoaded(vponNativeAd: VponNativeAd?) {
         nativeAdView = adFactory.createNativeAd(vponNativeAd!!)
         manager.onAdLoaded(this)
+    }
+
+    override fun getPlatformView(): PlatformView? {
+        if (nativeAdView != null) {
+            return VponFlutterPlatformView(nativeAdView)
+        }
+        return null
     }
 
     internal class Builder {
