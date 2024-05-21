@@ -1,15 +1,14 @@
 # vpon_plugin_poc
 
-A new Flutter plugin project.
+A Flutter plugin for integrating Vpon SDK with ease.
 
 ## Getting Started
 
-This project is a starting point for a Flutter
-[plug-in package](https://flutter.dev/developing-packages/),
-a specialized package that includes platform-specific implementation code for
-Android and/or iOS.
+For detailed setup and configuration instructions, please refer to the [Vpon SDK Wiki](https://wiki.vpon.com/zh-tw)
 
 For help getting started with Flutter development, view the
 [online documentation](https://flutter.dev/docs), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
 
+## License
+This project is licensed under the Apache License, Version 2.0.  See the LICENSE file for more information.

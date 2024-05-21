@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 
 import 'ad_containers.dart';
-import 'insterstitial_ad.dart';
+import 'interstitial_ad.dart';
 
 /// The callback type to handle an event occurring for an [Ad].
 typedef AdEventCallback = void Function(Ad ad);
@@ -108,9 +108,7 @@ class InterstitialAdLoadCallback
   }
 }
 
-/// Shared event callbacks used in Native and Banner ads.
 abstract class AdWithViewListener {
-  /// Default constructor for [AdWithViewListener], meant to be used by subclasses.
   @protected
   const AdWithViewListener({
     this.onAdLoaded,
@@ -122,28 +120,18 @@ abstract class AdWithViewListener {
     this.onAdClicked,
   });
 
-  /// Called when an ad is successfully received.
   final AdEventCallback? onAdLoaded;
 
-  /// Called when an ad request failed.
   final AdLoadErrorCallback? onAdFailedToLoad;
 
-  /// A full screen view/overlay is presented in response to the user clicking
-  /// on an ad. You may want to pause animations and time sensitive
-  /// interactions.
   final AdEventCallback? onAdOpened;
 
-  /// For iOS only. Called before dismissing a full screen view.
   final AdEventCallback? onAdWillDismissScreen;
 
-  /// Called when the full screen view has been closed. You should restart
-  /// anything paused while handling onAdOpened.
   final AdEventCallback? onAdClosed;
 
-  /// Called when an impression occurs on the ad.
   final AdEventCallback? onAdImpression;
 
-  /// Called when the ad is clicked.
   final AdEventCallback? onAdClicked;
 }
 

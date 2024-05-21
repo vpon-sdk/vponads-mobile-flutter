@@ -19,8 +19,6 @@ class NativeAdFactory: VponFlutterNativeAdFactory {
         (adView.bodyView as! UILabel).text = nativeAd.body
         (adView.iconView as! UIImageView).image = nativeAd.icon?.image
         adView.mediaView?.mediaContent = nativeAd.mediaContent
-        NSLog("mediaContent: \(nativeAd.mediaContent)")
-        NSLog("mediaView: \(adView.mediaView)")
         (adView.callToActionView as! UIButton).setTitle(nativeAd.callToAction, for: .normal)
         adView.nativeAd = nativeAd
         

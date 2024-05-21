@@ -20,7 +20,7 @@ class VponAdSDK {
     return instanceManager.setLogLevel(level.value);
   }
 
-  /// Get Vpon Ad SDK version
+  /// 取得 Vpon Ad SDK 版本號
   Future<String?> getVersionString() async {
     return await instanceManager.getVersionString();
   }

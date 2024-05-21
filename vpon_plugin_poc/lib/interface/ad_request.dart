@@ -4,7 +4,7 @@ class VponAdRequest {
   Map<String, dynamic> extraData = {};
   Map<String, dynamic> contentData = {};
 
-  /// Add content data
+  /// 新增 content data
   void addContentData({required String key, required String value}) {
     contentData[key] = value;
   }
@@ -33,31 +33,21 @@ class VponAdRequest {
   void _addPublisherExtraData({required String key, required String value}) {
     extraData[key] = value;
   }
-
-  // @override
-  // bool operator ==(Object other) {
-  //   return other is AdRequest &&
-  //       contentUrl == other.contentUrl &&
-  //       listEquals<String>(keywords, other.keywords) &&
-  //       mapEquals<String, String>(contentData, other.contentData) &&
-  //       format == other.format;
-  // }
 }
 
 class VponRequestConfiguration {
-  /// Maximum content rating that will be shown.
+  /// 最高可投放的年齡(分類)限制
   final VponMaxAdContentRating? maxAdContentRating;
 
-  /// Whether to tag as child directed.
+  /// 是否專為兒童投放
   final VponTagForChildDirectedTreatment? tagForChildDirectedTreatment;
 
-  /// Whether to tag as under age of consent.
+  /// 是否專為特定年齡投放
   final VponTagForUnderAgeOfConsent? tagForUnderAgeOfConsent;
 
-  /// List of test device ids to set.
+  /// 測試用的裝置 IDFA，以取得 Vpon 測試廣告
   final List<String>? testDeviceIds;
 
-  /// Creates a [VponRequestConfiguration].
   VponRequestConfiguration(
       {this.maxAdContentRating,
       this.tagForChildDirectedTreatment,

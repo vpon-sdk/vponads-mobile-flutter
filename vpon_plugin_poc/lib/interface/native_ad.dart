@@ -13,14 +13,11 @@ class NativeAd extends AdWithView {
         assert(factoryId != null),
         super(licenseKey: licenseKey, listener: listener);
 
-  /// An identifier for the factory that creates the Platform view.
   final String? factoryId;
 
-  /// A listener for receiving events in the ad lifecycle.
   @override
   final NativeAdListener listener;
 
-  /// Targeting information used to fetch an [Ad].
   final VponAdRequest? request;
 
   @override
