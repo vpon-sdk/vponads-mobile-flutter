@@ -3,7 +3,7 @@ import UIKit
 import VpadnSDKAdKit
 import AdSupport
 
-public class VponPluginPocPlugin: NSObject, FlutterPlugin {
+public class VponMobileAdsPlugin: NSObject, FlutterPlugin {
     
     var channel: FlutterMethodChannel?
     var manager: VponAdInstanceManager
@@ -11,7 +11,7 @@ public class VponPluginPocPlugin: NSObject, FlutterPlugin {
     private var nativeAdFactories: [String: VponFlutterNativeAdFactory] = [:]
     
     public static func register(with registrar: FlutterPluginRegistrar) {
-        let plugin = VponPluginPocPlugin(binaryMessenger: registrar.messenger())
+        let plugin = VponMobileAdsPlugin(binaryMessenger: registrar.messenger())
         registrar.publish(plugin)
         
         let readerWriter = VponFlutterReaderWriter()
@@ -35,8 +35,8 @@ public class VponPluginPocPlugin: NSObject, FlutterPlugin {
     }
     
     public static func registerNativeAdFactory(registry: FlutterPluginRegistry, factoryId: String, nativeAdFactory: VponFlutterNativeAdFactory) -> Bool {
-        let pluginClassName = String(describing: VponPluginPocPlugin.self)
-        guard let vponPlugin = registry.valuePublished(byPlugin: pluginClassName) as? VponPluginPocPlugin else {
+        let pluginClassName = String(describing: VponMobileAdsPlugin.self)
+        guard let vponPlugin = registry.valuePublished(byPlugin: pluginClassName) as? VponMobileAdsPlugin else {
             let reason = String(format: "Could not find a \(pluginClassName) instance. The plugin may have not been registered.")
             NSException(name: .invalidArgumentException, reason: reason).raise()
             return false
