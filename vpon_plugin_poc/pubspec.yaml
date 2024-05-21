@@ -37,4 +37,4 @@ flutter:
         package: com.example.vpon_plugin_poc
         pluginClass: VponPluginPocPlugin
       ios:
-        pluginClass: VponPluginPocPlugin
+        pluginClass: VponMobileAdsPlugin

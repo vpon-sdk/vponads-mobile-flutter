@@ -7,7 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:vpon_plugin_poc/interface/logger.dart';
 import 'ad_containers.dart';
 import 'ad_request.dart';
-import 'insterstitial_ad.dart';
+import 'interstitial_ad.dart';
 import 'banner_ad.dart';
 import 'native_ad.dart';
 

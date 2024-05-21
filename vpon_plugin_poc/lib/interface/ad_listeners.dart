@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 
 import 'ad_containers.dart';
-import 'insterstitial_ad.dart';
+import 'interstitial_ad.dart';
 
 /// The callback type to handle an event occurring for an [Ad].
 typedef AdEventCallback = void Function(Ad ad);
