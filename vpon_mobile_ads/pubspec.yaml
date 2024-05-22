@@ -1,0 +1,30 @@
+name: vpon_mobile_ads
+description: "A new Flutter plugin project."
+version: 0.0.1
+homepage:
+# repository: https://github.com/imaNNeo/fl_chart
+# issue_tracker: https://github.com/imaNNeo/fl_chart/issues
+
+environment:
+  sdk: '>=3.2.3 <4.0.0'
+  flutter: '>=3.3.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  plugin_platform_interface: ^2.0.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+
+# The following section is specific to Flutter packages.
+flutter:
+  plugin:
+    platforms:
+      android:
+        package: io.flutter.plugins.vponmobileads
+        pluginClass: VponMobileAdsPlugin
+      ios:
+        pluginClass: VponMobileAdsPlugin
