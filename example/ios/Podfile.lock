@@ -1,0 +1,43 @@
+PODS:
+  - Flutter (1.0.0)
+  - integration_test (0.0.1):
+    - Flutter
+  - shared_preferences_foundation (0.0.1):
+    - Flutter
+    - FlutterMacOS
+  - VpadnSDK (5.6.1)
+  - vpon_mobile_ads (0.0.1):
+    - Flutter
+    - VpadnSDK (>= 5.6.1)
+
+DEPENDENCIES:
+  - Flutter (from `Flutter`)
+  - integration_test (from `.symlinks/plugins/integration_test/ios`)
+  - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
+  - VpadnSDK (= 5.6.1)
+  - vpon_mobile_ads (from `.symlinks/plugins/vpon_mobile_ads/ios`)
+
+SPEC REPOS:
+  trunk:
+    - VpadnSDK
+
+EXTERNAL SOURCES:
+  Flutter:
+    :path: Flutter
+  integration_test:
+    :path: ".symlinks/plugins/integration_test/ios"
+  shared_preferences_foundation:
+    :path: ".symlinks/plugins/shared_preferences_foundation/darwin"
+  vpon_mobile_ads:
+    :path: ".symlinks/plugins/vpon_mobile_ads/ios"
+
+SPEC CHECKSUMS:
+  Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
+  integration_test: ce0a3ffa1de96d1a89ca0ac26fca7ea18a749ef4
+  shared_preferences_foundation: fcdcbc04712aee1108ac7fda236f363274528f78
+  VpadnSDK: 94c4cb983217a49a9463de726c38bbad041dccd8
+  vpon_mobile_ads: 7ce332ec819f73ecdde88cefd3acfa8ebac41d09
+
+PODFILE CHECKSUM: 8ea4a92ec03b3c19b6e7d8134c2ed568f2f24200
+
+COCOAPODS: 1.15.2
