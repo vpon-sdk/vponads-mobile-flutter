@@ -6,7 +6,6 @@ import 'package:flutter/services.dart';
 
 import 'ad_instance_manager.dart';
 import 'ad_listeners.dart';
-import 'banner_ad.dart';
 import 'logger.dart';
 
 abstract class Ad {
@@ -74,7 +73,6 @@ class _AdWidgetState extends State<AdWidget> {
   @override
   Widget build(BuildContext context) {
     VponLogger.d('_AdWidgetState build triggered');
-    AdWithView ad = widget.ad;
     if (_adIdAlreadyMounted) {
       throw FlutterError.fromParts(<DiagnosticsNode>[
         ErrorSummary('This AdWidget is already in the Widget tree'),
