@@ -1,7 +1,7 @@
 name: vpon_mobile_ads
-description: "A new Flutter plugin project."
+description: Flutter plugin for integrating Vpon ad network with support for banner, interstitial and native ads.
 version: 0.0.1
-homepage:
+homepage: https://wiki.vpon.com
 repository: https://github.com/vpon-sdk/vponads-mobile-flutter
 issue_tracker: https://github.com/vpon-sdk/vponads-mobile-flutter/issues
 
